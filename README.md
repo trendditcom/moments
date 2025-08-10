@@ -1088,6 +1088,160 @@ catalogs:
 
 This architectural transformation ensures Moments provides enterprise-grade data reliability while maintaining the performance benefits of intelligent caching, creating a robust foundation for local-first AI business intelligence applications.
 
+### Testing Incremental Moments Generation System
+
+The latest update introduces intelligent incremental analysis that dramatically improves performance by processing only changed content instead of re-analyzing everything from scratch.
+
+#### 15. Incremental Analysis Features
+
+**What to Test:**
+- **Smart Content Detection**: System tracks content changes using MD5 hashing and only processes new/modified items
+- **Temporal Correlation Windows**: Advanced correlation analysis within configurable time windows (default 14 days)
+- **Intelligent UI**: "Smart Update" vs "Full Refresh" buttons with incremental stats display
+- **Cache Management**: Clear incremental cache to force full re-analysis when needed
+
+**How It Works:**
+1. **Change Detection**: System maintains content hashes to identify what has changed since last analysis
+2. **Incremental Processing**: Only processes new or modified content, preserving existing analysis
+3. **Correlation Updates**: Updates correlations within affected temporal windows
+4. **Smart Merging**: Combines existing moments with newly discovered ones
+
+**Testing Scenarios:**
+
+**Scenario 1: Initial Analysis (Baseline)**
+1. **Fresh Start**: Clear all data and start with clean catalogs
+2. **Run Full Analysis**: Click "Full Analysis" button to establish baseline
+3. **Note Performance**: Record analysis time and moment count (e.g., "18 moments in 45 seconds")
+4. **Observe Files**: Check that moments are saved to `moments/` folder
+5. **Check Incremental Stats**: Note "Tracked Content" count in status card
+
+**Scenario 2: No-Change Incremental Analysis**
+1. **Immediate Re-run**: Click "Smart Update" immediately after initial analysis
+2. **Expected Behavior**: Should complete very quickly with "No changes detected" message
+3. **Moment Preservation**: Verify same moment count and data
+4. **Performance**: Should complete in < 5 seconds (vs 45 seconds for full analysis)
+
+**Scenario 3: Content Change Detection**
+1. **Modify Content**: Edit a markdown file in `companies/` or `technologies/` folder
+2. **Add New Content**: Create a new markdown file with business-relevant information
+3. **Run Smart Update**: Click "Smart Update" button
+4. **Observe Processing**: Should process only changed files, not all content
+5. **Verify Results**: New moments appear while existing ones are preserved
+6. **Check Correlation**: Related moments should have updated impact scores
+
+**Scenario 4: Force Full Re-analysis**
+1. **Change Multiple Files**: Modify several content files significantly
+2. **Click "Full Refresh"**: Use force full analysis option
+3. **Compare Performance**: Should take longer but be more comprehensive than Smart Update
+4. **Verify Accuracy**: All moments should be re-analyzed with current content
+
+**Scenario 5: Incremental Cache Management**
+1. **View Stats**: Check incremental status card for tracked content count and last update
+2. **Clear Cache**: Click "Reset Cache" button to clear change detection
+3. **Next Analysis**: Verify next "Smart Update" becomes full analysis (no change history)
+4. **Re-establish Tracking**: Subsequent analyses should again be incremental
+
+**User Interface Elements to Evaluate:**
+
+**Incremental Analysis Buttons:**
+- **"Smart Update"**: Primary button for incremental analysis
+- **"Full Refresh"**: Secondary button for complete re-analysis  
+- **"Reset Cache"**: Small button to clear incremental cache
+
+**Incremental Status Card:**
+- **Blue background**: Indicates incremental analysis is active
+- **Tracked Content**: Number of files being monitored for changes
+- **Temporal Window**: Shows correlation window (14 days default)
+- **Last Update**: Timestamp of most recent analysis
+
+**Expected Performance Benefits:**
+
+**Time Comparison:**
+- **Full Analysis**: 30-60 seconds for typical dataset
+- **Smart Update (no changes)**: 2-5 seconds
+- **Smart Update (few changes)**: 5-15 seconds
+- **Reset Cache impact**: Next analysis becomes full (one-time cost)
+
+**Content Processing:**
+- **Full Analysis**: Processes 100% of content files
+- **Incremental**: Processes only changed files (often 0-20%)
+- **Correlation Updates**: Only affected temporal windows recalculated
+- **Memory Usage**: Lower memory footprint for large content collections
+
+**Advanced Features to Test:**
+
+**Correlation Intelligence:**
+1. **Temporal Windowing**: Related moments within 14-day windows get correlation updates
+2. **Impact Score Boosting**: Highly correlated moments (>60% similarity) get impact score increases
+3. **Similarity Calculation**: Based on entity overlap, factor alignment, and keyword matching
+4. **Detailed Reasoning**: Console logs show correlation strength and reasoning
+
+**Configuration Options:**
+```yaml
+# Test different temporal window sizes
+incremental:
+  temporal_window_days: 14  # Try 7, 14, 21, 30 days
+  correlation_threshold: 0.6  # Adjust similarity threshold
+  force_full_analysis: false  # Override incremental behavior
+```
+
+**Evaluation Criteria:**
+- ✅ Smart Update processes only changed content (significant time savings)
+- ✅ No-change analysis completes in < 5 seconds
+- ✅ Existing moments preserved during incremental analysis  
+- ✅ New moments properly integrated with existing correlation network
+- ✅ Temporal correlation windows update affected moments only
+- ✅ Impact scores adjust based on new correlations
+- ✅ Incremental stats display accurate tracking information
+- ✅ Cache reset forces full analysis on next run
+- ✅ User interface clearly distinguishes incremental vs full analysis options
+
+**Common Issues to Watch For:**
+
+**Performance Issues:**
+- Smart Update taking too long (should be < 15 seconds for typical changes)
+- Memory leaks during repeated incremental analysis
+- Excessive correlation calculations in temporal windows
+
+**Data Integrity Issues:**
+- Missing moments after incremental analysis
+- Duplicated moments appearing in results  
+- Correlation relationships lost during updates
+- Impact scores not updating based on new correlations
+
+**UI/UX Issues:**
+- Incremental status card not reflecting actual state
+- Button states confusing (when to use Smart Update vs Full Refresh)
+- Status messages unclear during incremental processing
+
+**Troubleshooting Guide:**
+
+**Issue: Smart Update Not Working**
+- Check browser console for change detection errors
+- Verify content files have actual changes (timestamps, content)
+- Try "Reset Cache" and run analysis again
+- Compare content hashes in localStorage for debugging
+
+**Issue: Poor Performance**
+- Check if temporal correlation window is too large
+- Verify not processing unchanged content (check console logs)  
+- Monitor memory usage during analysis
+- Consider clearing incremental cache for fresh start
+
+**Issue: Missing Correlations**
+- Ensure temporal window captures related moments timeframe
+- Check correlation threshold isn't too restrictive
+- Verify entity and factor overlap detection working
+- Test with "Full Refresh" to establish complete correlation baseline
+
+**Integration with File System:**
+- Incremental analysis respects file-system-first persistence
+- Content hashes track both file modifications and timestamps  
+- Changes to moment files trigger correlation recalculation
+- Manual file editing detected and processed incrementally
+
+This incremental analysis system transforms Moments from a static batch processor into an intelligent, efficient analysis platform that scales gracefully with large content collections while maintaining analysis quality and correlation accuracy.
+
 ## 🔧 Configuration
 
 ### Custom Content Sources

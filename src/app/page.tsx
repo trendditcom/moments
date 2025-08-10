@@ -60,13 +60,18 @@ export default function HomePage() {
     addAgent,
     updateAgent,
     setCurrentPrompt,
-    resetProgress
+    resetProgress,
+    // Incremental analysis methods
+    analyzeMomentsIncremental,
+    getIncrementalStats,
+    clearIncrementalCache
   } = useMomentsStore()
   
   const [viewState, setViewState] = useState<ViewState>({ type: 'catalog', tab: 'companies' })
 
   // Use hasData from initialization hook for more reliable state management
   const momentStats = getMomentStats()
+  const incrementalStats = getIncrementalStats()
   
   const handleRetryInitialization = () => {
     window.location.reload()
@@ -212,6 +217,39 @@ export default function HomePage() {
     } finally {
       setAnalyzing(false)
     }
+  }
+
+  // Handle incremental moment analysis
+  const handleAnalyzeIncremental = async () => {
+    if (!hasData) {
+      setAnalysisError('Please wait for catalogs to load first')
+      return
+    }
+
+    try {
+      await analyzeMomentsIncremental(companies, technologies, 'all', { forceFullAnalysis: false })
+    } catch (error) {
+      setAnalysisError(error instanceof Error ? error.message : 'Incremental analysis failed')
+    }
+  }
+
+  // Handle force full analysis  
+  const handleForceFullAnalysis = async () => {
+    if (!hasData) {
+      setAnalysisError('Please wait for catalogs to load first')
+      return
+    }
+
+    try {
+      await analyzeMomentsIncremental(companies, technologies, 'all', { forceFullAnalysis: true })
+    } catch (error) {
+      setAnalysisError(error instanceof Error ? error.message : 'Full analysis failed')
+    }
+  }
+
+  // Handle clear incremental cache
+  const handleClearIncrementalCache = () => {
+    clearIncrementalCache()
   }
 
   // Show loading screen during initialization
@@ -416,6 +454,10 @@ export default function HomePage() {
                         error={analysisError}
                         progress={analysisProgress}
                         onAnalyzeMoments={handleAnalyzeMoments}
+                        onAnalyzeIncremental={handleAnalyzeIncremental}
+                        onForceFullAnalysis={handleForceFullAnalysis}
+                        onClearIncrementalCache={handleClearIncrementalCache}
+                        incrementalStats={incrementalStats}
                         onMomentSelect={handleMomentSelect}
                         onEntityClick={handleEntityClick}
                       />

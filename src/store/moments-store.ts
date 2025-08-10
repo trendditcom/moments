@@ -18,6 +18,7 @@ import { SubAgentManager, createSubAgentManager } from '@/lib/sub-agents'
 import { createPersistStorage, createFileFirstStorage } from '@/lib/persistence'
 import { momentFileProcessor } from '@/lib/moment-file-processor'
 import { loadConfigClient } from '@/lib/config-loader.client'
+import { incrementalMomentManager } from '@/lib/incremental-moment-manager'
 
 interface MomentStore extends MomentState, MomentActions {
   // Additional helper methods
@@ -31,6 +32,19 @@ interface MomentStore extends MomentState, MomentActions {
     byConfidence: { high: number; medium: number; low: number }
     bySource: { company: number; technology: number }
   }
+  // Incremental analysis methods
+  analyzeMomentsIncremental: (
+    companies: Company[],
+    technologies: Technology[],
+    sourceType?: 'companies' | 'technologies' | 'all',
+    options?: { forceFullAnalysis?: boolean }
+  ) => Promise<void>
+  getIncrementalStats: () => {
+    trackedContent: number
+    lastUpdate: Date | null
+    temporalWindowDays: number
+  }
+  clearIncrementalCache: () => void
   // Debug helper
   debugStoreState: () => MomentState
 }
@@ -380,6 +394,149 @@ export const useMomentsStore = create<MomentStore>()(
           byConfidence,
           bySource
         }
+      },
+
+      // Incremental analysis methods
+      analyzeMomentsIncremental: async (companies, technologies, sourceType = 'all', options = {}) => {
+        const { 
+          setAnalyzing, 
+          setAnalysisError, 
+          updateProcessingStats, 
+          updateProgress,
+          addStep,
+          updateStep,
+          addAgent,
+          updateAgent,
+          setCurrentPrompt,
+          resetProgress
+        } = get()
+        
+        try {
+          setAnalyzing(true)
+          setAnalysisError(null)
+          resetProgress()
+
+          // Start progress tracking
+          set({
+            progress: {
+              isActive: true,
+              currentStep: null,
+              completedSteps: [],
+              activeAgents: [],
+              currentPrompt: undefined,
+              progressPercentage: 0,
+              estimatedTimeRemaining: undefined,
+              stats: {
+                totalItems: companies.length + technologies.length,
+                processedItems: 0,
+                momentsExtracted: 0,
+                errorsEncountered: 0
+              }
+            }
+          })
+
+          // Run incremental analysis with progress callbacks
+          const result = await incrementalMomentManager.analyzeIncrementally(
+            companies,
+            technologies,
+            sourceType,
+            {
+              forceFullAnalysis: options.forceFullAnalysis,
+              onProgress: (step) => {
+                addStep(step)
+                if (step.progress) {
+                  set((state) => ({
+                    progress: {
+                      ...state.progress,
+                      progressPercentage: step.progress!,
+                      currentStep: step
+                    }
+                  }))
+                }
+              },
+              onAgentActivity: (agent) => {
+                const existingAgentIndex = get().progress.activeAgents.findIndex(a => a.agentId === agent.agentId)
+                if (existingAgentIndex >= 0) {
+                  updateAgent(agent.agentId, agent)
+                } else {
+                  addAgent(agent)
+                }
+              },
+              onPrompt: (prompt) => {
+                setCurrentPrompt(prompt)
+              }
+            }
+          )
+
+          // Update processing stats
+          updateProcessingStats({
+            totalContent: result.totalProcessed,
+            processedContent: result.totalProcessed,
+            momentsFound: result.moments.length
+          })
+
+          // Replace moments with incremental results
+          set({ 
+            moments: result.moments,
+            lastAnalysisAt: new Date(),
+            progress: {
+              ...get().progress,
+              isActive: false,
+              progressPercentage: 100,
+              stats: {
+                ...get().progress.stats,
+                processedItems: result.totalProcessed,
+                momentsExtracted: result.moments.length,
+                errorsEncountered: result.errors.length
+              }
+            }
+          })
+
+          // Auto-save to files if enabled
+          try {
+            const config = await loadConfigClient()
+            if (config.catalogs.moments?.auto_save && result.moments.length > 0) {
+              console.log(`Auto-saving ${result.moments.length} moments to files...`)
+              const saveResult = await momentFileProcessor.saveMoments(result.moments)
+              console.log(`File save result: ${saveResult.saved} saved, ${saveResult.failed} failed`)
+            }
+          } catch (error) {
+            console.error('Error auto-saving moments:', error)
+          }
+
+          // Set analysis completion
+          if (result.errors.length > 0) {
+            setAnalysisError(`Incremental analysis completed with ${result.errors.length} errors`)
+          }
+
+          console.log(`[MomentsStore] Incremental analysis completed: ${result.moments.length} moments, ${result.errors.length} errors`)
+
+        } catch (error) {
+          console.error('[MomentsStore] Incremental analysis error:', error)
+          setAnalysisError(error instanceof Error ? error.message : 'Incremental analysis failed')
+          
+          set((state) => ({
+            progress: {
+              ...state.progress,
+              isActive: false,
+              stats: {
+                ...state.progress.stats,
+                errorsEncountered: state.progress.stats.errorsEncountered + 1
+              }
+            }
+          }))
+        } finally {
+          setAnalyzing(false)
+        }
+      },
+
+      getIncrementalStats: () => {
+        return incrementalMomentManager.getIncrementalStats()
+      },
+
+      clearIncrementalCache: () => {
+        incrementalMomentManager.clearContentHashes()
+        console.log('[MomentsStore] Incremental cache cleared - next analysis will be full')
       },
 
       // Debug helper to check store state

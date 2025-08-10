@@ -26,6 +26,14 @@ interface MomentsViewProps {
   error?: string | null
   progress?: AnalysisProgress
   onAnalyzeMoments?: () => void
+  onAnalyzeIncremental?: () => void
+  onForceFullAnalysis?: () => void
+  onClearIncrementalCache?: () => void
+  incrementalStats?: {
+    trackedContent: number
+    lastUpdate: Date | null
+    temporalWindowDays: number
+  }
   onMomentSelect?: (moment: PivotalMoment) => void
   onEntityClick?: (entity: string, type: 'company' | 'technology') => void
 }
@@ -39,6 +47,10 @@ export function MomentsView({
   error = null,
   progress,
   onAnalyzeMoments,
+  onAnalyzeIncremental,
+  onForceFullAnalysis,
+  onClearIncrementalCache,
+  incrementalStats,
   onMomentSelect,
   onEntityClick 
 }: MomentsViewProps) {
@@ -256,12 +268,20 @@ export function MomentsView({
             <p className="text-muted-foreground">
               Run moment analysis to discover pivotal business intelligence insights.
             </p>
-            {onAnalyzeMoments && (
-              <Button onClick={onAnalyzeMoments}>
-                <TrendingUp className="w-4 h-4 mr-2" />
-                Analyze Moments
-              </Button>
-            )}
+            <div className="flex flex-col gap-2">
+              {onAnalyzeIncremental && (
+                <Button onClick={onAnalyzeIncremental} className="w-full">
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  Analyze Moments (Incremental)
+                </Button>
+              )}
+              {onAnalyzeMoments && (
+                <Button onClick={onAnalyzeMoments} variant="outline" className="w-full">
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  Full Analysis
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -294,14 +314,58 @@ export function MomentsView({
             </Badge>
           </div>
           
-          {onAnalyzeMoments && (
-            <Button onClick={onAnalyzeMoments} variant="outline">
-              <TrendingUp className="w-4 h-4 mr-2" />
-              Refresh Analysis
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {onAnalyzeIncremental && (
+              <Button onClick={onAnalyzeIncremental} variant="default">
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Smart Update
+              </Button>
+            )}
+            {onForceFullAnalysis && (
+              <Button onClick={onForceFullAnalysis} variant="outline" size="sm">
+                Full Refresh
+              </Button>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Incremental Analysis Status */}
+      {incrementalStats && (
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="pt-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-medium text-blue-800">
+                    Incremental Analysis Active
+                  </span>
+                </div>
+                <div className="text-xs text-blue-600 space-x-4">
+                  <span>Tracking: {incrementalStats.trackedContent} items</span>
+                  <span>Window: {incrementalStats.temporalWindowDays} days</span>
+                  {incrementalStats.lastUpdate && (
+                    <span>
+                      Last update: {incrementalStats.lastUpdate.toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+              </div>
+              {onClearIncrementalCache && (
+                <Button 
+                  onClick={onClearIncrementalCache} 
+                  variant="outline" 
+                  size="sm"
+                  className="text-xs"
+                >
+                  Reset Cache
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Controls */}
       <div className="flex items-center justify-between gap-4">
