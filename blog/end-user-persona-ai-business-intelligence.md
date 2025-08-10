@@ -14,15 +14,15 @@ Traditional approaches fail:
 - **Social media chaos**: Important announcements buried in noise
 - **Analysis paralysis**: Too much data, too little insight
 
-**Moments** solves this by automatically discovering, analyzing, and connecting the dots across the entire AI ecosystem—delivering only what matters to your business.
+**Moments** solves this by automatically discovering, analyzing, and connecting the dots across the entire AI ecosystem using advanced AI agents and intelligent file-based persistence—delivering only what matters to your business in real-time.
 
 ## Your AI Business Intelligence Assistant
 
-### Automatic Signal Discovery
+### Automatic Signal Discovery & Smart Analysis
 
 ![Company Tracking](images/companies.png)
 
-Moments continuously monitors and analyzes content from:
+Moments automatically loads and continuously analyzes content from configured folders, using specialized AI sub-agents for intelligent processing:
 
 **AI Startups**: Track funding rounds, product launches, team changes, and strategic pivots across 100+ top AI companies
 - OpenAI's latest model releases and enterprise partnerships  
@@ -44,9 +44,19 @@ Moments continuously monitors and analyzes content from:
 - Hardware innovations in AI chips and infrastructure  
 - Open source developments reshaping competitive landscapes
 
-### Intelligent Moment Classification
+### Advanced AI-Powered Intelligence Pipeline
 
-Moments doesn't just collect information—it **understands** it. Our AI automatically classifies every development into clear categories:
+![Moment Analysis](images/moments.png)
+
+Moments doesn't just collect information—it **intelligently processes** it through a sophisticated multi-agent architecture:
+
+**Smart Update System**: Incremental analysis that processes only new or changed content, dramatically reducing processing time while maintaining comprehensive coverage.
+
+**Parallel Processing**: Multiple AI agents work simultaneously to analyze content, classify moments, and identify correlations—delivering results 3-4x faster than traditional sequential processing.
+
+**Real-Time Progress Tracking**: Watch as moments are discovered and classified in real-time, with live counts and detailed progress indicators.
+
+**Intelligent Moment Classification**: Our specialized AI agents automatically categorize every development into clear categories:
 
 **Company Developments**
 - Leadership transitions that signal strategic changes
@@ -124,26 +134,52 @@ The real power comes from **connecting the dots**. Moments automatically discove
 
 ## How Moments Works for You
 
-### Simple Setup, Powerful Results
+### Zero-Configuration Setup, Enterprise-Grade Results
 
-1. **Content Sources**: Point Moments to your industry research folders or let it use curated AI industry sources
-2. **Focus Areas**: Specify companies, technologies, and market segments you care about
-3. **Analysis Preferences**: Set impact thresholds and notification preferences
-4. **Automatic Intelligence**: Receive daily insights and alerts on high-impact developments
+**Automatic Content Discovery**: Moments automatically discovers and loads your content from configured folders—no manual setup required. Just launch the app and start exploring.
 
-### Intuitive Discovery Interface
+**Intelligent Analysis Options**:
+- **Smart Update**: Processes only new or changed content for lightning-fast updates
+- **Full Analysis**: Complete re-analysis when you need comprehensive coverage
+- **File-System Integration**: All moments are automatically saved as human-readable markdown files
 
-**Smart Filtering**: Find exactly what you need
-- Filter by company type: startups vs. enterprises
-- Sort by impact level: high-impact moments first  
-- Search by keywords: specific technologies or business areas
-- Time-range analysis: focus on recent developments or historical patterns
+**Local-First Architecture**: Your data stays on your machine. No cloud dependencies, no data sharing, complete privacy control.
 
-**Visual Intelligence**: Understand complex relationships at a glance
-- Moment timeline visualization showing development sequences
-- Factor classification badges indicating business impact areas
-- Confidence indicators showing analysis reliability
-- Correlation networks revealing hidden connections
+### Next-Generation Discovery Interface
+
+![Moment Details](images/moment-details.png)
+
+**Advanced Filtering & Search**: Find exactly what you need instantly
+- **Real-time search** across all moment content with live filtering
+- **Impact-based sorting**: High-impact moments surface first automatically
+- **Factor-based filtering**: Click any keyword or factor badge to filter instantly
+- **Entity navigation**: Click companies/technologies to explore detailed views
+
+**Comprehensive Moment Details**: Deep-dive into any pivotal moment
+- **Overview tab**: Factor classification, impact analysis, and entity relationships
+- **Related tab**: AI-powered correlation discovery with similarity scoring
+- **Source tab**: Original content and metadata for fact verification
+- **Timeline tab**: Temporal context and sequence analysis
+
+**Apple Settings-Style Interface**: Professional, intuitive user experience
+- **Sidebar navigation** with Storage Health, Current Data, and Storage Management
+- **Real-time status indicators** showing catalog health and file counts
+- **One-click operations** for backup, restore, and storage optimization
+
+### Enterprise Data Management
+
+![Storage Management](images/settings-storage-management.png)
+
+**Two-Way File Persistence**: Your moments live as readable markdown files
+- **Automatic saving**: Every analyzed moment is saved to your local filesystem
+- **Human-readable format**: Edit moments manually or integrate with other tools
+- **Version control ready**: Git-compatible markdown files with YAML frontmatter
+
+**Advanced Storage Management**:
+- **Create/Restore Backups**: Full data backup and restore capabilities
+- **File System Health**: Real-time monitoring of storage status and space usage
+- **Incremental Processing**: Only analyze changed content, preserving existing work
+- **Cache Management**: Intelligent caching with configurable persistence strategies
 
 ### Export and Integration
 

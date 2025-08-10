@@ -6,28 +6,38 @@
 
 ## The New Stack for AI-First Applications
 
-The AI development landscape has evolved beyond simple API integrations. Today's production AI applications require sophisticated **agent orchestration**, **local-first architectures**, and **verifiable AI workflows**. 
+The AI development landscape has evolved beyond simple API integrations. Today's production AI applications require sophisticated **agent orchestration**, **local-first architectures**, **intelligent persistence**, and **verifiable AI workflows**. 
 
-**Moments** showcases this evolution—a TypeScript application built entirely on the Claude Code SDK that transforms raw business content into classified intelligence through multi-agent processing pipelines.
+**Moments** showcases this evolution—a TypeScript application built on the Claude Code SDK with Next.js 14+ that transforms raw business content into classified intelligence through parallel multi-agent processing pipelines with file-system-first persistence.
 
 ## Architecture Deep Dive
 
-### Claude Code SDK as Application Foundation
+### Claude Code SDK with Advanced State Management
 
-Traditional AI integrations rely on stateless API calls. Claude Code SDK enables **stateful agent interactions** with conversation memory, tool access, and structured output parsing:
+Traditional AI integrations rely on stateless API calls and ephemeral storage. The Moments architecture demonstrates **stateful agent interactions** with persistent conversation memory, file-system integration, and sophisticated progress tracking:
 
 ```typescript
 // Traditional approach: Single API call
 const response = await anthropic.messages.create({...})
 
-// Claude Code SDK approach: Agent workflow
+// Moments architecture: Stateful agent workflow with persistence
 const momentExtractor = createMomentExtractor({
-  onProgress: (step) => updateUI(step),
-  onAgentActivity: (agent) => trackAgent(agent),
+  onProgress: (step) => {
+    updateUI(step)
+    // Real-time progress tracking with moment counting
+    const momentCount = extractMomentCount(step.details)
+    updateStats({ momentsExtracted: momentCount })
+  },
+  onAgentActivity: (agent) => trackParallelAgent(agent),
   onPrompt: (prompt) => logPrompt(prompt)
 })
 
-const result = await momentExtractor.analyzeCompanies(companies)
+// Intelligent incremental processing
+const result = await analyzeMomentsIncremental(companies, technologies, 'all', {
+  forceFullAnalysis: false, // Only process changed content
+  persistToFiles: true,     // Auto-save to filesystem
+  enableParallelProcessing: true // 3-4x faster processing
+})
 ```
 
 ### Multi-Agent Architecture Pattern
@@ -70,33 +80,145 @@ export class CorrelationEngine {
 }
 ```
 
-### Local-First with Global Intelligence
+### File-System-First Persistence Architecture
 
-The **hybrid local-first** pattern enables both privacy and AI capabilities:
+Moments implements a sophisticated **file-system-first** persistence layer that treats the filesystem as the source of truth while using localStorage as an intelligent cache:
 
-**Local Storage Layer**:
+**File-System Primary Storage**:
 ```typescript
-// Zustand store with persistence
+// Two-way file persistence for moments
+export class MomentFileProcessor {
+  async saveToFiles(moments: PivotalMoment[]): Promise<void> {
+    const files = await Promise.all(
+      moments.map(moment => this.convertToMarkdown(moment))
+    )
+    // Save as human-readable markdown with YAML frontmatter
+    return this.writeMomentFiles(files)
+  }
+  
+  async loadFromFiles(): Promise<PivotalMoment[]> {
+    const files = await this.readMomentFiles()
+    return Promise.all(
+      files.map(file => this.parseMarkdownToMoment(file))
+    )
+  }
+}
+
+// Intelligent caching with file-first priority
 export const useMomentsStore = create<MomentStore>()(
-  persist(
+  createFileFirstStorage(
     (set, get) => ({
       moments: [],
-      progress: { isActive: false, agents: [], completedSteps: [] },
-      analyzeMoments: async () => {
-        // Local processing with AI enhancement
+      // Automatically hydrates from filesystem first
+      hydrateFromFiles: async () => {
+        const processor = MomentFileProcessor.getInstance()
+        const moments = await processor.loadFromFiles()
+        set({ moments })
       }
     }),
-    { name: 'moments-store' }
+    'moments-store' // localStorage used only for performance cache
   )
 )
 ```
 
-**AI Agent Integration**:
+**Parallel AI Agent Integration with Real-Time Progress**:
 ```typescript
+// Enhanced callbacks for parallel processing
 const progressCallbacks = {
-  onProgress: (step: AnalysisStep) => addStep(step),
-  onAgentActivity: (agent: AgentActivity) => updateAgent(agent),
+  onProgress: (step: AnalysisStep) => {
+    addStep(step)
+    // Extract real-time moment counts during analysis
+    const momentCount = extractMomentCount(step.details)
+    updateProgress({ 
+      momentsExtracted: momentCount,
+      progressPercentage: step.progress || 0
+    })
+  },
+  onAgentActivity: (agent: AgentActivity) => {
+    // Track parallel agent execution
+    updateAgent(agent.agentId, agent)
+    logParallelActivity(agent)
+  },
   onPrompt: (prompt: string) => setCurrentPrompt(prompt)
+}
+
+// Incremental processing with change detection
+const incrementalManager = new IncrementalMomentManager({
+  temporalWindow: '14d', // 14-day correlation windows
+  contentHashing: 'md5', // Content change detection
+  forceFullAnalysis: false // Only process changed content
+})
+```
+
+## Parallel Processing & Performance Optimization
+
+### Multi-Source Concurrent Analysis
+
+Moments implements sophisticated parallel processing to analyze large content collections efficiently:
+
+```typescript
+// Parallel processing configuration
+const parallelConfig = {
+  maxConcurrentSources: 4,           // Companies + Technologies in parallel
+  maxConcurrentContentPerSource: 3,  // Individual files per source
+  enableSubAgentParallelization: true, // Batch processing for classification
+  subAgentBatchSize: 10              // Optimal batch size for AI agents
+}
+
+// Parallel source processing
+async function analyzeWithParallelProcessing(
+  companies: Company[], 
+  technologies: Technology[]
+): Promise<AnalysisResult> {
+  // Process companies and technologies simultaneously
+  const [companyResults, technologyResults] = await Promise.all([
+    processBatch(companies, parallelConfig.maxConcurrentSources),
+    processBatch(technologies, parallelConfig.maxConcurrentSources)
+  ])
+  
+  // Sub-agents process results in parallel batches
+  const classificationResults = await Promise.all([
+    classificationAgent.processBatch(companyResults, 10),
+    correlationEngine.processBatch(technologyResults, 10)
+  ])
+  
+  return combineResults(classificationResults)
+}
+```
+
+### Incremental Analysis with Change Detection
+
+```typescript
+export class IncrementalMomentManager {
+  private contentHashes = new Map<string, string>()
+  
+  async assessChanges(content: ContentItem[]): Promise<ChangeAssessment> {
+    const assessment = {
+      newContent: [],
+      modifiedContent: [],
+      unchangedContent: [],
+      affectedMoments: [],
+      impactedTimeWindows: []
+    }
+    
+    // MD5 hash-based change detection
+    for (const item of content) {
+      const currentHash = this.calculateHash(item)
+      const previousHash = this.contentHashes.get(item.path)
+      
+      if (!previousHash) {
+        assessment.newContent.push(item)
+      } else if (currentHash !== previousHash) {
+        assessment.modifiedContent.push(item)
+        // Identify affected existing moments
+        assessment.affectedMoments.push(...this.findAffectedMoments(item))
+      } else {
+        assessment.unchangedContent.push(item)
+      }
+    }
+    
+    return assessment
+  }
 }
 ```
 
