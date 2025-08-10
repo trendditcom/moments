@@ -20,6 +20,20 @@ export class MomentExtractor {
   private anthropic: Anthropic
   private config: ExtractorConfig
 
+  /**
+   * Creates a new MomentExtractor instance
+   * 
+   * @param config - Configuration for the extractor
+   * 
+   * @warning SECURITY ISSUE: This class currently runs Anthropic API calls in the browser
+   * with dangerouslyAllowBrowser: true, which exposes the API key to the client.
+   * 
+   * @todo PRODUCTION FIX: Move API calls to server-side API routes:
+   * - Create /api/moments/analyze endpoint
+   * - Move Anthropic SDK calls to server-side
+   * - Use fetch() from client to call server endpoints
+   * - Remove dangerouslyAllowBrowser and NEXT_PUBLIC_ prefix from API key
+   */
   constructor(config: ExtractorConfig = {}) {
     this.config = {
       model: 'claude-3-sonnet-20240229',
@@ -28,7 +42,8 @@ export class MomentExtractor {
     }
     
     this.anthropic = new Anthropic({
-      apiKey: config.apiKey || process.env.ANTHROPIC_API_KEY || '',
+      apiKey: config.apiKey || process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY || '',
+      dangerouslyAllowBrowser: true, // WARNING: This exposes API key in browser - only for development
     })
   }
 

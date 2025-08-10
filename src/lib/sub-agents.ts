@@ -14,9 +14,25 @@ export class SubAgentManager {
   private anthropic: Anthropic
   private configs: SubAgentConfigs
   
+  /**
+   * Creates a new SubAgentManager instance
+   * 
+   * @param apiKey - Optional API key override
+   * @param configs - Sub-agent configurations
+   * 
+   * @warning SECURITY ISSUE: This class currently runs Anthropic API calls in the browser
+   * with dangerouslyAllowBrowser: true, which exposes the API key to the client.
+   * 
+   * @todo PRODUCTION FIX: Move API calls to server-side API routes:
+   * - Create /api/sub-agents/* endpoints
+   * - Move Anthropic SDK calls to server-side
+   * - Use fetch() from client to call server endpoints
+   * - Remove dangerouslyAllowBrowser and NEXT_PUBLIC_ prefix from API key
+   */
   constructor(apiKey?: string, configs?: SubAgentConfigs) {
     this.anthropic = new Anthropic({
-      apiKey: apiKey || process.env.ANTHROPIC_API_KEY || '',
+      apiKey: apiKey || process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY || '',
+      dangerouslyAllowBrowser: true, // WARNING: This exposes API key in browser - only for development
     })
     
     // Default configurations - will be loaded from config.yml in practice

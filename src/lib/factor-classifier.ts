@@ -217,7 +217,7 @@ export class FactorClassifier {
     const detectedFactors: { factor: Factor; score: number; matchedKeywords: string[] }[] = []
 
     // Analyze each factor for keyword matches
-    for (const [factor, definition] of this.factorMap) {
+    for (const [factor, definition] of Array.from(this.factorMap)) {
       const matchedKeywords: string[] = []
       let score = 0
 
@@ -269,7 +269,7 @@ export class FactorClassifier {
       : 'No clear factor indicators found in content'
 
     // Collect all matched keywords
-    const allKeywords = [...new Set(detectedFactors.flatMap(d => d.matchedKeywords))]
+    const allKeywords = Array.from(new Set(detectedFactors.flatMap(d => d.matchedKeywords)))
 
     return {
       microFactors,
@@ -288,14 +288,14 @@ export class FactorClassifier {
     
     // Merge with existing classification, preferring detected factors
     const enhancedClassification: MomentClassification = {
-      microFactors: [...new Set([...moment.classification.microFactors, ...textAnalysis.microFactors])],
-      macroFactors: [...new Set([...moment.classification.macroFactors, ...textAnalysis.macroFactors])],
+      microFactors: Array.from(new Set([...moment.classification.microFactors, ...textAnalysis.microFactors])),
+      macroFactors: Array.from(new Set([...moment.classification.macroFactors, ...textAnalysis.macroFactors])),
       confidence: this.calculateCombinedConfidence(moment.classification.confidence, textAnalysis.confidence),
       reasoning: moment.classification.reasoning + 
         (textAnalysis.reasoning !== moment.classification.reasoning 
           ? ` Additional analysis: ${textAnalysis.reasoning}` 
           : ''),
-      keywords: [...new Set([...moment.classification.keywords, ...textAnalysis.keywords])]
+      keywords: Array.from(new Set([...moment.classification.keywords, ...textAnalysis.keywords]))
     }
 
     return enhancedClassification
