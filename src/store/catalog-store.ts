@@ -1,0 +1,101 @@
+'use client'
+
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+import { CatalogState, CatalogActions } from '@/types/catalog'
+import { processFolder } from '@/lib/content-processor'
+
+interface CatalogStore extends CatalogState, CatalogActions {}
+
+export const useCatalogStore = create<CatalogStore>()(
+  persist(
+    (set, get) => ({
+      // State
+      companies: [],
+      technologies: [],
+      folderSelection: {
+        companiesPath: null,
+        technologiesPath: null,
+        lastUpdated: null,
+      },
+      isLoading: false,
+      error: null,
+
+      // Actions
+      setFolderSelection: (selection) =>
+        set((state) => ({
+          folderSelection: {
+            ...state.folderSelection,
+            ...selection,
+            lastUpdated: new Date(),
+          },
+        })),
+
+      addCompanies: (companies) =>
+        set((state) => ({
+          companies: [...state.companies, ...companies],
+        })),
+
+      addTechnologies: (technologies) =>
+        set((state) => ({
+          technologies: [...state.technologies, ...technologies],
+        })),
+
+      setLoading: (loading) => set({ isLoading: loading }),
+
+      setError: (error) => set({ error }),
+
+      clearCatalogs: () =>
+        set({
+          companies: [],
+          technologies: [],
+          error: null,
+        }),
+
+      hydrateCatalogs: async (companiesPath, technologiesPath) => {
+        const { setLoading, setError, addCompanies, addTechnologies, setFolderSelection } = get()
+        
+        try {
+          setLoading(true)
+          setError(null)
+
+          // Update folder selection
+          if (companiesPath || technologiesPath) {
+            setFolderSelection({
+              ...(companiesPath && { companiesPath }),
+              ...(technologiesPath && { technologiesPath }),
+            })
+          }
+
+          const currentSelection = get().folderSelection
+
+          // Process companies folder
+          if (companiesPath || currentSelection.companiesPath) {
+            const path = companiesPath || currentSelection.companiesPath!
+            const companies = await processFolder(path, 'companies')
+            addCompanies(companies)
+          }
+
+          // Process technologies folder
+          if (technologiesPath || currentSelection.technologiesPath) {
+            const path = technologiesPath || currentSelection.technologiesPath!
+            const technologies = await processFolder(path, 'technologies')
+            addTechnologies(technologies)
+          }
+        } catch (error) {
+          setError(error instanceof Error ? error.message : 'Failed to process folders')
+        } finally {
+          setLoading(false)
+        }
+      },
+    }),
+    {
+      name: 'moments-catalog-store',
+      partialize: (state) => ({
+        folderSelection: state.folderSelection,
+        companies: state.companies,
+        technologies: state.technologies,
+      }),
+    }
+  )
+)
