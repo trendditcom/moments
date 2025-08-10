@@ -30,31 +30,46 @@ export class SubAgentManager {
    * - Remove dangerouslyAllowBrowser and NEXT_PUBLIC_ prefix from API key
    */
   constructor(apiKey?: string, configs?: SubAgentConfigs) {
+    const finalApiKey = apiKey || process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY || ''
+    console.log('SubAgentManager API Key check:', {
+      hasProvidedKey: !!apiKey,
+      hasEnvKey: !!process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY,
+      keyLength: finalApiKey.length,
+      keyPrefix: finalApiKey.substring(0, 15) + '...',
+    })
+    
+    if (!finalApiKey) {
+      throw new Error('ANTHROPIC_API_KEY is required. Please set NEXT_PUBLIC_ANTHROPIC_API_KEY in your .env.local file')
+    }
+    
     this.anthropic = new Anthropic({
-      apiKey: apiKey || process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY || '',
+      apiKey: finalApiKey,
       dangerouslyAllowBrowser: true, // WARNING: This exposes API key in browser - only for development
+      defaultHeaders: {
+        "anthropic-dangerous-direct-browser-access": "true"
+      }
     })
     
     // Default configurations - will be loaded from config.yml in practice
     this.configs = configs || {
       content_analyzer: {
         enabled: true,
-        model: 'claude-3-sonnet-20240229',
+        model: 'claude-sonnet-4-20250514',
         temperature: 0.3
       },
       classification_agent: {
         enabled: true,
-        model: 'claude-3-sonnet-20240229',
+        model: 'claude-sonnet-4-20250514',
         temperature: 0.2
       },
       correlation_engine: {
         enabled: true,
-        model: 'claude-3-sonnet-20240229',
+        model: 'claude-sonnet-4-20250514',
         temperature: 0.4
       },
       report_generator: {
         enabled: true,
-        model: 'claude-3-sonnet-20240229',
+        model: 'claude-sonnet-4-20250514',
         temperature: 0.5
       }
     }

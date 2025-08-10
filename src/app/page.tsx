@@ -67,7 +67,9 @@ export default function HomePage() {
               AI Business Intelligence Dashboard
             </p>
           </div>
-          <FolderSelection />
+          <div className="flex items-center gap-4">
+            <FolderSelection />
+          </div>
         </div>
       </header>
 

@@ -36,14 +36,33 @@ export class MomentExtractor {
    */
   constructor(config: ExtractorConfig = {}) {
     this.config = {
-      model: 'claude-3-sonnet-20240229',
+      model: 'claude-sonnet-4-20250514',
       temperature: 0.3,
       ...config
     }
     
+    const apiKey = config.apiKey || process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY || ''
+    console.log('MomentExtractor API Key check:', {
+      hasConfigKey: !!config.apiKey,
+      hasEnvKey: !!process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY,
+      keyLength: apiKey.length,
+      keyPrefix: apiKey.substring(0, 15) + '...',
+    })
+    
+    if (!apiKey) {
+      throw new Error('ANTHROPIC_API_KEY is required. Please set NEXT_PUBLIC_ANTHROPIC_API_KEY in your .env.local file')
+    }
+    
+    if (!apiKey.startsWith('sk-ant-api')) {
+      throw new Error('Invalid API key format. Anthropic API keys should start with "sk-ant-api03-" or "sk-ant-api04-"')
+    }
+    
     this.anthropic = new Anthropic({
-      apiKey: config.apiKey || process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY || '',
+      apiKey,
       dangerouslyAllowBrowser: true, // WARNING: This exposes API key in browser - only for development
+      defaultHeaders: {
+        "anthropic-dangerous-direct-browser-access": "true"
+      }
     })
   }
 
