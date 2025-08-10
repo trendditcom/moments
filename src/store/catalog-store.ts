@@ -95,12 +95,21 @@ export const useCatalogStore = create<CatalogStore>()(
     }),
     {
       name: 'moments-catalog-store',
+      version: 1,
       storage: createJSONStorage(() => createPersistStorage('moments-catalog-store')),
       partialize: (state) => ({
         folderSelection: state.folderSelection,
         companies: state.companies,
         technologies: state.technologies,
       }),
+      migrate: (persistedState: any, version: number) => {
+        console.log(`[CatalogStore] Migrating from version ${version} to 1`)
+        if (version === 0) {
+          // Version 0 to 1: no structural changes needed, just version bump
+          return persistedState
+        }
+        return persistedState
+      },
       onRehydrateStorage: () => (state) => {
         console.log('[CatalogStore] Rehydration complete', {
           companies: state?.companies?.length || 0,

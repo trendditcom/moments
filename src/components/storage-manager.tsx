@@ -250,7 +250,7 @@ export function StorageManager() {
             )}
           </CardTitle>
           <CardDescription>
-            Monitor your browser's local storage capacity and health. All data is stored locally on your device.
+            Monitor your browser&apos;s local storage capacity and health. All data is stored locally on your device.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

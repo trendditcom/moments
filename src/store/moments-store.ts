@@ -293,12 +293,21 @@ export const useMomentsStore = create<MomentStore>()(
     }),
     {
       name: 'moments-store',
+      version: 1,
       storage: createJSONStorage(() => createPersistStorage('moments-store')),
       partialize: (state) => ({
         moments: state.moments,
         correlations: state.correlations,
         lastAnalysisAt: state.lastAnalysisAt,
       }),
+      migrate: (persistedState: any, version: number) => {
+        console.log(`[MomentsStore] Migrating from version ${version} to 1`)
+        if (version === 0) {
+          // Version 0 to 1: no structural changes needed, just version bump
+          return persistedState
+        }
+        return persistedState
+      },
       onRehydrateStorage: () => (state) => {
         console.log('[MomentsStore] Rehydration complete', {
           moments: state?.moments?.length || 0,

@@ -22,6 +22,12 @@ Moments creates signal from noise by classifying and correlating these pivotal m
 
 **IMPORTANT**: Refer to `specs/tagging-correlation.md` when implementing content classification and moment correlation features. This specification provides the operational framework for detecting, classifying, correlating, and ranking pivotal moments through preprocessing, entity extraction, rule-based and ML classification, and correlation algorithms.
 
+## Backlog Management
+
+Project features and requirements are defined in the `backlog/` folder. Development should follow the backlog items in sequence to ensure systematic progress toward the project goals.
+
+**IMPORTANT:** If you receive a user prompt or instruction that leads to code generation/changes and this instruction is not present in the backlog/ folder, after completing the code change, update the latest backlog file with a new item describing the instruction and change, marking it as complete
+
 ## Project Structure
 
 - `src/` - Source code for the Moments application
@@ -268,12 +274,6 @@ with claude_session() as session:
 - Integration tests for Claude Code SDK interactions
 - End-to-end tests for complete workflow from content discovery to analysis
 - Performance tests for large-scale AI startup data processing
-
-## Backlog Management
-
-**IMPORTANT:** If user pastes an instruction in Claude Code that leads to code generation/changes and this instruction is not present in the backlog/ folder, after completing the code change, update the latest backlog file with a new item describing the instruction and change, marking it as complete
-
-Project features and requirements are defined in the `backlog/` folder. Development should follow the backlog items in sequence to ensure systematic progress toward the project goals.
 
 ### Key Principle for Moments Development
 Claude performs best when it has a clear target to iterate against—visual mockups for UI components, test cases for AI analysis features, or specific output examples for moment classification results.

@@ -24,9 +24,9 @@ export const createPersistStorage = (name: string): StateStorage => {
         
         // Check version and handle migrations
         if (parsed.version !== STORAGE_VERSION) {
-          console.log(`[Persistence] Version mismatch for ${key}. Expected ${STORAGE_VERSION}, got ${parsed.version}`)
-          // In the future, we could handle migrations here
-          // For now, we'll use the data as-is if it's compatible
+          console.log(`[Persistence] Version mismatch for ${key}. Expected ${STORAGE_VERSION}, got ${parsed.version || 0}`)
+          // Let Zustand handle migration via its migrate function
+          // We'll pass through the data and let the store decide
         }
         
         console.log(`[Persistence] Loaded ${key} with ${Object.keys(parsed.state || {}).length} state keys`)
@@ -138,9 +138,14 @@ export const checkStorageHealth = () => {
 export const migrateStorage = (oldVersion: number, newVersion: number, data: any): any => {
   console.log(`[Persistence] Migrating from version ${oldVersion} to ${newVersion}`)
   
-  // Example migration logic (to be implemented as needed)
+  // Migration from v0 to v1: no structural changes needed
+  if (oldVersion === 0 && newVersion === 1) {
+    console.log('[Persistence] Migrating v0 to v1: version bump only')
+    return data
+  }
+  
+  // Future migrations would go here
   if (oldVersion < 1 && newVersion >= 1) {
-    // Migration from v0 to v1
     // Add any necessary transformations here
   }
   
