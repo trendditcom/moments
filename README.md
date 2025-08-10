@@ -32,6 +32,14 @@ The Moments application is currently in early development. The following feature
 - **SDK Implementation Patterns**: Multi-turn conversations, session management, and sub-agent orchestration for complex AI analysis workflows
 - **Production-Ready Development**: Enhanced Environment Setup and Advanced Development Patterns for responsible AI-driven development
 
+### ✅ Architecture & Technology Stack Specification (Backlog Item #5)
+- **System Architecture**: 4-layer design with Presentation Layer (React/Next.js), Agent Orchestration Layer (Claude Code SDK), Data Processing Layer, and Storage & Integration Layer
+- **Technology Stack**: Comprehensive stack covering Frontend (Next.js 14+, React 18+, TypeScript 5+, Tailwind CSS, shadcn/ui), Backend (Claude Code SDK, tRPC, Prisma, SQLite), AI Technologies (specialized sub-agents), and Development Tools
+- **Sub-Agent Specifications**: Detailed TypeScript interfaces for Content Analyzer, Classification Agent, Correlation Engine, and Report Generator
+- **Data Models**: SQLite schema for moments, companies, and correlations with full-text search capabilities
+- **Security & Performance**: Local-first optimization, memory management, and data privacy strategies
+- **Integration Patterns**: MCP server configurations and Claude Code SDK multi-turn conversation examples
+
 ## User Evaluation Guide
 
 ### What You Can Evaluate Now
@@ -74,26 +82,39 @@ The Moments application is currently in early development. The following feature
   - **Advanced Development Patterns** enhanced with headless automation, vibe coding workflows, session management, and sub-agent orchestration
   - **SDK Implementation Patterns** documented with multi-turn conversation examples and error handling strategies
 
-#### 5. Development Process Evaluation
+#### 5. Architecture & Technology Stack Specification Implementation
+- **Location**: `specs/stack.md` and `CLAUDE.md` (IMPORTANT reference)
+- **What to Check**:
+  - **Architecture Overview** clearly defines local-first, agent-driven design with Claude Code SDK integration
+  - **4-Layer System Architecture** properly documented with ASCII diagrams for Presentation, Agent Orchestration, Data Processing, and Storage layers
+  - **Technology Stack** comprehensively covers Frontend (Next.js 14+, React 18+, TypeScript 5+, Tailwind CSS, shadcn/ui), Backend (Claude Code SDK, tRPC, Prisma, SQLite), and AI Technologies
+  - **Sub-Agent Specifications** include detailed TypeScript interfaces for Content Analyzer, Classification Agent, Correlation Engine, and Report Generator with clear purpose and tool definitions
+  - **Data Models** provide complete SQLite schema with CREATE TABLE statements for moments, companies, and correlations
+  - **Performance & Security** sections address local-first optimization, memory management, encrypted storage, and data privacy
+  - **Integration Patterns** include MCP server configurations and Claude Code SDK multi-turn conversation code examples
+  - **CLAUDE.md Reference** contains IMPORTANT prefix directing developers to specs/stack.md for architecture decisions
+
+#### 6. Development Process Evaluation
 - **Location**: `backlog/001-backlog.md`
 - **What to Check**:
-  - Backlog items #1, #2, #3, and #4 are marked as complete [x]
+  - Backlog items #1, #2, #3, #4, and #5 are marked as complete [x]
   - Completion summaries are detailed and accurate for all completed items
   - Remaining backlog items are clearly defined
-  - Item #4 completion summary covers headless automation, vibe coding, and agent development practices
+  - Item #5 completion summary covers system architecture, technology stack, sub-agent specifications, data models, security strategies, and integration patterns
 
-#### 6. Project Structure Validation
+#### 7. Project Structure Validation
 - **What to Check**:
   - `companies/` and `technologies/` content folders exist
   - `backlog/` folder contains development roadmap
+  - `specs/` folder contains stack.md architecture specification
   - Project follows Claude Code SDK integration patterns
 
 ### Next Development Phase
 
 The next backlog items to be implemented include:
-1. Architecture and technology stack specification (Backlog Item #5)
-2. User interface design specification (Backlog Item #6)
-3. Minimal Moments app scaffolding with IDE-like interface (Backlog Item #7)
+1. User interface design specification (Backlog Item #6)
+2. Minimal Moments app scaffolding with IDE-like interface (Backlog Item #7)
+3. Additional features as defined in the backlog
 
 ### How to Test
 

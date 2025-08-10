@@ -10,6 +10,8 @@ Moments creates signal from noise by classifying and correlating these pivotal m
 - **Micro factors**: company, competition, partners, customers
 - **Macro factors**: economic, geo-political, regulation, technology, environment, supply chain
 
+**IMPORTANT**: Refer to `specs/stack.md` when building Moments app architecture and technology stack. This specification provides comprehensive architecture overview, technology stack details, sub-agent configurations, data models, and integration patterns following modern AI-first design principles.
+
 ## Project Structure
 
 - `src/` - Source code for the Moments application
