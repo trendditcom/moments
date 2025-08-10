@@ -319,6 +319,48 @@ export const useMomentsStore = create<MomentStore>()(
   )
 )
 
+// Helper function to analyze items with progress tracking
+async function analyzeWithProgressTracking(
+  extractor: any,
+  type: 'companies' | 'technologies',
+  items: (Company | Technology)[],
+  onMomentsFound: (moments: PivotalMoment[]) => void
+): Promise<MomentAnalysisResult> {
+  const allMoments: PivotalMoment[] = []
+  const allErrors: string[] = []
+  let totalProcessed = 0
+  const startTime = Date.now()
+
+  for (const item of items) {
+    try {
+      const result = await extractor.analyzeContent(
+        item.content,
+        type === 'companies' ? 'company' : 'technology',
+        item.name
+      )
+      
+      // Report progress with newly found moments
+      if (result.moments.length > 0) {
+        onMomentsFound(result.moments)
+      }
+      
+      allMoments.push(...result.moments)
+      allErrors.push(...result.errors)
+      totalProcessed += result.totalProcessed
+    } catch (error) {
+      const errorMessage = `Failed to analyze ${type.slice(0, -1)} ${item.name}: ${error instanceof Error ? error.message : 'Unknown error'}`
+      allErrors.push(errorMessage)
+    }
+  }
+
+  return {
+    moments: allMoments,
+    totalProcessed,
+    processingTime: Date.now() - startTime,
+    errors: allErrors
+  }
+}
+
 // Standalone function to analyze moments from catalog data
 export async function analyzeMomentsFromCatalog(
   companies: Company[], 
@@ -334,8 +376,30 @@ export async function analyzeMomentsFromCatalog(
   console.log('Companies:', companies.length, 'Technologies:', technologies.length)
   console.log('Source type:', sourceType)
   
+  // Track running totals for real-time progress
+  let runningMomentCount = 0
+  let processedCount = 0
+  const totalItems = (sourceType === 'companies' ? companies.length : 0) + 
+                    (sourceType === 'technologies' ? technologies.length : 0) + 
+                    (sourceType === 'all' ? companies.length + technologies.length : 0)
+  
+  // Enhanced progress callback that tracks moment count
+  const enhancedOnProgress = (step: AnalysisStep, momentCount?: number) => {
+    if (momentCount !== undefined) {
+      runningMomentCount = momentCount
+    }
+    
+    // Update progress with current moment count
+    const enhancedStep: AnalysisStep = {
+      ...step,
+      details: step.details || `Found ${runningMomentCount} moments so far`
+    }
+    
+    progressCallbacks?.onProgress?.(enhancedStep)
+  }
+  
   const extractor = createMomentExtractor({
-    onProgress: progressCallbacks?.onProgress,
+    onProgress: enhancedOnProgress,
     onAgentActivity: progressCallbacks?.onAgentActivity,
     onPrompt: progressCallbacks?.onPrompt
   })
@@ -349,7 +413,27 @@ export async function analyzeMomentsFromCatalog(
     if (sourceType === 'companies' || sourceType === 'all') {
       if (companies.length > 0) {
         console.log('Analyzing companies:', companies.map(c => c.name))
-        companiesResult = await extractor.analyzeCompanies(companies)
+        
+        // Create enhanced analyzer that reports moment counts
+        const enhancedCompaniesResult = await analyzeWithProgressTracking(
+          extractor, 
+          'companies', 
+          companies, 
+          (newMoments) => {
+            runningMomentCount += newMoments.length
+            processedCount++
+            enhancedOnProgress({
+              id: `companies-progress`,
+              type: 'content_analysis',
+              status: 'running',
+              startTime: new Date(),
+              description: `Analyzing companies (${processedCount}/${companies.length})`,
+              details: `Found ${runningMomentCount} moments so far`,
+              progress: Math.round((processedCount / totalItems) * 100)
+            }, runningMomentCount)
+          }
+        )
+        companiesResult = enhancedCompaniesResult
         console.log('Companies analysis result:', companiesResult.moments.length, 'moments,', companiesResult.errors.length, 'errors')
       }
     }
@@ -358,7 +442,27 @@ export async function analyzeMomentsFromCatalog(
     if (sourceType === 'technologies' || sourceType === 'all') {
       if (technologies.length > 0) {
         console.log('Analyzing technologies:', technologies.map(t => t.name))
-        technologiesResult = await extractor.analyzeTechnologies(technologies)
+        
+        // Create enhanced analyzer that reports moment counts
+        const enhancedTechnologiesResult = await analyzeWithProgressTracking(
+          extractor, 
+          'technologies', 
+          technologies, 
+          (newMoments) => {
+            runningMomentCount += newMoments.length
+            processedCount++
+            enhancedOnProgress({
+              id: `technologies-progress`,
+              type: 'content_analysis',
+              status: 'running',
+              startTime: new Date(),
+              description: `Analyzing technologies (${processedCount - companies.length}/${technologies.length})`,
+              details: `Found ${runningMomentCount} moments so far`,
+              progress: Math.round((processedCount / totalItems) * 100)
+            }, runningMomentCount)
+          }
+        )
+        technologiesResult = enhancedTechnologiesResult
         console.log('Technologies analysis result:', technologiesResult.moments.length, 'moments,', technologiesResult.errors.length, 'errors')
       }
     }

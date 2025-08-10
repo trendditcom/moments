@@ -25,6 +25,7 @@ import {
   DocumentTextIcon, 
   WrenchScrewdriverIcon 
 } from '@heroicons/react/24/outline'
+import { Zap } from 'lucide-react'
 
 type ViewState = 
   | { type: 'catalog', tab: 'companies' | 'technologies' | 'moments' }
@@ -143,12 +144,17 @@ export default function HomePage() {
             addStep(step)
             // Calculate overall progress based on step progress
             const overallProgress = step.progress || 0
+            
+            // Extract moment count from step details if available
+            const momentCountMatch = step.details?.match(/Found (\d+) moments so far/)
+            const currentMomentCount = momentCountMatch ? parseInt(momentCountMatch[1]) : 0
+            
             updateProgress({
               progressPercentage: overallProgress,
               stats: {
                 totalItems: companies.length + technologies.length,
                 processedItems: Math.round((overallProgress / 100) * (companies.length + technologies.length)),
-                momentsExtracted: moments.length,
+                momentsExtracted: currentMomentCount,
                 errorsEncountered: 0 // Will be updated when analysis completes
               }
             })
@@ -283,14 +289,16 @@ export default function HomePage() {
         {/* Header */}
         <header className="border-b border-border bg-card/50 backdrop-blur-sm px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex flex-col items-center text-center min-w-0">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mb-2">
-                <span className="text-white text-sm font-bold">M</span>
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
+                <Zap className="w-5 h-5 text-primary-foreground" />
               </div>
-              <h1 className="text-2xl font-bold text-foreground">Moments</h1>
-              <p className="text-sm text-muted-foreground">
-                AI Business Intelligence Dashboard
-              </p>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Moments</h1>
+                <p className="text-sm text-muted-foreground">
+                  AI Business Intelligence Dashboard
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               {hasData ? (

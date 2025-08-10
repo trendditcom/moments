@@ -1,7 +1,6 @@
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
-import { Navigation } from '@/components/navigation'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -27,11 +26,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
         <Providers>
-          <div className="flex min-h-screen bg-background">
-            <Navigation />
-            <main className="flex-1 overflow-hidden">
-              {children}
-            </main>
+          <div className="min-h-screen bg-background">
+            {children}
           </div>
         </Providers>
       </body>
