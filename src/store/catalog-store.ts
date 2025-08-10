@@ -2,7 +2,7 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { CatalogState, CatalogActions } from '@/types/catalog'
+import { CatalogState, CatalogActions, Company, Technology } from '@/types/catalog'
 import { processFolder } from '@/lib/content-processor'
 
 interface CatalogStore extends CatalogState, CatalogActions {}
@@ -72,14 +72,14 @@ export const useCatalogStore = create<CatalogStore>()(
           // Process companies folder
           if (companiesPath || currentSelection.companiesPath) {
             const path = companiesPath || currentSelection.companiesPath!
-            const companies = await processFolder(path, 'companies')
+            const companies = await processFolder(path, 'companies') as Company[]
             addCompanies(companies)
           }
 
           // Process technologies folder
           if (technologiesPath || currentSelection.technologiesPath) {
             const path = technologiesPath || currentSelection.technologiesPath!
-            const technologies = await processFolder(path, 'technologies')
+            const technologies = await processFolder(path, 'technologies') as Technology[]
             addTechnologies(technologies)
           }
         } catch (error) {

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { loadConfig } from '@/lib/config-loader'
+import { loadConfig } from '@/lib/config-loader.server'
 
 export async function GET() {
   try {

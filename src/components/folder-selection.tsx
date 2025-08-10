@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { Folder, RefreshCw, Database } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useCatalogStore } from '@/store/catalog-store'
-import { loadConfigClient, Config } from '@/lib/config-loader'
+import { loadConfigClient } from '@/lib/config-loader.client'
+import { Config } from '@/lib/config-types'
 
 export function FolderSelection() {
   const { folderSelection, isLoading, hydrateCatalogs, setFolderSelection } = useCatalogStore()

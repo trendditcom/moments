@@ -1,6 +1,6 @@
 import matter from 'gray-matter'
 import { Company, Technology, ContentItem } from '@/types/catalog'
-import { loadConfigClient } from '@/lib/config-loader'
+import { loadConfigClient } from '@/lib/config-loader.client'
 
 export async function processFolder(
   folderPath: string,

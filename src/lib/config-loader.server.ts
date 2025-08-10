@@ -1,56 +1,7 @@
 import yaml from 'js-yaml'
 import fs from 'fs'
 import path from 'path'
-
-export interface CatalogConfig {
-  name: string
-  description: string
-  source_folders: string[]
-  default_folder: string
-  file_patterns: string[]
-}
-
-export interface AppConfig {
-  name: string
-  description: string
-  version: string
-  processing: {
-    max_file_size_mb: number
-    cache_enabled: boolean
-    cache_ttl_seconds: number
-  }
-  ui: {
-    items_per_page: number
-    enable_search: boolean
-    enable_filters: boolean
-  }
-}
-
-export interface FactorsConfig {
-  micro: string[]
-  macro: string[]
-}
-
-export interface AgentConfig {
-  enabled: boolean
-  model: string
-  temperature: number
-}
-
-export interface Config {
-  catalogs: {
-    companies: CatalogConfig
-    technologies: CatalogConfig
-  }
-  app: AppConfig
-  factors: FactorsConfig
-  agents: {
-    content_analyzer: AgentConfig
-    classification_agent: AgentConfig
-    correlation_engine: AgentConfig
-    report_generator: AgentConfig
-  }
-}
+import { Config } from './config-types'
 
 let cachedConfig: Config | null = null
 
@@ -169,43 +120,4 @@ export function getDefaultConfig(): Config {
       }
     }
   }
-}
-
-// Client-side config loader (for browser environments)
-export async function loadConfigClient(): Promise<Config> {
-  if (cachedConfig) {
-    return cachedConfig
-  }
-
-  try {
-    const response = await fetch('/api/config')
-    if (!response.ok) {
-      throw new Error('Failed to load configuration')
-    }
-    cachedConfig = await response.json()
-    return cachedConfig
-  } catch (error) {
-    console.error('Error loading configuration:', error)
-    return getDefaultConfig()
-  }
-}
-
-export function getCatalogConfig(type: 'companies' | 'technologies'): CatalogConfig {
-  const config = loadConfig()
-  return config.catalogs[type]
-}
-
-export function getAppConfig(): AppConfig {
-  const config = loadConfig()
-  return config.app
-}
-
-export function getFactorsConfig(): FactorsConfig {
-  const config = loadConfig()
-  return config.factors
-}
-
-export function getAgentConfig(agent: keyof Config['agents']): AgentConfig {
-  const config = loadConfig()
-  return config.agents[agent]
 }
