@@ -12,6 +12,8 @@ Moments creates signal from noise by classifying and correlating these pivotal m
 
 **IMPORTANT**: Refer to `specs/stack.md` when building Moments app architecture and technology stack. This specification provides comprehensive architecture overview, technology stack details, sub-agent configurations, data models, and integration patterns following modern AI-first design principles.
 
+**IMPORTANT**: Refer to `specs/design.md` when building Moments app user experience and interface design. This specification provides comprehensive UI/UX design guidelines, component architecture, design systems, accessibility standards, and data visualization patterns following modern AI-first design principles.
+
 ## Project Structure
 
 - `src/` - Source code for the Moments application

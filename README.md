@@ -40,6 +40,16 @@ The Moments application is currently in early development. The following feature
 - **Security & Performance**: Local-first optimization, memory management, and data privacy strategies
 - **Integration Patterns**: MCP server configurations and Claude Code SDK multi-turn conversation examples
 
+### ✅ User Interface Design Specification (Backlog Item #6)
+- **Design Philosophy**: Data-first, AI-native design with signal clarity focus and contextual intelligence
+- **Information Architecture**: Primary user journeys for Moment Discovery, Correlation Exploration, and Company Deep Dive with hierarchical navigation
+- **Component Architecture**: Specialized components including Moment Cards, Agent Status Indicators, Correlation Graphs, Factor Classification Panels, Timeline Visualizations, and Company Intelligence Dashboards
+- **Design System**: Semantic color palettes for moment types and confidence levels, typography scales using Inter/JetBrains Mono, comprehensive spacing and layout systems
+- **Responsive Design**: Mobile-first breakpoints with adaptive layouts for different screen sizes and devices
+- **Accessibility Standards**: WCAG 2.1 AA compliance with inclusive design features and comprehensive screen reader support
+- **Data Visualization**: Chart types for temporal/relational/comparative data with principles for data integrity and progressive disclosure
+- **Performance Optimization**: Virtual scrolling, lazy loading, local-first interface optimizations for instant responsiveness
+
 ## User Evaluation Guide
 
 ### What You Can Evaluate Now
@@ -94,27 +104,41 @@ The Moments application is currently in early development. The following feature
   - **Integration Patterns** include MCP server configurations and Claude Code SDK multi-turn conversation code examples
   - **CLAUDE.md Reference** contains IMPORTANT prefix directing developers to specs/stack.md for architecture decisions
 
-#### 6. Development Process Evaluation
+#### 6. User Interface Design Specification Implementation
+- **Location**: `specs/design.md` and `CLAUDE.md` (IMPORTANT reference)
+- **What to Check**:
+  - **Design Philosophy** clearly defines data-first, AI-native approach with signal clarity focus and contextual intelligence
+  - **Information Architecture** includes comprehensive user journey mapping for Moment Discovery, Correlation Exploration, and Company Deep Dive with hierarchical navigation structure
+  - **Component Architecture** provides detailed specifications for specialized components: Moment Cards, Agent Status Indicators, Correlation Graphs, Factor Classification Panels, Timeline Visualizations, and Company Intelligence Dashboards
+  - **Design System Specifications** include semantic color palettes for moment types and confidence levels, typography scales using Inter/JetBrains Mono, comprehensive spacing/layout systems, and component patterns
+  - **Responsive Design Strategy** implements mobile-first breakpoints with adaptive layouts for mobile, tablet, and desktop experiences
+  - **Interaction Design** covers purposeful animations, loading states, WCAG 2.1 AA accessibility compliance, and inclusive design features
+  - **Data Visualization Guidelines** provide chart type recommendations for temporal/relational/comparative data with principles for data integrity and progressive disclosure
+  - **Performance Considerations** include virtual scrolling, lazy loading, local-first interface optimizations, and rendering optimization strategies
+  - **Development Implementation** provides component structure patterns, state management integration with Zustand/TanStack Query, and comprehensive testing strategy
+  - **CLAUDE.md Reference** contains IMPORTANT prefix directing developers to specs/design.md for user experience and interface design decisions
+
+#### 7. Development Process Evaluation
 - **Location**: `backlog/001-backlog.md`
 - **What to Check**:
-  - Backlog items #1, #2, #3, #4, and #5 are marked as complete [x]
+  - Backlog items #1, #2, #3, #4, #5, and #6 are marked as complete [x]
   - Completion summaries are detailed and accurate for all completed items
   - Remaining backlog items are clearly defined
   - Item #5 completion summary covers system architecture, technology stack, sub-agent specifications, data models, security strategies, and integration patterns
+  - Item #6 completion summary covers design philosophy, information architecture, component architecture, design systems, responsive design, interaction design, data visualization, performance considerations, and development implementation
 
-#### 7. Project Structure Validation
+#### 8. Project Structure Validation
 - **What to Check**:
   - `companies/` and `technologies/` content folders exist
   - `backlog/` folder contains development roadmap
-  - `specs/` folder contains stack.md architecture specification
+  - `specs/` folder contains stack.md architecture specification and design.md UI specification
   - Project follows Claude Code SDK integration patterns
 
 ### Next Development Phase
 
 The next backlog items to be implemented include:
-1. User interface design specification (Backlog Item #6)
-2. Minimal Moments app scaffolding with IDE-like interface (Backlog Item #7)
-3. Additional features as defined in the backlog
+1. Minimal Moments app scaffolding with IDE-like interface (Backlog Item #7)
+2. Additional features as defined in the backlog
 
 ### How to Test
 
