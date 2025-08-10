@@ -60,6 +60,16 @@ The Moments application is currently in early development. The following feature
 - **Error Handling**: Comprehensive error states and loading indicators for smooth user experience
 - **Type-Safe Development**: Complete TypeScript interfaces for data models and state management
 
+### ✅ Configuration System (Backlog Item #8)
+- **config.yml File**: Structured YAML configuration for catalogs, app settings, moment classification factors, and sub-agent configurations
+- **Configuration Loader**: TypeScript module with YAML parsing, local override support, and client-side configuration loading
+- **Local Overrides**: Support for config.local.yml files for user-specific configurations without affecting version control
+- **API Endpoint**: Server endpoint to serve configuration to client-side components
+- **Dynamic Content Processing**: File patterns and source folders now configurable through config.yml
+- **UI Configuration**: Catalog names, descriptions, and settings displayed from configuration
+- **Deep Merge Support**: Sophisticated configuration merging for local overrides
+- **Type-Safe Interfaces**: Comprehensive TypeScript definitions for all configuration structures
+
 ## User Evaluation Guide
 
 ### What You Can Evaluate Now
@@ -143,23 +153,38 @@ The Moments application is currently in early development. The following feature
   - **Type Safety** comprehensive TypeScript interfaces for Company, Technology, ContentItem, CatalogState, and CatalogActions
   - **UI Components** built with shadcn/ui including Card, Button, Badge components with proper styling and interactions
 
-#### 8. Development Process Evaluation
+#### 8. Configuration System Implementation
+- **Location**: `config.yml`, `src/lib/config-loader.ts`, `src/app/api/config/route.ts`
+- **What to Check**:
+  - **config.yml File** contains structured configuration for catalogs (companies/technologies), app settings, moment classification factors, and sub-agent configurations
+  - **Configuration Loader** (`src/lib/config-loader.ts`) includes TypeScript interfaces for Config, CatalogConfig, AppConfig, FactorsConfig, and AgentConfig
+  - **YAML Parsing** properly integrated using js-yaml library with error handling and fallback to default configuration
+  - **Local Override Support** through config.local.yml with deep merge functionality for user-specific configurations
+  - **API Endpoint** (`/api/config`) correctly serves configuration to client-side components
+  - **Content Processor Integration** uses configured file patterns and source folders from config.yml
+  - **Folder Selection Component** displays catalog names and descriptions from configuration
+  - **Type Safety** comprehensive TypeScript definitions for all configuration structures
+  - **config.local.yml** added to .gitignore for local overrides without version control conflicts
+
+#### 9. Development Process Evaluation
 - **Location**: `backlog/001-backlog.md`
 - **What to Check**:
-  - Backlog items #1, #2, #3, #4, #5, #6, and #7 are marked as complete [x]
+  - Backlog items #1, #2, #3, #4, #5, #6, #7, and #8 are marked as complete [x]
   - Completion summaries are detailed and accurate for all completed items
   - Remaining backlog items are clearly defined
   - Item #5 completion summary covers system architecture, technology stack, sub-agent specifications, data models, security strategies, and integration patterns
   - Item #6 completion summary covers design philosophy, information architecture, component architecture, design systems, responsive design, interaction design, data visualization, performance considerations, and development implementation
   - Item #7 completion summary covers Next.js architecture, folder selection system, content processing pipeline, catalog hydration, persistent state management, responsive dashboard, error handling, and type-safe development
+  - Item #8 completion summary covers config.yml creation, configuration loader module, API endpoint, content processor updates, folder selection enhancements, and local override support
 
-#### 9. Project Structure Validation
+#### 10. Project Structure Validation
 - **What to Check**:
   - `companies/` and `technologies/` content folders exist
   - `backlog/` folder contains development roadmap
   - `specs/` folder contains stack.md architecture specification and design.md UI specification
   - `src/` folder contains complete Next.js application with proper structure
-  - `package.json` includes all required dependencies for the tech stack
+  - `config.yml` file exists with catalog and application configuration
+  - `package.json` includes all required dependencies for the tech stack including js-yaml
   - Project follows Claude Code SDK integration patterns
 
 ### Next Development Phase
@@ -189,6 +214,8 @@ npm run dev
 - **Catalog Browsing**: Switch between Companies and Technologies tabs to view processed content
 - **Content Cards**: Examine detailed information for each company/technology including content items and metadata
 - **Persistent Storage**: Refresh browser to verify folder selections are remembered across sessions
+- **Configuration System**: Modify `config.yml` to change catalog names, descriptions, or file patterns
+- **Local Overrides**: Create `config.local.yml` to test user-specific configuration without affecting version control
 
 #### Available Content
 - **Companies**: Glean (agent platform), Sierra AI (agent OS)

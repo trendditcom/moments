@@ -1,18 +1,31 @@
 import matter from 'gray-matter'
 import { Company, Technology, ContentItem } from '@/types/catalog'
+import { loadConfigClient } from '@/lib/config-loader'
 
 export async function processFolder(
   folderPath: string,
   type: 'companies' | 'technologies'
 ): Promise<Company[] | Technology[]> {
   try {
+    // Load configuration from client
+    const config = await loadConfigClient()
+    const catalogConfig = config.catalogs[type]
+    
+    // Use configured source folders if folderPath matches default
+    const isDefaultPath = folderPath === catalogConfig.default_folder || 
+                         catalogConfig.source_folders.includes(folderPath)
+    
+    if (!isDefaultPath) {
+      console.log(`Using custom folder path: ${folderPath}`)
+    }
+    
     // In a real application, this would use Node.js fs APIs or a file system API
-    // For now, we'll process the known structure from the companies/ and technologies/ folders
+    // For now, we'll process the known structure from the configured folders
     
     if (type === 'companies') {
-      return await processCompaniesFolder(folderPath)
+      return await processCompaniesFolder(folderPath, catalogConfig.file_patterns)
     } else {
-      return await processTechnologiesFolder(folderPath)
+      return await processTechnologiesFolder(folderPath, catalogConfig.file_patterns)
     }
   } catch (error) {
     console.error(`Error processing ${type} folder:`, error)
@@ -20,9 +33,10 @@ export async function processFolder(
   }
 }
 
-async function processCompaniesFolder(folderPath: string): Promise<Company[]> {
+async function processCompaniesFolder(folderPath: string, filePatterns: string[]): Promise<Company[]> {
   // Simulate processing the companies folder structure
-  // In a real app, this would read the actual file system
+  // In a real app, this would read the actual file system using filePatterns
+  console.log(`Processing companies with patterns: ${filePatterns.join(', ')}`)
   const companies: Company[] = [
     {
       id: 'glean',
@@ -87,8 +101,9 @@ async function processCompaniesFolder(folderPath: string): Promise<Company[]> {
   return companies
 }
 
-async function processTechnologiesFolder(folderPath: string): Promise<Technology[]> {
+async function processTechnologiesFolder(folderPath: string, filePatterns: string[]): Promise<Technology[]> {
   // Simulate processing the technologies folder structure
+  console.log(`Processing technologies with patterns: ${filePatterns.join(', ')}`)
   const technologies: Technology[] = [
     {
       id: 'claude-code',

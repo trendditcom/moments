@@ -116,7 +116,7 @@ function CatalogItemCard({ item, type }: CatalogItemCardProps) {
           )}
           
           <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>Updated: {item.updatedAt.toLocaleDateString()}</span>
+            <span>Updated: {new Date(item.updatedAt).toLocaleDateString()}</span>
             <span className="truncate ml-2">{item.path}</span>
           </div>
         </div>

@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Folder, RefreshCw, Database } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useCatalogStore } from '@/store/catalog-store'
+import { loadConfigClient, Config } from '@/lib/config-loader'
 
 export function FolderSelection() {
   const { folderSelection, isLoading, hydrateCatalogs, setFolderSelection } = useCatalogStore()
@@ -13,16 +14,18 @@ export function FolderSelection() {
   const [selectedTechnologiesPath, setSelectedTechnologiesPath] = useState(
     folderSelection.technologiesPath || ''
   )
+  const [config, setConfig] = useState<Config | null>(null)
+
+  useEffect(() => {
+    loadConfigClient().then(setConfig)
+  }, [])
 
   const handleFolderSelect = async (type: 'companies' | 'technologies') => {
-    // For demo purposes, we'll use predefined paths
+    // Use configuration-based paths
     // In a real app, this would open a folder picker dialog
-    const predefinedPaths = {
-      companies: './companies',
-      technologies: './technologies'
-    }
+    if (!config) return
 
-    const path = predefinedPaths[type]
+    const path = config.catalogs[type].default_folder
     
     if (type === 'companies') {
       setSelectedCompaniesPath(path)
@@ -45,8 +48,11 @@ export function FolderSelection() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">
-            Companies Folder
+            {config?.catalogs.companies.name || 'Companies'} Folder
           </label>
+          <p className="text-xs text-muted-foreground">
+            {config?.catalogs.companies.description}
+          </p>
           <div className="flex space-x-2">
             <Button
               variant="outline"
@@ -67,8 +73,11 @@ export function FolderSelection() {
 
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">
-            Technologies Folder
+            {config?.catalogs.technologies.name || 'Technologies'} Folder
           </label>
+          <p className="text-xs text-muted-foreground">
+            {config?.catalogs.technologies.description}
+          </p>
           <div className="flex space-x-2">
             <Button
               variant="outline"

@@ -1,0 +1,89 @@
+# Moments Application Configuration
+
+# Source folders for hydrating catalogs
+catalogs:
+  companies:
+    name: "Companies"
+    description: "AI startup companies and enterprises"
+    source_folders:
+      - ./companies
+    default_folder: ./companies
+    file_patterns:
+      - "*.md"
+      - "*.mdx"
+      - "*.png"
+      - "*.jpg"
+      - "*.jpeg"
+      - "*.webp"
+      - "*.svg"
+    
+  technologies:
+    name: "Technologies"
+    description: "AI technologies, frameworks, and tools"
+    source_folders:
+      - ./technologies
+    default_folder: ./technologies
+    file_patterns:
+      - "*.md"
+      - "*.mdx"
+      - "*.png"
+      - "*.jpg"
+      - "*.jpeg"
+      - "*.webp"
+      - "*.svg"
+
+# Application settings
+app:
+  name: "Moments"
+  description: "AI Business Intelligence Dashboard"
+  version: "0.1.0"
+  
+  # Data processing settings
+  processing:
+    max_file_size_mb: 10
+    cache_enabled: true
+    cache_ttl_seconds: 3600
+    
+  # UI settings
+  ui:
+    items_per_page: 20
+    enable_search: true
+    enable_filters: true
+    
+# Moment classification factors
+factors:
+  micro:
+    - company
+    - competition
+    - partners
+    - customers
+    
+  macro:
+    - economic
+    - geo_political
+    - regulation
+    - technology
+    - environment
+    - supply_chain
+    
+# Sub-agent configurations
+agents:
+  content_analyzer:
+    enabled: true
+    model: "claude-3-sonnet"
+    temperature: 0.3
+    
+  classification_agent:
+    enabled: true
+    model: "claude-3-sonnet"
+    temperature: 0.2
+    
+  correlation_engine:
+    enabled: true
+    model: "claude-3-sonnet"
+    temperature: 0.4
+    
+  report_generator:
+    enabled: true
+    model: "claude-3-sonnet"
+    temperature: 0.5
