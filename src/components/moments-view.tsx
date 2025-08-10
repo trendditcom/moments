@@ -16,7 +16,9 @@ import {
   Eye,
   Search,
   BarChart3,
-  AlertCircle
+  AlertCircle,
+  RefreshCw,
+  WifiIcon
 } from 'lucide-react'
 import { getAllFactors } from '@/lib/factor-classifier'
 
@@ -36,6 +38,9 @@ interface MomentsViewProps {
   }
   onMomentSelect?: (moment: PivotalMoment) => void
   onEntityClick?: (entity: string, type: 'company' | 'technology') => void
+  onRefreshMoments?: () => Promise<any>
+  isRefreshing?: boolean
+  lastRefresh?: Date | null
 }
 
 type SortOption = 'impact' | 'date' | 'confidence' | 'title'
@@ -52,7 +57,10 @@ export function MomentsView({
   onClearIncrementalCache,
   incrementalStats,
   onMomentSelect,
-  onEntityClick 
+  onEntityClick,
+  onRefreshMoments,
+  isRefreshing = false,
+  lastRefresh = null
 }: MomentsViewProps) {
   const [sortBy, setSortBy] = useState<SortOption>('impact')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
@@ -315,6 +323,18 @@ export function MomentsView({
           </div>
           
           <div className="flex items-center gap-2">
+            {onRefreshMoments && (
+              <Button 
+                onClick={onRefreshMoments} 
+                variant="ghost" 
+                size="sm"
+                disabled={isRefreshing}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                {isRefreshing ? 'Refreshing...' : 'Refresh'}
+              </Button>
+            )}
             {onAnalyzeIncremental && (
               <Button onClick={onAnalyzeIncremental} variant="default">
                 <TrendingUp className="w-4 h-4 mr-2" />
@@ -330,42 +350,59 @@ export function MomentsView({
         </div>
       </div>
 
-      {/* Incremental Analysis Status */}
-      {incrementalStats && (
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="pt-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-medium text-blue-800">
-                    Incremental Analysis Active
-                  </span>
-                </div>
-                <div className="text-xs text-blue-600 space-x-4">
-                  <span>Tracking: {incrementalStats.trackedContent} items</span>
-                  <span>Window: {incrementalStats.temporalWindowDays} days</span>
-                  {incrementalStats.lastUpdate && (
-                    <span>
-                      Last update: {incrementalStats.lastUpdate.toLocaleDateString()}
-                    </span>
-                  )}
-                </div>
+      {/* Status Cards */}
+      <div className="flex gap-4">
+        {/* Refresh Status */}
+        {lastRefresh && (
+          <Card className="bg-green-50 border-green-200">
+            <CardContent className="pt-3 pb-3">
+              <div className="flex items-center gap-2">
+                <RefreshCw className="w-4 h-4 text-green-600" />
+                <span className="text-sm font-medium text-green-800">
+                  Last refreshed: {lastRefresh.toLocaleTimeString()}
+                </span>
               </div>
-              {onClearIncrementalCache && (
-                <Button 
-                  onClick={onClearIncrementalCache} 
-                  variant="outline" 
-                  size="sm"
-                  className="text-xs"
-                >
-                  Reset Cache
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Incremental Analysis Status */}
+        {incrementalStats && (
+          <Card className="bg-blue-50 border-blue-200 flex-1">
+            <CardContent className="pt-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-800">
+                      Incremental Analysis Active
+                    </span>
+                  </div>
+                  <div className="text-xs text-blue-600 space-x-4">
+                    <span>Tracking: {incrementalStats.trackedContent} items</span>
+                    <span>Window: {incrementalStats.temporalWindowDays} days</span>
+                    {incrementalStats.lastUpdate && (
+                      <span>
+                        Last update: {incrementalStats.lastUpdate.toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {onClearIncrementalCache && (
+                  <Button 
+                    onClick={onClearIncrementalCache} 
+                    variant="outline" 
+                    size="sm"
+                    className="text-xs"
+                  >
+                    Reset Cache
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       {/* Controls */}
       <div className="flex items-center justify-between gap-4">

@@ -1501,6 +1501,38 @@ Test that content scrolls properly when extending below the viewport:
 - ✅ Settings sidebar content scrollable
 - ✅ No overflow issues or hidden content
 
+#### Real-Time Moments Refresh (Latest Feature)
+Test that new moments appear immediately after analysis without requiring app restart:
+
+1. **Automatic Refresh After Analysis**:
+   - Navigate to Moments tab
+   - Run "Smart Update" or "Full Refresh" analysis
+   - Verify moments appear immediately when analysis completes
+   - Check that new moment count updates in real-time during analysis
+
+2. **Manual Refresh Functionality**:
+   - Look for the "Refresh" button next to analysis buttons
+   - Click to manually refresh moments from filesystem
+   - Verify spinning icon appears during refresh
+   - Check that button is disabled during refresh operation
+
+3. **Refresh Status Indicator**:
+   - Look for green "Last refreshed" status card after refresh
+   - Verify timestamp updates when refresh occurs
+   - Check that status appears alongside incremental analysis status
+
+4. **File-Based Moment Updates**:
+   - Run analysis to create moment files in `moments/` folder
+   - Verify moments appear in UI without app restart
+   - Test that manually added moment files appear after clicking "Refresh"
+
+#### Performance Verification
+- ✅ Moments refresh is immediate after analysis completion
+- ✅ No app restart required for new moments to appear
+- ✅ Manual refresh button provides user control
+- ✅ Status indicators show data freshness
+- ✅ Auto-refresh works for all analysis types (Full, Smart Update, Force Full)
+
 ## 🔐 Security & Privacy
 
 ### Local-First Design

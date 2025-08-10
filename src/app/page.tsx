@@ -15,6 +15,7 @@ import { useMomentsStore } from '@/store/moments-store'
 import { analyzeMomentsFromCatalog } from '@/store/moments-store'
 import { useAppInitialization } from '@/hooks/use-app-initialization'
 import { useMomentsHydration } from '@/hooks/use-moments-hydration'
+import { useMomentsRefresh } from '@/hooks/use-moments-watcher'
 import { Company, Technology } from '@/types/catalog'
 import { PivotalMoment } from '@/types/moments'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -43,6 +44,11 @@ export default function HomePage() {
     hydrationStatus: momentsHydrationStatus, 
     hydrationError: momentsHydrationError 
   } = useMomentsHydration()
+  const {
+    isRefreshing: isMomentsRefreshing,
+    lastRefresh: momentsLastRefresh,
+    refreshMoments
+  } = useMomentsRefresh()
   const { companies, technologies } = useCatalogStore()
   const { 
     moments, 
@@ -205,6 +211,12 @@ export default function HomePage() {
         }
       })
       
+      // Auto-refresh to load any moments saved to files
+      if (result.moments.length > 0) {
+        console.log('[Analysis] Auto-refreshing moments after analysis completion')
+        setTimeout(() => refreshMoments(), 1000) // Small delay to ensure files are written
+      }
+      
       if (result.errors.length > 0) {
         console.log('Analysis warnings:', result.errors)
         const errorDetails = result.errors.slice(0, 3).join('\n• ')
@@ -228,6 +240,9 @@ export default function HomePage() {
 
     try {
       await analyzeMomentsIncremental(companies, technologies, 'all', { forceFullAnalysis: false })
+      // Auto-refresh after incremental analysis
+      console.log('[Analysis] Auto-refreshing moments after incremental analysis')
+      setTimeout(() => refreshMoments(), 1000)
     } catch (error) {
       setAnalysisError(error instanceof Error ? error.message : 'Incremental analysis failed')
     }
@@ -242,6 +257,9 @@ export default function HomePage() {
 
     try {
       await analyzeMomentsIncremental(companies, technologies, 'all', { forceFullAnalysis: true })
+      // Auto-refresh after full analysis
+      console.log('[Analysis] Auto-refreshing moments after full analysis')
+      setTimeout(() => refreshMoments(), 1000)
     } catch (error) {
       setAnalysisError(error instanceof Error ? error.message : 'Full analysis failed')
     }
@@ -460,6 +478,9 @@ export default function HomePage() {
                         incrementalStats={incrementalStats}
                         onMomentSelect={handleMomentSelect}
                         onEntityClick={handleEntityClick}
+                        onRefreshMoments={refreshMoments}
+                        isRefreshing={isMomentsRefreshing}
+                        lastRefresh={momentsLastRefresh}
                       />
                     </div>
                   ) : (
