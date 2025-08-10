@@ -115,14 +115,15 @@ CONFIG_PATH=./config.yml
 
 ## 📖 Getting Started Guide
 
-### 1. Load Content Catalogs
+### 1. Automatic Catalog Loading
 
 <img src="blog/images/companies.png" alt="Content Loading" width="400" align="right">
 
-- Click **"Select Folder"** to choose your content directories
-- Load the included `companies/` and `technologies/` folders
-- Catalogs populate automatically with structured data
-- Content persists across browser sessions
+- **Zero Configuration**: Catalogs load automatically from `companies/` and `technologies/` folders
+- **Immediate Start**: App begins loading content on first visit
+- **Status Feedback**: Watch loading progress in the header status bar
+- **Persistent Storage**: Loaded content persists across browser sessions
+- **Manual Refresh**: Use the refresh button if you add new content
 
 ### 2. Analyze Moments
 
@@ -435,6 +436,94 @@ new Blob(Object.values(localStorage)).size
 - Auto-recovery: < 2s on app startup
 - Backup/restore: < 500ms for typical datasets
 - Health check: < 50ms response time
+
+### Testing Automatic Catalog Loading
+
+The latest update implements zero-configuration catalog loading that automatically hydrates from config.yml on app startup.
+
+#### 10. Automatic Catalog Hydration
+
+**What to Test:**
+- **Zero Setup Experience**: App loads catalogs automatically on first visit
+- **Configuration-Driven Loading**: Catalogs loaded from config.yml folder definitions
+- **Real-Time Status**: Visual feedback during loading process
+- **Error Handling**: Graceful handling of missing folders or configuration issues
+
+**How It Works:**
+1. On app startup, auto-hydration hook reads config.yml
+2. Extracts folder paths: `./companies` and `./technologies`
+3. Automatically processes content from these folders
+4. Populates catalogs without user intervention
+
+**Testing Scenarios:**
+
+**Scenario 1: Fresh Installation**
+1. Open app for the first time (or clear storage)
+2. Observe automatic loading in header status
+3. Should see "Loading configuration..." then "Loading catalogs..."
+4. Catalogs populate automatically with companies and technologies
+
+**Scenario 2: Configuration Changes**
+1. Modify paths in config.yml
+2. Refresh app or clear storage
+3. Verify new paths are loaded automatically
+4. Check catalog contents match new configuration
+
+**Scenario 3: Missing Folders**
+1. Temporarily rename companies/ or technologies/ folder
+2. Refresh app
+3. Should see error status with descriptive message
+4. Restore folder and use refresh button to reload
+
+**Visual Indicators:**
+- **Catalog Status in Header**: Shows real-time loading progress
+- **Company/Technology Badges**: Display item counts once loaded
+- **Loading Animations**: Spinning icons during processing
+- **Error States**: Red warning icons with error messages
+- **Success States**: Green checkmarks when loaded successfully
+
+**Evaluation Criteria:**
+- ✅ App starts loading catalogs immediately without user action
+- ✅ Status shows "Loading configuration..." then "Loading catalogs..."
+- ✅ Header displays catalog counts once loading completes
+- ✅ No manual folder selection required
+- ✅ Error handling for missing folders or configuration issues
+- ✅ Refresh button available for manual reloading
+
+**Manual Refresh Testing:**
+1. After catalogs are loaded, click refresh button in header
+2. Should reload catalogs from configured folders
+3. Observe loading states and updated content
+4. Verify all existing functionality remains intact
+
+**Configuration Integration:**
+- Folder paths defined in config.yml (`./companies`, `./technologies`)
+- Display names from config ("Companies", "Technologies")
+- File patterns respected during content processing
+- Easy configuration changes without code modifications
+
+**Performance Expectations:**
+- Auto-hydration starts within 100ms of app load
+- Configuration loading: < 200ms
+- Catalog processing: varies by content size
+- UI feedback: immediate visual indicators
+- Error detection: < 500ms response time
+
+**Troubleshooting:**
+
+**Issue: Catalogs not loading automatically**
+- Check if companies/ and technologies/ folders exist
+- Verify config.yml has correct folder paths
+- Check browser console for configuration errors
+- Try using refresh button manually
+
+**Issue: Only partial catalog loading**
+- Verify both folders have readable content
+- Check file permissions on folders
+- Look for specific folder processing errors
+- Compare loaded counts with expected content
+
+This automatic loading feature eliminates setup friction and provides immediate value to users while maintaining all advanced functionality including manual refresh, persistence, and recovery capabilities.
 
 ## 🔧 Configuration
 

@@ -6,12 +6,11 @@ import { CatalogDetail } from '@/components/catalog-detail'
 import { MomentsView } from '@/components/moments-view'
 import { StorageManager } from '@/components/storage-manager'
 import { CatalogStatus } from '@/components/catalog-status'
-import { LoadingScreen } from '@/components/loading-screen'
-import { CatalogSkeleton, CatalogHeaderSkeleton } from '@/components/catalog-skeleton'
 import { useCatalogStore } from '@/store/catalog-store'
 import { useMomentsStore } from '@/store/moments-store'
 import { analyzeMomentsFromCatalog } from '@/store/moments-store'
-import { useAppInitialization } from '@/hooks/use-app-initialization'
+import { useAutoRecovery } from '@/hooks/use-auto-recovery'
+import { useAutoHydration } from '@/hooks/use-auto-hydration'
 import { Company, Technology } from '@/types/catalog'
 import { PivotalMoment } from '@/types/moments'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -26,13 +25,14 @@ type ViewState =
 
 export default function HomePage() {
   const [showStorageManager, setShowStorageManager] = useState(false)
-  const { phase, status, error, progress, isInitializing, hasData, isLoading } = useAppInitialization()
+  const { isRecovering, recoveryStatus } = useAutoRecovery()
+  const { isHydrating, hydrationStatus, hydrationError } = useAutoHydration()
   const { companies, technologies } = useCatalogStore()
   const { 
     moments, 
     isAnalyzing, 
     analysisError, 
-    progress: analysisProgress,
+    progress,
     addMoments, 
     setAnalyzing, 
     setAnalysisError,
@@ -50,12 +50,8 @@ export default function HomePage() {
   
   const [viewState, setViewState] = useState<ViewState>({ type: 'catalog', tab: 'companies' })
 
-  // Use hasData from initialization hook for more reliable state management
+  const hasData = companies.length > 0 || technologies.length > 0
   const momentStats = getMomentStats()
-  
-  const handleRetryInitialization = () => {
-    window.location.reload()
-  }
   
   // Navigation handlers
   const handleCatalogItemClick = (item: Company | Technology) => {
@@ -107,7 +103,7 @@ export default function HomePage() {
   // Handle moment analysis
   const handleAnalyzeMoments = async () => {
     if (!hasData) {
-      setAnalysisError('Please wait for catalogs to load first')
+      setAnalysisError('Please load catalog data first')
       return
     }
 
@@ -149,7 +145,7 @@ export default function HomePage() {
           },
           onAgentActivity: (agent) => {
             // Check if agent already exists
-            const existingAgent = analysisProgress.activeAgents.find(a => a.agentId === agent.agentId)
+            const existingAgent = progress.activeAgents.find(a => a.agentId === agent.agentId)
             if (existingAgent) {
               updateAgent(agent.agentId, agent)
             } else {
@@ -192,19 +188,6 @@ export default function HomePage() {
     }
   }
 
-  // Show loading screen during initialization
-  if (isInitializing || error) {
-    return (
-      <LoadingScreen 
-        phase={phase}
-        status={status}
-        error={error}
-        progress={progress}
-        onRetry={error ? handleRetryInitialization : undefined}
-      />
-    )
-  }
-  
   return (
     <div className="flex flex-col h-screen">
       <header className="border-b border-border bg-card/50 backdrop-blur-sm px-6 py-4">
@@ -216,15 +199,11 @@ export default function HomePage() {
             </p>
           </div>
           <div className="flex items-center gap-4">
-            {hasData ? (
-              <CatalogStatus 
-                hydrationStatus={status} 
-                hydrationError={error}
-                isHydrating={isLoading}
-              />
-            ) : (
-              <CatalogHeaderSkeleton />
-            )}
+            <CatalogStatus 
+              hydrationStatus={hydrationStatus} 
+              hydrationError={hydrationError}
+              isHydrating={isHydrating}
+            />
             <Button
               variant="ghost"
               size="icon"
@@ -247,7 +226,29 @@ export default function HomePage() {
 
       <div className="flex-1 overflow-hidden">
         {!hasData ? (
-          <CatalogSkeleton />
+          <div className="flex items-center justify-center h-full">
+            <Card className="w-full max-w-md">
+              <CardHeader className="text-center">
+                <CardTitle>Welcome to Moments</CardTitle>
+                <CardDescription>
+                  {isHydrating ? (
+                    <>Loading your catalogs from configuration...</>
+                  ) : hydrationError ? (
+                    <>Failed to load catalogs. Check configuration and try refreshing.</>
+                  ) : (
+                    <>Catalogs are loading automatically from your configuration.</>  
+                  )}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center">
+                <CatalogStatus 
+                  hydrationStatus={hydrationStatus} 
+                  hydrationError={hydrationError}
+                  isHydrating={isHydrating}
+                />
+              </CardContent>
+            </Card>
+          </div>
         ) : (
           <div className="flex flex-col h-full">
             {viewState.type === 'catalog' && (
@@ -293,9 +294,7 @@ export default function HomePage() {
             )}
             
             <div className="flex-1 overflow-hidden">
-              {isLoading ? (
-                <CatalogSkeleton />
-              ) : viewState.type === 'detail' ? (
+              {viewState.type === 'detail' ? (
                 <CatalogDetail
                   item={viewState.item}
                   type={viewState.itemType}
@@ -310,7 +309,7 @@ export default function HomePage() {
                     moments={moments}
                     isLoading={isAnalyzing}
                     error={analysisError}
-                    progress={analysisProgress}
+                    progress={progress}
                     onAnalyzeMoments={handleAnalyzeMoments}
                     onMomentSelect={handleMomentSelect}
                     onEntityClick={handleEntityClick}
