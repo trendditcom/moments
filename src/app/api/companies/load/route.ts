@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
 import { Company } from '@/types/catalog'
-import { processFolder } from '@/lib/content-processor'
+import { processFolder } from '@/lib/content-processor.server'
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    // Load and process companies
+    // Load and process companies directly using server-side logic
     const companies = await processFolder(folderPath, 'companies') as Company[]
     
     console.log(`[API] Loaded ${companies.length} companies from ${folderPath}`)
