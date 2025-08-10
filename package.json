@@ -10,7 +10,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.59.0",
     "@hookform/resolvers": "^3.9.0",
+    "@instantlyeasy/claude-code-sdk-ts": "^0.3.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@tanstack/react-query": "^5.51.11",
     "@types/node": "^20.14.12",
@@ -19,6 +21,7 @@
     "autoprefixer": "^10.4.19",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "gray-matter": "^4.0.3",
     "js-yaml": "^4.1.0",
     "lucide-react": "^0.408.0",

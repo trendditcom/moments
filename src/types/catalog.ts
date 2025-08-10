@@ -7,6 +7,10 @@ export interface ContentItem {
   metadata?: Record<string, any>
   createdAt: Date
   updatedAt: Date
+  // Moment analysis properties
+  momentsExtracted?: number
+  lastAnalyzedAt?: Date
+  analysisStatus?: 'pending' | 'processing' | 'completed' | 'error'
 }
 
 export interface Company {
@@ -21,6 +25,10 @@ export interface Company {
   content: ContentItem[]
   createdAt: Date
   updatedAt: Date
+  // Moment analysis properties
+  totalMoments?: number
+  lastMomentAnalysis?: Date
+  highImpactMoments?: number
 }
 
 export interface Technology {
@@ -33,6 +41,10 @@ export interface Technology {
   content: ContentItem[]
   createdAt: Date
   updatedAt: Date
+  // Moment analysis properties
+  totalMoments?: number
+  lastMomentAnalysis?: Date
+  highImpactMoments?: number
 }
 
 export interface FolderSelection {

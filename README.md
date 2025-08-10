@@ -88,6 +88,15 @@ The Moments application is currently in early development. The following feature
 - **Implementation Guidance**: Clear pathways from high-level design to detailed implementation through cross-referenced documentation
 - **Complete Integration**: Both primary specification files now comprehensively reference all new detailed specifications
 
+### ✅ AI-Powered Moment Detection & Classification System (Backlog Item #11)
+- **Claude Code SDK Integration**: Full integration with @anthropic-ai/sdk for content analysis with structured prompting, JSON parsing, and error handling
+- **Moment Extraction Pipeline**: Sophisticated content analysis system processing markdown from companies/ and technologies/ folders with comprehensive metadata including impact scores, entities, timelines, and classification factors
+- **Factor Classification System**: FactorClassifier with 10 comprehensive factor definitions (4 micro: company, competition, partners, customers; 6 macro: economic, geo_political, regulation, technology, environment, supply_chain) based on specs/macro-factors.md
+- **Sub-Agent Architecture**: SubAgentManager with 4 specialized agents (Content Analyzer, Classification Agent, Correlation Engine, Report Generator) using config.yml configurations with different model temperatures and capabilities
+- **Enhanced UI Components**: MomentCard and MomentsView components with factor badges, confidence indicators, impact scoring, filtering/sorting, search functionality, and timeline visualization following specs/design.md patterns
+- **Real-Time Analysis Integration**: Moments tab added to main navigation with processing indicators, error handling, and state management using Zustand store with persistence, enabling seamless transition between catalog browsing and AI-powered moment analysis
+- **Production-Ready Capabilities**: Complete transformation from static content browser to AI business intelligence dashboard with moment discovery, classification, and correlation detection
+
 ## User Evaluation Guide
 
 ### What You Can Evaluate Now
@@ -207,10 +216,22 @@ The Moments application is currently in early development. The following feature
   - **Cross-Reference Integration** both specifications provide clear pathways from high-level design to detailed implementation
   - **Developer Context** enhanced documentation ensures all new pipeline, architecture, and classification specifications are properly integrated
 
-#### 11. Development Process Evaluation
+#### 11. AI-Powered Moment Detection & Classification System Implementation
+- **Location**: `src/lib/moment-extractor.ts`, `src/lib/factor-classifier.ts`, `src/lib/sub-agents.ts`, `src/components/moment-card.tsx`, `src/components/moments-view.tsx`, `src/store/moments-store.ts`, `src/app/page.tsx`
+- **What to Check**:
+  - **Claude Code SDK Integration** (`src/lib/moment-extractor.ts`): MomentExtractor class with @anthropic-ai/sdk integration, structured prompting for AI analysis, JSON parsing with error handling, and comprehensive content analysis capabilities
+  - **Moment Extraction Pipeline**: Sophisticated content processing that analyzes markdown files from companies/ and technologies/ folders, extracts pivotal moments using AI agents, and structures findings with impact scores, entities, timelines, and classification factors
+  - **Factor Classification System** (`src/lib/factor-classifier.ts`): FactorClassifier with 10 comprehensive factor definitions including 4 micro factors (company, competition, partners, customers) and 6 macro factors (economic, geo_political, regulation, technology, environment, supply_chain) based on specs/macro-factors.md with keyword matching and automated classification
+  - **Sub-Agent Architecture** (`src/lib/sub-agents.ts`): SubAgentManager implementing 4 specialized agents (Content Analyzer temp 0.3, Classification Agent temp 0.2, Correlation Engine temp 0.4, Report Generator temp 0.5) using config.yml configurations for enhanced analysis workflow
+  - **Enhanced UI Components**: MomentCard component with factor badges, confidence indicators (high/medium/low with color coding), impact scoring (0-100 with visual indicators), entity displays (companies, technologies, people, locations), and timeline visualization; MomentsView component with advanced filtering/sorting, search functionality, statistics display, and responsive grid layout
+  - **Real-Time Analysis Integration** (`src/app/page.tsx`): New "Moments" tab in main navigation with moment count and high-impact indicators, integrated analysis workflow with "Analyze Moments" button, processing indicators during AI analysis, comprehensive error handling with retry capabilities
+  - **State Management** (`src/store/moments-store.ts`): Zustand store with persistence for moments, correlations, analysis state, and processing statistics with helper methods for filtering by source, factor, and impact level
+  - **Production Features**: Complete transformation from static catalog browser to AI business intelligence dashboard capable of discovering, classifying, and analyzing pivotal moments in AI industry dynamics with factor analysis, correlation detection, and comprehensive business intelligence reporting
+
+#### 12. Development Process Evaluation
 - **Location**: `backlog/001-backlog.md`
 - **What to Check**:
-  - Backlog items #1, #2, #3, #4, #5, #6, #7, #8, #9, and #10 are marked as complete [x]
+  - Backlog items #1, #2, #3, #4, #5, #6, #7, #8, #9, #10, and #11 are marked as complete [x]
   - Completion summaries are detailed and accurate for all completed items
   - Remaining backlog items are clearly defined
   - Item #5 completion summary covers system architecture, technology stack, sub-agent specifications, data models, security strategies, and integration patterns
@@ -219,16 +240,20 @@ The Moments application is currently in early development. The following feature
   - Item #8 completion summary covers config.yml creation, configuration loader module, API endpoint, content processor updates, folder selection enhancements, and local override support
   - Item #9 completion summary covers specs folder review, IMPORTANT references addition to CLAUDE.md, pipeline blueprint reference, factor classification reference, architecture documentation reference, and tagging correlation reference
   - Item #10 completion summary covers specs/stack.md and specs/design.md updates, architecture documentation references, pipeline implementation references, cross-reference network creation, and comprehensive documentation integration
+  - Item #11 completion summary covers Claude Code SDK integration, moment extraction pipeline, factor classification system, sub-agent architecture, enhanced UI components, and real-time analysis integration transforming the app into an AI business intelligence dashboard
 
-#### 12. Project Structure Validation
+#### 13. Project Structure Validation
 - **What to Check**:
   - `companies/` and `technologies/` content folders exist
   - `backlog/` folder contains development roadmap
   - `specs/` folder contains comprehensive specifications: stack.md, design.md, blueprint.md, macro-factors.md, moments_architecture_doc.md, moments_architecture.png, and tagging-correlation.md
   - `src/` folder contains complete Next.js application with proper structure
   - `config.yml` file exists with catalog and application configuration
-  - `package.json` includes all required dependencies for the tech stack including js-yaml
+  - `package.json` includes all required dependencies for the tech stack including @anthropic-ai/sdk, date-fns, and js-yaml
   - Project follows Claude Code SDK integration patterns
+  - `src/lib/` contains moment-extractor.ts, factor-classifier.ts, and sub-agents.ts for AI functionality
+  - `src/components/` contains moment-card.tsx and moments-view.tsx for AI-powered UI
+  - `src/store/` contains moments-store.ts for AI analysis state management
 
 ### Next Development Phase
 
@@ -251,14 +276,31 @@ npm run dev
 ```
 
 #### Testing Features
+
+##### Basic Catalog Features
 - **Folder Selection**: Click "Select Folder" buttons to choose companies/ and technologies/ folders
 - **Catalog Hydration**: Click "Hydrate Catalogs" to process selected folders and populate catalogs
-- **Dashboard Navigation**: Use sidebar navigation to explore different sections
+- **Dashboard Navigation**: Use navigation tabs to explore Companies, Technologies, and Moments sections
 - **Catalog Browsing**: Switch between Companies and Technologies tabs to view processed content
 - **Content Cards**: Examine detailed information for each company/technology including content items and metadata
 - **Persistent Storage**: Refresh browser to verify folder selections are remembered across sessions
 - **Configuration System**: Modify `config.yml` to change catalog names, descriptions, or file patterns
 - **Local Overrides**: Create `config.local.yml` to test user-specific configuration without affecting version control
+
+##### AI-Powered Moments Features
+- **Moments Analysis**: Click "Analyze Moments" button in the Moments tab to trigger AI-powered content analysis
+- **Processing Indicators**: Observe real-time processing indicators during AI analysis with loading states and progress feedback
+- **Moment Discovery**: View extracted pivotal moments with titles, descriptions, and detailed content analysis
+- **Factor Classification**: Examine micro factors (company, competition, partners, customers) and macro factors (economic, geo_political, regulation, technology, environment, supply_chain) displayed as colored badges
+- **Impact Scoring**: Review impact scores (0-100) with color-coded indicators (red for high impact 80+, orange for medium 60-79, yellow for low 40-59, green for minimal <40)
+- **Confidence Levels**: Check confidence indicators (high/medium/low) with color coding for analysis reliability
+- **Entity Extraction**: View extracted entities including companies, technologies, people, and locations from analyzed content
+- **Timeline Information**: Examine temporal data with estimated dates, timeframes, and historical context
+- **Advanced Filtering**: Use search functionality and filter by factors, confidence levels, source types, and impact scores
+- **Sorting Options**: Sort moments by impact score, date, confidence level, or title with ascending/descending options
+- **Statistics Dashboard**: Review moment statistics including total counts, high-impact moments, and distribution by confidence and source type
+- **Error Handling**: Test error scenarios with retry capabilities and detailed error messages for failed AI operations
+- **Persistent Analysis**: Verify that analyzed moments are saved and persist across browser sessions
 
 #### Available Content
 - **Companies**: Glean (agent platform), Sierra AI (agent OS)
@@ -266,7 +308,28 @@ npm run dev
 
 ## Getting Started
 
-This project requires Claude Code SDK. Refer to `CLAUDE.md` for detailed setup and development instructions.
+This project requires Claude Code SDK and Anthropic API access for AI-powered moment analysis features.
+
+### Prerequisites
+- **Node.js** (18+ recommended)
+- **Anthropic API Key** for AI moment analysis (set `ANTHROPIC_API_KEY` environment variable)
+- **Claude Code CLI** (optional, for enhanced development workflow)
+
+### Setup Instructions
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Set up environment variables:
+   ```bash
+   export ANTHROPIC_API_KEY=your_anthropic_api_key_here
+   ```
+4. Run the development server: `npm run dev`
+5. Open browser to http://localhost:3000
+
+### Environment Variables
+- `ANTHROPIC_API_KEY` (required for AI analysis features)
+- Additional configuration can be set in `config.yml` or `config.local.yml`
+
+Refer to `CLAUDE.md` for detailed setup and development instructions.
 
 ---
 

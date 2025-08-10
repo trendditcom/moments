@@ -1,16 +1,58 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FolderSelection } from '@/components/folder-selection'
 import { CatalogView } from '@/components/catalog-view'
+import { MomentsView } from '@/components/moments-view'
 import { useCatalogStore } from '@/store/catalog-store'
+import { useMomentsStore } from '@/store/moments-store'
+import { analyzeMomentsFromCatalog } from '@/store/moments-store'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function HomePage() {
   const { companies, technologies } = useCatalogStore()
-  const [activeTab, setActiveTab] = useState<'companies' | 'technologies'>('companies')
+  const { 
+    moments, 
+    isAnalyzing, 
+    analysisError, 
+    addMoments, 
+    setAnalyzing, 
+    setAnalysisError,
+    clearMoments,
+    getMomentStats
+  } = useMomentsStore()
+  
+  const [activeTab, setActiveTab] = useState<'companies' | 'technologies' | 'moments'>('companies')
 
   const hasData = companies.length > 0 || technologies.length > 0
+  const momentStats = getMomentStats()
+
+  // Handle moment analysis
+  const handleAnalyzeMoments = async () => {
+    if (!hasData) {
+      setAnalysisError('Please load catalog data first')
+      return
+    }
+
+    try {
+      setAnalyzing(true)
+      setAnalysisError(null)
+      
+      const result = await analyzeMomentsFromCatalog(companies, technologies, 'all')
+      
+      // Clear existing moments and add new ones
+      clearMoments()
+      addMoments(result.moments)
+      
+      if (result.errors.length > 0) {
+        setAnalysisError(`Analysis completed with ${result.errors.length} warnings`)
+      }
+    } catch (error) {
+      setAnalysisError(error instanceof Error ? error.message : 'Analysis failed')
+    } finally {
+      setAnalyzing(false)
+    }
+  }
 
   return (
     <div className="flex flex-col h-screen">
@@ -65,11 +107,37 @@ export default function HomePage() {
                 >
                   Technologies ({technologies.length})
                 </button>
+                <button
+                  onClick={() => setActiveTab('moments')}
+                  className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === 'moments'
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Moments ({momentStats.totalMoments})
+                  {momentStats.highImpactCount > 0 && (
+                    <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-800">
+                      {momentStats.highImpactCount} high impact
+                    </span>
+                  )}
+                </button>
               </nav>
             </div>
             
             <div className="flex-1 overflow-hidden">
-              <CatalogView key={activeTab} type={activeTab} />
+              {activeTab === 'moments' ? (
+                <div className="h-full overflow-y-auto p-6">
+                  <MomentsView
+                    moments={moments}
+                    isLoading={isAnalyzing}
+                    error={analysisError}
+                    onAnalyzeMoments={handleAnalyzeMoments}
+                  />
+                </div>
+              ) : (
+                <CatalogView key={activeTab} type={activeTab} />
+              )}
             </div>
           </div>
         )}
