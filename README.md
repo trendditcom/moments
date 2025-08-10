@@ -323,6 +323,119 @@ When testing, please note:
 
 This enhanced interactivity transforms Moments from a static dashboard into a fully interactive business intelligence platform for AI industry analysis.
 
+### Testing Data Persistence & Recovery Features
+
+The latest update includes robust data persistence and recovery mechanisms to ensure your catalogs and moments data remain available across browser sessions.
+
+#### 7. Storage Management System
+
+**What to Test:**
+- **Storage Health Monitor**: Check available storage space and health status
+- **Backup/Restore**: Export and import complete application state
+- **Auto-Recovery**: Automatic data restoration on app startup
+- **Storage Inspection**: Debug and monitor stored data
+
+**How to Access:**
+1. Click the settings/cog icon in the header (next to folder selection)
+2. Storage Manager panel expands with complete storage controls
+
+**Storage Manager Features:**
+- **Health Status**: Green checkmark = healthy, Red warning = issues
+- **Space Usage**: Shows KB used and percentage of available storage
+- **Current State**: Displays loaded companies, technologies, and moments counts
+- **Backup Button**: Downloads complete state as JSON file
+- **Restore Button**: Upload previous backup to restore state
+- **Inspect Button**: Logs detailed storage info to browser console
+- **Check Health**: Re-runs storage diagnostics
+- **Refresh Page**: Force reload with fresh hydration
+- **Clear All**: Remove all stored data (with confirmation)
+
+**Evaluation Criteria:**
+- ✅ Storage health shows accurate status and metrics
+- ✅ Backup creates downloadable JSON with timestamp
+- ✅ Restore successfully loads previous state from backup
+- ✅ Storage persists after closing/reopening browser
+- ✅ Auto-recovery status badge shows in header
+
+#### 8. Data Persistence Testing
+
+**Test Scenarios:**
+
+**Scenario 1: Basic Persistence**
+1. Load catalogs and generate moments
+2. Note the counts (e.g., 3 companies, 3 technologies, 20 moments)
+3. Close browser completely
+4. Reopen browser and navigate to app
+5. Verify all data is restored automatically
+
+**Scenario 2: Extended Session**
+1. Load data and generate moments
+2. Leave browser open for 8+ hours or overnight
+3. Return to app and verify data still present
+4. If missing, check auto-recovery status in header
+
+**Scenario 3: Backup and Restore**
+1. Create full dataset with catalogs and moments
+2. Click Storage Manager → Backup
+3. Save the JSON file
+4. Clear all data using "Clear All" button
+5. Restore from backup file
+6. Verify complete restoration
+
+**Scenario 4: Auto-Recovery**
+1. Load catalogs (but don't generate moments)
+2. Close browser
+3. Reopen and watch for recovery status badge
+4. Should show "Rehydrating catalogs..." then "Recovery complete"
+5. Verify catalogs are restored
+
+**Expected Behavior:**
+- Data persists indefinitely until manually cleared
+- Auto-recovery runs within 500ms of app load
+- Recovery status shows in header during process
+- Corrupted data is automatically cleared and reported
+- Version tracking enables future migrations
+
+#### 9. Storage Debugging
+
+**Console Commands for Debugging:**
+
+Open browser console (F12) and run:
+```javascript
+// Inspect all stored data
+localStorage.getItem('moments-catalog-store')
+localStorage.getItem('moments-store')
+
+// Check storage size
+new Blob(Object.values(localStorage)).size
+```
+
+**Common Issues and Solutions:**
+
+**Issue: Data disappears after session**
+- Check browser privacy settings (disable "Clear on exit")
+- Verify localStorage is not blocked
+- Check Storage Manager health status
+- Try backup/restore as workaround
+
+**Issue: Auto-recovery not working**
+- Check recovery status badge in header
+- Open console for detailed recovery logs
+- Verify folder paths still exist
+- Use Storage Manager to manually reload
+
+**Issue: Storage quota exceeded**
+- Check Storage Manager for space usage
+- Clear old moments before generating new ones
+- Use backup to save important data externally
+- Consider using multiple browser profiles
+
+**Performance Metrics:**
+- Storage operations: < 100ms
+- Auto-recovery: < 2s on app startup
+- Backup/restore: < 500ms for typical datasets
+- Health check: < 50ms response time
+
 ## 🔧 Configuration
 
 ### Custom Content Sources

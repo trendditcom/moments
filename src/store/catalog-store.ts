@@ -1,9 +1,10 @@
 'use client'
 
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 import { CatalogState, CatalogActions, Company, Technology } from '@/types/catalog'
 import { processFolder } from '@/lib/content-processor'
+import { createPersistStorage } from '@/lib/persistence'
 
 interface CatalogStore extends CatalogState, CatalogActions {}
 
@@ -94,11 +95,19 @@ export const useCatalogStore = create<CatalogStore>()(
     }),
     {
       name: 'moments-catalog-store',
+      storage: createJSONStorage(() => createPersistStorage('moments-catalog-store')),
       partialize: (state) => ({
         folderSelection: state.folderSelection,
         companies: state.companies,
         technologies: state.technologies,
       }),
+      onRehydrateStorage: () => (state) => {
+        console.log('[CatalogStore] Rehydration complete', {
+          companies: state?.companies?.length || 0,
+          technologies: state?.technologies?.length || 0,
+          folderSelection: state?.folderSelection
+        })
+      },
     }
   )
 )

@@ -5,18 +5,26 @@ import { FolderSelection } from '@/components/folder-selection'
 import { CatalogView } from '@/components/catalog-view'
 import { CatalogDetail } from '@/components/catalog-detail'
 import { MomentsView } from '@/components/moments-view'
+import { StorageManager } from '@/components/storage-manager'
 import { useCatalogStore } from '@/store/catalog-store'
 import { useMomentsStore } from '@/store/moments-store'
 import { analyzeMomentsFromCatalog } from '@/store/moments-store'
+import { useAutoRecovery } from '@/hooks/use-auto-recovery'
 import { Company, Technology } from '@/types/catalog'
 import { PivotalMoment } from '@/types/moments'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { Badge } from '@/components/ui/badge'
+import { Cog6ToothIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
 
 type ViewState = 
   | { type: 'catalog', tab: 'companies' | 'technologies' | 'moments' }
   | { type: 'detail', item: Company | Technology, itemType: 'company' | 'technology' }
 
 export default function HomePage() {
+  const [showStorageManager, setShowStorageManager] = useState(false)
+  const { isRecovering, recoveryStatus } = useAutoRecovery()
   const { companies, technologies } = useCatalogStore()
   const { 
     moments, 
@@ -186,13 +194,38 @@ export default function HomePage() {
             <h1 className="text-2xl font-bold text-foreground">Moments</h1>
             <p className="text-sm text-muted-foreground">
               AI Business Intelligence Dashboard
+              {recoveryStatus && (
+                <Badge 
+                  variant={isRecovering ? 'secondary' : 'outline'} 
+                  className="ml-2 text-xs"
+                >
+                  {isRecovering && <ArrowPathIcon className="w-3 h-3 mr-1 animate-spin" />}
+                  {recoveryStatus}
+                </Badge>
+              )}
             </p>
           </div>
           <div className="flex items-center gap-4">
             <FolderSelection />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowStorageManager(!showStorageManager)}
+              title="Storage Manager"
+            >
+              <Cog6ToothIcon className="w-5 h-5" />
+            </Button>
           </div>
         </div>
       </header>
+
+      <Collapsible open={showStorageManager} onOpenChange={setShowStorageManager}>
+        <CollapsibleContent className="border-b border-border bg-card/95 backdrop-blur-sm">
+          <div className="p-6">
+            <StorageManager />
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       <div className="flex-1 overflow-hidden">
         {!hasData ? (

@@ -1,7 +1,7 @@
 'use client'
 
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 import { 
   MomentState, 
   MomentActions, 
@@ -15,6 +15,7 @@ import {
 import { Company, Technology } from '@/types/catalog'
 import { MomentExtractor, createMomentExtractor } from '@/lib/moment-extractor'
 import { SubAgentManager, createSubAgentManager } from '@/lib/sub-agents'
+import { createPersistStorage } from '@/lib/persistence'
 
 interface MomentStore extends MomentState, MomentActions {
   // Additional helper methods
@@ -292,11 +293,19 @@ export const useMomentsStore = create<MomentStore>()(
     }),
     {
       name: 'moments-store',
+      storage: createJSONStorage(() => createPersistStorage('moments-store')),
       partialize: (state) => ({
         moments: state.moments,
         correlations: state.correlations,
         lastAnalysisAt: state.lastAnalysisAt,
       }),
+      onRehydrateStorage: () => (state) => {
+        console.log('[MomentsStore] Rehydration complete', {
+          moments: state?.moments?.length || 0,
+          correlations: state?.correlations?.length || 0,
+          lastAnalysisAt: state?.lastAnalysisAt
+        })
+      },
     }
   )
 )
