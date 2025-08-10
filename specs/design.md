@@ -4,6 +4,12 @@
 
 Moments follows a **data-first, AI-native** design philosophy that prioritizes signal clarity over visual complexity. The interface serves as an intelligent lens for discovering and correlating pivotal moments in the AI business landscape.
 
+**📋 Related Design Documentation**:
+- See `macro-factors.md` for comprehensive micro/macro factor definitions and examples that inform UI classification displays
+- See `tagging-correlation.md` for operational framework that influences data presentation and user interaction patterns
+- See `blueprint.md` for pipeline stages that inform loading states, progress indicators, and data flow visualizations
+- See `moments_architecture_doc.md` for system components that inform navigation structure and information architecture
+
 ### Core Design Principles
 
 1. **Signal-First Design**: Every UI element serves to surface meaningful insights
@@ -75,6 +81,9 @@ interface FocusLayout {
 
 #### 1. Moment Cards
 **Purpose**: Display individual pivotal moments with key metadata
+
+**📋 Factor Classification Reference**: See `macro-factors.md` for complete definitions of micro factors (company, competition, partners, customers) and macro factors (economic, geo-political, regulation, technology, environment, supply chain) with specific pivotal moment examples for each category.
+
 ```typescript
 interface MomentCard {
   id: string;
@@ -138,6 +147,8 @@ interface CorrelationGraph {
 
 #### 4. Factor Classification Panel
 **Purpose**: Visual breakdown of micro/macro factor analysis
+**📋 Implementation Reference**: See `macro-factors.md` for detailed examples of each factor category with specific pivotal moments that should be displayed in this panel interface.
+
 ```typescript
 interface FactorPanel {
   microFactors: {

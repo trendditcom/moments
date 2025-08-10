@@ -14,6 +14,14 @@ Moments creates signal from noise by classifying and correlating these pivotal m
 
 **IMPORTANT**: Refer to `specs/design.md` when building Moments app user experience and interface design. This specification provides comprehensive UI/UX design guidelines, component architecture, design systems, accessibility standards, and data visualization patterns following modern AI-first design principles.
 
+**IMPORTANT**: Refer to `specs/blueprint.md` when implementing the Moments ingestion-to-insight pipeline. This specification provides visual dataflow diagrams, processing stages, and system blueprint for data ingestion, preprocessing, entity extraction, factor classification, correlation, and impact scoring.
+
+**IMPORTANT**: Refer to `specs/macro-factors.md` when implementing moment classification and factor analysis. This specification provides comprehensive tables of micro and macro factors with concrete pivotal moment examples for AI startups and enterprises, essential for training classification algorithms and correlation logic.
+
+**IMPORTANT**: Refer to `specs/moments_architecture_doc.md` and `specs/moments_architecture.png` when understanding the complete system architecture and operational framework. These specifications provide detailed pipeline stages, data sources, processing components, and visual architecture diagrams for the full Moments application ecosystem.
+
+**IMPORTANT**: Refer to `specs/tagging-correlation.md` when implementing content classification and moment correlation features. This specification provides the operational framework for detecting, classifying, correlating, and ranking pivotal moments through preprocessing, entity extraction, rule-based and ML classification, and correlation algorithms.
+
 ## Project Structure
 
 - `src/` - Source code for the Moments application

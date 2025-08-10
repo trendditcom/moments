@@ -4,6 +4,11 @@
 
 Moments is a local-first, agent-driven application built as an intelligent wrapper around the Claude Code SDK. The architecture follows a modern AI-first design with specialized sub-agents, headless automation capabilities, and comprehensive content analysis pipelines.
 
+**📋 Related Architecture Documentation**:
+- See `moments_architecture_doc.md` and `moments_architecture.png` for complete system architecture and operational framework
+- See `blueprint.md` for detailed ingestion-to-insight pipeline diagrams and dataflow specifications  
+- See `tagging-correlation.md` for operational framework implementation details
+
 ### Core Architectural Principles
 
 1. **Local-First Architecture**: All data processing and storage happens locally with optional cloud sync
@@ -54,6 +59,11 @@ Moments is a local-first, agent-driven application built as an intelligent wrapp
 │  └─────────────────┘ └─────────────────┘ └─────────────────┘│
 └─────────────────────────────────────────────────────────────┘
 ```
+
+**📋 Pipeline Implementation References**:
+- **Content Ingestion Pipeline**: See `blueprint.md` for complete dataflow diagrams from sources through ingestion gateway, preprocessing, entity extraction, factor classification, enrichment, correlation, and impact scoring
+- **Moment Extraction Engine**: See `tagging-correlation.md` for operational framework including preprocessing (language detection, entity extraction), micro/macro classification using rule-based and ML approaches, and enrichment with knowledge graph integration
+- **Factor Classification**: See `macro-factors.md` for comprehensive micro and macro factor definitions and pivotal moment examples essential for training classification algorithms
 
 ### Layer 4: Storage & External Integration Layer
 ```

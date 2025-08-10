@@ -1,5 +1,5 @@
 Think harder to perform these tasks:
-1. Read the project code (src/ ) and tests (tests/) to understand the state of the project
+1. Read the project code (src/ ) to understand the state of the project
 2. Read the backlog/ folder to understand the project backlog
 3. Pick the next open [ ] backlog item. If multiple open items are present only pick one next in sequence.
 4. Develop the open backlog item.
