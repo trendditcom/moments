@@ -12,7 +12,7 @@ import {
   AnalysisStep,
   AgentActivity
 } from '@/types/moments'
-import { Company, Technology } from '@/types/catalog'
+import { Company, Technology, ContentItem } from '@/types/catalog'
 import { MomentExtractor, createMomentExtractor } from '@/lib/moment-extractor'
 import { SubAgentManager, createSubAgentManager } from '@/lib/sub-agents'
 import { createPersistStorage, createFileFirstStorage } from '@/lib/persistence'
@@ -631,7 +631,136 @@ async function analyzeWithProgressTracking(
   }
 }
 
-// Standalone function to analyze moments from catalog data
+// Helper function for parallel content processing within a single extractor
+async function analyzeContentInParallel(
+  extractor: any,
+  content: ContentItem[],
+  sourceType: 'company' | 'technology',
+  sourceName: string,
+  maxConcurrent: number = 3
+): Promise<MomentAnalysisResult> {
+  const results: Promise<PivotalMoment[]>[] = []
+  const errors: string[] = []
+  const startTime = Date.now()
+
+  // Process content in parallel batches
+  for (let i = 0; i < content.length; i += maxConcurrent) {
+    const batch = content.slice(i, i + maxConcurrent)
+    const batchPromises = batch.map(async (item) => {
+      try {
+        const result = await extractor.extractMomentsFromText(item.content || '', {
+          sourceType,
+          sourceName,
+          contentId: item.id,
+          filePath: item.path,
+          contentName: item.name
+        })
+        return result
+      } catch (error) {
+        errors.push(`Failed to analyze ${item.name}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+        return []
+      }
+    })
+    
+    results.push(...batchPromises)
+  }
+
+  const allMoments = (await Promise.all(results)).flat()
+  
+  return {
+    moments: allMoments,
+    totalProcessed: content.length,
+    processingTime: Date.now() - startTime,
+    errors
+  }
+}
+
+// Parallel analysis function for multiple sources
+async function analyzeSourcesInParallel(
+  sources: Array<{items: (Company | Technology)[], type: 'companies' | 'technologies'}>,
+  extractor: any,
+  onMomentsFound: (moments: PivotalMoment[], sourceType: string, sourceName: string) => void
+): Promise<MomentAnalysisResult[]> {
+  const analysisPromises = sources.map(async ({items, type}) => {
+    const typeResults: MomentAnalysisResult[] = []
+    
+    // Process all items of this type in parallel
+    const itemPromises = items.map(async (item) => {
+      try {
+        const result = await extractor.analyzeContent(
+          item.content,
+          type === 'companies' ? 'company' : 'technology',
+          item.name,
+          true, // Enable parallel processing within each item
+          3     // Max concurrent content per item
+        )
+        
+        // Report progress with newly found moments
+        if (result.moments.length > 0) {
+          onMomentsFound(result.moments, type, item.name)
+        }
+        
+        return result
+      } catch (error) {
+        const errorResult: MomentAnalysisResult = {
+          moments: [],
+          totalProcessed: 0,
+          processingTime: 0,
+          errors: [`Failed to analyze ${type.slice(0, -1)} ${item.name}: ${error instanceof Error ? error.message : 'Unknown error'}`]
+        }
+        return errorResult
+      }
+    })
+    
+    const results = await Promise.all(itemPromises)
+    return results
+  })
+  
+  const allTypeResults = await Promise.all(analysisPromises)
+  return allTypeResults.flat()
+}
+
+// Sequential analysis function for fallback processing
+async function analyzeSourcesSequentially(
+  sources: Array<{items: (Company | Technology)[], type: 'companies' | 'technologies'}>,
+  extractor: any,
+  onMomentsFound: (moments: PivotalMoment[], sourceType: string, sourceName: string) => void
+): Promise<MomentAnalysisResult[]> {
+  const allResults: MomentAnalysisResult[] = []
+  
+  for (const {items, type} of sources) {
+    for (const item of items) {
+      try {
+        const result = await extractor.analyzeContent(
+          item.content,
+          type === 'companies' ? 'company' : 'technology',
+          item.name,
+          false, // Disable parallel processing within each item
+          1      // Sequential processing
+        )
+        
+        // Report progress with newly found moments
+        if (result.moments.length > 0) {
+          onMomentsFound(result.moments, type, item.name)
+        }
+        
+        allResults.push(result)
+      } catch (error) {
+        const errorResult: MomentAnalysisResult = {
+          moments: [],
+          totalProcessed: 0,
+          processingTime: 0,
+          errors: [`Failed to analyze ${type.slice(0, -1)} ${item.name}: ${error instanceof Error ? error.message : 'Unknown error'}`]
+        }
+        allResults.push(errorResult)
+      }
+    }
+  }
+  
+  return allResults
+}
+
+// Standalone function to analyze moments from catalog data with parallel processing
 export async function analyzeMomentsFromCatalog(
   companies: Company[], 
   technologies: Technology[],
@@ -642,7 +771,7 @@ export async function analyzeMomentsFromCatalog(
     onPrompt?: (prompt: string) => void
   }
 ): Promise<MomentAnalysisResult> {
-  console.log('Starting moment analysis...')
+  console.log('Starting parallel moment analysis...')
   console.log('Companies:', companies.length, 'Technologies:', technologies.length)
   console.log('Source type:', sourceType)
   
@@ -668,99 +797,147 @@ export async function analyzeMomentsFromCatalog(
     progressCallbacks?.onProgress?.(enhancedStep)
   }
   
-  const extractor = createMomentExtractor({
+  // Create multiple extractors for parallel processing
+  const createExtractorWithCallbacks = () => createMomentExtractor({
     onProgress: enhancedOnProgress,
     onAgentActivity: progressCallbacks?.onAgentActivity,
     onPrompt: progressCallbacks?.onPrompt
   })
+  
   const subAgents = createSubAgentManager()
   
   try {
-    let companiesResult: MomentAnalysisResult = { moments: [], totalProcessed: 0, processingTime: 0, errors: [] }
-    let technologiesResult: MomentAnalysisResult = { moments: [], totalProcessed: 0, processingTime: 0, errors: [] }
-
-    // Analyze companies if requested
+    // Load configuration first (await is needed)
+    const config = await loadConfigClient()
+    
+    // Extract parallel processing settings from loaded config
+    const parallelConfig = config.app.processing.parallel_processing
+    const isParallelEnabled = parallelConfig?.enabled ?? true
+    const maxConcurrentSources = parallelConfig?.max_concurrent_sources ?? 4
+    const maxConcurrentContent = parallelConfig?.max_concurrent_content_per_source ?? 3
+    const enableSubAgentParallel = parallelConfig?.enable_sub_agent_parallelization ?? true
+    
+    console.log(`[ParallelAnalysis] Parallel processing ${isParallelEnabled ? 'enabled' : 'disabled'}`, {
+      maxConcurrentSources,
+      maxConcurrentContent,
+      enableSubAgentParallel
+    })
+    
+    // Prepare sources for parallel processing
+    const sources: Array<{items: (Company | Technology)[], type: 'companies' | 'technologies'}> = []
+    
     if (sourceType === 'companies' || sourceType === 'all') {
       if (companies.length > 0) {
-        console.log('Analyzing companies:', companies.map(c => c.name))
-        
-        // Create enhanced analyzer that reports moment counts
-        const enhancedCompaniesResult = await analyzeWithProgressTracking(
-          extractor, 
-          'companies', 
-          companies, 
-          (newMoments) => {
-            runningMomentCount += newMoments.length
-            processedCount++
-            enhancedOnProgress({
-              id: `companies-progress`,
-              type: 'content_analysis',
-              status: 'running',
-              startTime: new Date(),
-              description: `Analyzing companies (${processedCount}/${companies.length})`,
-              details: `Found ${runningMomentCount} moments so far`,
-              progress: Math.round((processedCount / totalItems) * 100)
-            }, runningMomentCount)
-          }
-        )
-        companiesResult = enhancedCompaniesResult
-        console.log('Companies analysis result:', companiesResult.moments.length, 'moments,', companiesResult.errors.length, 'errors')
+        sources.push({ items: companies, type: 'companies' })
       }
     }
-
-    // Analyze technologies if requested  
+    
     if (sourceType === 'technologies' || sourceType === 'all') {
       if (technologies.length > 0) {
-        console.log('Analyzing technologies:', technologies.map(t => t.name))
-        
-        // Create enhanced analyzer that reports moment counts
-        const enhancedTechnologiesResult = await analyzeWithProgressTracking(
-          extractor, 
-          'technologies', 
-          technologies, 
-          (newMoments) => {
-            runningMomentCount += newMoments.length
-            processedCount++
-            enhancedOnProgress({
-              id: `technologies-progress`,
-              type: 'content_analysis',
-              status: 'running',
-              startTime: new Date(),
-              description: `Analyzing technologies (${processedCount - companies.length}/${technologies.length})`,
-              details: `Found ${runningMomentCount} moments so far`,
-              progress: Math.round((processedCount / totalItems) * 100)
-            }, runningMomentCount)
-          }
-        )
-        technologiesResult = enhancedTechnologiesResult
-        console.log('Technologies analysis result:', technologiesResult.moments.length, 'moments,', technologiesResult.errors.length, 'errors')
+        sources.push({ items: technologies, type: 'technologies' })
       }
     }
 
-    // Combine results
-    const allMoments = [...companiesResult.moments, ...technologiesResult.moments]
-    const allErrors = [...companiesResult.errors, ...technologiesResult.errors]
+    console.log(`[ParallelAnalysis] Processing ${sources.length} source types in parallel`)
     
-    console.log('Combined analysis result:', allMoments.length, 'total moments,', allErrors.length, 'total errors')
-    if (allErrors.length > 0) {
-      console.log('All errors:', allErrors)
+    // Enhanced callback that reports moment counts in real-time
+    const onMomentsFound = (moments: PivotalMoment[], sourceType: string, sourceName: string) => {
+      runningMomentCount += moments.length
+      processedCount++
+      enhancedOnProgress({
+        id: `parallel-${sourceType}`,
+        type: 'content_analysis',
+        status: 'running',
+        startTime: new Date(),
+        description: `Analyzing ${sourceType} ${isParallelEnabled ? 'in parallel' : 'sequentially'} (${sourceName})`,
+        details: `Found ${runningMomentCount} moments so far`,
+        progress: Math.round((processedCount / totalItems) * 100)
+      }, runningMomentCount)
     }
     
-    // Enhance classifications using sub-agents if available
+    // Process all sources based on parallel configuration
+    const allResults = isParallelEnabled 
+      ? await analyzeSourcesInParallel(
+          sources,
+          createExtractorWithCallbacks(),
+          onMomentsFound
+        )
+      : await analyzeSourcesSequentially(
+          sources,
+          createExtractorWithCallbacks(),
+          onMomentsFound
+        )
+
+    // Combine results
+    const allMoments: PivotalMoment[] = []
+    const allErrors: string[] = []
+    let totalProcessed = 0
+    let maxProcessingTime = 0
+    
+    for (const result of allResults) {
+      allMoments.push(...result.moments)
+      allErrors.push(...result.errors)
+      totalProcessed += result.totalProcessed
+      maxProcessingTime = Math.max(maxProcessingTime, result.processingTime)
+    }
+    
+    console.log(`[ParallelAnalysis] Combined results: ${allMoments.length} moments, ${allErrors.length} errors`)
+    
+    // Enhance classifications using sub-agents in parallel (if enabled)
     try {
-      const classificationResult = await subAgents.classifyMoments(allMoments)
-      if (classificationResult.success && classificationResult.data) {
-        // Apply enhanced classifications (this would be more sophisticated in practice)
-        console.log('Enhanced classifications available:', classificationResult.data.classifications.length)
+      const subAgentPromises = []
+      
+      // Run sub-agents based on parallel configuration
+      if (allMoments.length > 0) {
+        const batchSize = parallelConfig?.sub_agent_batch_size ?? 10
+        
+        if (enableSubAgentParallel) {
+          // Run classification and correlation in parallel
+          subAgentPromises.push(
+            subAgents.classifyMoments(allMoments, batchSize, true).then(result => {
+              if (result.success) {
+                console.log('[SubAgents] Parallel classification completed:', result.data?.classifications?.length || 0)
+              }
+              return result
+            })
+          )
+          
+          subAgentPromises.push(
+            subAgents.findCorrelations(allMoments, batchSize + 5, true).then(result => {
+              if (result.success) {
+                console.log('[SubAgents] Parallel correlation analysis completed:', result.data?.correlations?.length || 0)
+              }
+              return result
+            })
+          )
+          
+          // Wait for all sub-agents to complete in parallel
+          await Promise.all(subAgentPromises)
+          console.log(`[ParallelAnalysis] Sub-agent enhancement completed in parallel`)
+        } else {
+          // Run sub-agents sequentially
+          const classificationResult = await subAgents.classifyMoments(allMoments, batchSize, false)
+          if (classificationResult.success) {
+            console.log('[SubAgents] Sequential classification completed:', classificationResult.data?.classifications?.length || 0)
+          }
+          
+          const correlationResult = await subAgents.findCorrelations(allMoments, batchSize + 5, false)
+          if (correlationResult.success) {
+            console.log('[SubAgents] Sequential correlation analysis completed:', correlationResult.data?.correlations?.length || 0)
+          }
+          
+          console.log(`[ParallelAnalysis] Sub-agent enhancement completed sequentially`)
+        }
       }
+      
     } catch (error) {
-      console.warn('Sub-agent classification failed:', error)
+      console.warn('[ParallelAnalysis] Sub-agent enhancement failed:', error)
     }
 
     return {
       moments: allMoments,
-      totalProcessed: companiesResult.totalProcessed + technologiesResult.totalProcessed,
-      processingTime: Math.max(companiesResult.processingTime, technologiesResult.processingTime),
+      totalProcessed,
+      processingTime: maxProcessingTime,
       errors: allErrors
     }
   } catch (error) {

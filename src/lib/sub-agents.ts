@@ -135,8 +135,13 @@ export class SubAgentManager {
   /**
    * Classification Agent Sub-Agent
    * Specialized in classifying moments into micro/macro factors
+   * Now supports batch processing for improved performance
    */
-  async classifyMoments(moments: PivotalMoment[]): Promise<AgentResponse<{
+  async classifyMoments(
+    moments: PivotalMoment[], 
+    batchSize: number = 10,
+    useParallelBatches: boolean = true
+  ): Promise<AgentResponse<{
     classifications: Array<{
       momentId: string
       enhancedClassification: {
@@ -159,28 +164,69 @@ export class SubAgentManager {
     const startTime = Date.now()
 
     try {
-      const prompt = this.buildClassificationPrompt(moments)
-      
-      const response = await this.anthropic.messages.create({
-        model: this.configs.classification_agent.model,
-        max_tokens: 4000,
-        temperature: this.configs.classification_agent.temperature,
-        messages: [{
-          role: 'user',
-          content: prompt
-        }]
-      })
+      if (useParallelBatches && moments.length > batchSize) {
+        // Process large moment sets in parallel batches
+        console.log(`[ClassificationAgent] Processing ${moments.length} moments in parallel batches of ${batchSize}`)
+        
+        const batches: PivotalMoment[][] = []
+        for (let i = 0; i < moments.length; i += batchSize) {
+          batches.push(moments.slice(i, i + batchSize))
+        }
+        
+        const batchPromises = batches.map(async (batch) => {
+          const prompt = this.buildClassificationPrompt(batch)
+          
+          const response = await this.anthropic.messages.create({
+            model: this.configs.classification_agent.model,
+            max_tokens: 4000,
+            temperature: this.configs.classification_agent.temperature,
+            messages: [{
+              role: 'user',
+              content: prompt
+            }]
+          })
 
-      const responseText = response.content[0].type === 'text' 
-        ? response.content[0].text 
-        : ''
+          const responseText = response.content[0].type === 'text' 
+            ? response.content[0].text 
+            : ''
 
-      const classifications = this.parseClassificationResponse(responseText, moments)
-      
-      return {
-        success: true,
-        data: { classifications },
-        processingTime: Date.now() - startTime
+          return this.parseClassificationResponse(responseText, batch)
+        })
+        
+        const batchResults = await Promise.all(batchPromises)
+        const allClassifications = batchResults.flat()
+        
+        return {
+          success: true,
+          data: { classifications: allClassifications },
+          processingTime: Date.now() - startTime
+        }
+        
+      } else {
+        // Process all moments in a single batch (original behavior)
+        const prompt = this.buildClassificationPrompt(moments)
+        
+        const response = await this.anthropic.messages.create({
+          model: this.configs.classification_agent.model,
+          max_tokens: 4000,
+          temperature: this.configs.classification_agent.temperature,
+          messages: [{
+            role: 'user',
+            content: prompt
+          }]
+        })
+
+        const responseText = response.content[0].type === 'text' 
+          ? response.content[0].text 
+          : ''
+
+        const classifications = this.parseClassificationResponse(responseText, moments)
+        
+        return {
+          success: true,
+          data: { classifications },
+          processingTime: Date.now() - startTime
+        }
       }
     } catch (error) {
       return {
@@ -194,8 +240,13 @@ export class SubAgentManager {
   /**
    * Correlation Engine Sub-Agent
    * Specialized in finding relationships between moments
+   * Now supports batch processing for large moment sets
    */
-  async findCorrelations(moments: PivotalMoment[]): Promise<AgentResponse<{
+  async findCorrelations(
+    moments: PivotalMoment[], 
+    batchSize: number = 15,
+    useParallelBatches: boolean = true
+  ): Promise<AgentResponse<{
     correlations: MomentCorrelation[]
     insights: Array<{
       type: 'trend' | 'pattern' | 'anomaly' | 'cluster'
@@ -211,28 +262,80 @@ export class SubAgentManager {
     const startTime = Date.now()
 
     try {
-      const prompt = this.buildCorrelationPrompt(moments)
-      
-      const response = await this.anthropic.messages.create({
-        model: this.configs.correlation_engine.model,
-        max_tokens: 4000,
-        temperature: this.configs.correlation_engine.temperature,
-        messages: [{
-          role: 'user',
-          content: prompt
-        }]
-      })
+      if (useParallelBatches && moments.length > batchSize) {
+        // Process large moment sets in parallel batches
+        console.log(`[CorrelationEngine] Processing ${moments.length} moments in parallel batches of ${batchSize}`)
+        
+        const batches: PivotalMoment[][] = []
+        for (let i = 0; i < moments.length; i += batchSize) {
+          batches.push(moments.slice(i, i + batchSize))
+        }
+        
+        const batchPromises = batches.map(async (batch) => {
+          const prompt = this.buildCorrelationPrompt(batch)
+          
+          const response = await this.anthropic.messages.create({
+            model: this.configs.correlation_engine.model,
+            max_tokens: 4000,
+            temperature: this.configs.correlation_engine.temperature,
+            messages: [{
+              role: 'user',
+              content: prompt
+            }]
+          })
 
-      const responseText = response.content[0].type === 'text' 
-        ? response.content[0].text 
-        : ''
+          const responseText = response.content[0].type === 'text' 
+            ? response.content[0].text 
+            : ''
 
-      const correlationData = this.parseCorrelationResponse(responseText, moments)
-      
-      return {
-        success: true,
-        data: correlationData,
-        processingTime: Date.now() - startTime
+          return this.parseCorrelationResponse(responseText, batch)
+        })
+        
+        const batchResults = await Promise.all(batchPromises)
+        
+        // Combine results from all batches
+        const allCorrelations: MomentCorrelation[] = []
+        const allInsights: Array<{type: 'trend' | 'pattern' | 'anomaly' | 'cluster', description: string, momentIds: string[], confidence: number}> = []
+        
+        for (const result of batchResults) {
+          allCorrelations.push(...(result.correlations || []))
+          allInsights.push(...(result.insights || []))
+        }
+        
+        return {
+          success: true,
+          data: {
+            correlations: allCorrelations,
+            insights: allInsights
+          },
+          processingTime: Date.now() - startTime
+        }
+        
+      } else {
+        // Process all moments in a single batch (original behavior)
+        const prompt = this.buildCorrelationPrompt(moments)
+        
+        const response = await this.anthropic.messages.create({
+          model: this.configs.correlation_engine.model,
+          max_tokens: 4000,
+          temperature: this.configs.correlation_engine.temperature,
+          messages: [{
+            role: 'user',
+            content: prompt
+          }]
+        })
+
+        const responseText = response.content[0].type === 'text' 
+          ? response.content[0].text 
+          : ''
+
+        const correlationData = this.parseCorrelationResponse(responseText, moments)
+        
+        return {
+          success: true,
+          data: correlationData,
+          processingTime: Date.now() - startTime
+        }
       }
     } catch (error) {
       return {

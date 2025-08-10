@@ -26,6 +26,17 @@ export interface AppConfig {
     max_file_size_mb: number
     cache_enabled: boolean
     cache_ttl_seconds: number
+    parallel_processing?: {
+      enabled: boolean
+      max_concurrent_sources: number
+      max_concurrent_content_per_source: number
+      enable_sub_agent_parallelization: boolean
+      sub_agent_batch_size: number
+      api_rate_limiting: {
+        requests_per_minute: number
+        concurrent_requests: number
+      }
+    }
   }
   ui: {
     items_per_page: number
@@ -43,6 +54,8 @@ export interface AgentConfig {
   enabled: boolean
   model: string
   temperature: number
+  parallel_batch_size?: number
+  enable_parallel_batches?: boolean
 }
 
 export interface PersistenceConfig {

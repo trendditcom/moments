@@ -95,6 +95,17 @@ app:
     cache_enabled: true
     cache_ttl_seconds: 3600
     
+    # Parallel processing configuration
+    parallel_processing:
+      enabled: true
+      max_concurrent_sources: 4 # How many companies/technologies to process simultaneously
+      max_concurrent_content_per_source: 3 # How many content files per source to process simultaneously
+      enable_sub_agent_parallelization: true # Run sub-agents (classification, correlation) in parallel
+      sub_agent_batch_size: 10 # Batch size for sub-agent processing
+      api_rate_limiting:
+        requests_per_minute: 120 # Stay within API limits
+        concurrent_requests: 10 # Max simultaneous API calls
+    
   # UI settings
   ui:
     items_per_page: 20
@@ -117,24 +128,30 @@ factors:
     - environment
     - supply_chain
     
-# Sub-agent configurations
+# Sub-agent configurations with parallel processing support
 agents:
   content_analyzer:
     enabled: true
     model: "claude-sonnet-4-20250514"
     temperature: 0.3
+    parallel_batch_size: 5 # Process content in batches for performance
     
   classification_agent:
     enabled: true
     model: "claude-sonnet-4-20250514"
     temperature: 0.2
+    parallel_batch_size: 10 # Classify moments in parallel batches
+    enable_parallel_batches: true
     
   correlation_engine:
     enabled: true
     model: "claude-sonnet-4-20250514"
     temperature: 0.4
+    parallel_batch_size: 15 # Find correlations in parallel batches
+    enable_parallel_batches: true
     
   report_generator:
     enabled: true
     model: "claude-sonnet-4-20250514"
     temperature: 0.5
+    parallel_batch_size: 8 # Generate reports in parallel when applicable

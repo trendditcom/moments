@@ -74,11 +74,13 @@ export class MomentExtractor {
   async analyzeContent(
     content: ContentItem[],
     sourceType: 'company' | 'technology',
-    sourceName: string
+    sourceName: string,
+    useParallelProcessing: boolean = true,
+    maxConcurrent: number = 3
   ): Promise<MomentAnalysisResult> {
     const startTime = Date.now()
-    const moments: PivotalMoment[] = []
-    const errors: string[] = []
+    let moments: PivotalMoment[] = []
+    let errors: string[] = []
 
     // Report analysis start
     this.config.onProgress?.({
@@ -87,7 +89,7 @@ export class MomentExtractor {
       status: 'running',
       startTime: new Date(),
       description: `Analyzing ${sourceName} content`,
-      details: `Processing ${content.length} files`,
+      details: `Processing ${content.length} files ${useParallelProcessing ? 'in parallel' : 'sequentially'}`,
       progress: 0
     })
 
@@ -103,51 +105,115 @@ export class MomentExtractor {
       processingCount: 0
     })
 
-    for (let i = 0; i < content.length; i++) {
-      const item = content[i]
-      const progress = Math.round(((i + 1) / content.length) * 100)
-
-      // Update progress
-      this.config.onProgress?.({
-        id: `analyze-${sourceName}`,
-        type: 'content_analysis',
-        status: 'running',
-        startTime: new Date(startTime),
-        description: `Analyzing ${sourceName} content`,
-        details: `Processing ${item.name} (${i + 1}/${content.length})`,
-        progress
-      })
-
-      // Update agent activity
-      this.config.onAgentActivity?.({
-        agentId: `extractor-${sourceName}`,
-        agentType: 'moment_extractor',
-        status: 'processing',
-        currentTask: `Processing: ${item.name}`,
-        model: this.config.model!,
-        startTime: new Date(startTime),
-        lastActivity: new Date(),
-        processingCount: i + 1
-      })
-
-      if (item.type === 'markdown' && item.content) {
-        try {
-          const extractedMoments = await this.extractMomentsFromText(
-            item.content,
-            {
-              sourceType,
-              sourceName,
-              contentId: item.id,
-              filePath: item.path,
-              contentName: item.name
+    if (useParallelProcessing && content.length > 1) {
+      // Parallel processing mode
+      console.log(`[MomentExtractor] Processing ${content.length} items in parallel (max ${maxConcurrent} concurrent)`)
+      
+      const results: Promise<{moments: PivotalMoment[], errors: string[]}>[] = []
+      let processedCount = 0
+      
+      // Process content in parallel batches
+      for (let i = 0; i < content.length; i += maxConcurrent) {
+        const batch = content.slice(i, i + maxConcurrent)
+        
+        const batchPromises = batch.map(async (item) => {
+          if (item.type === 'markdown' && item.content) {
+            try {
+              const extractedMoments = await this.extractMomentsFromText(
+                item.content,
+                {
+                  sourceType,
+                  sourceName,
+                  contentId: item.id,
+                  filePath: item.path,
+                  contentName: item.name
+                }
+              )
+              
+              // Update progress atomically
+              processedCount++
+              const progress = Math.round((processedCount / content.length) * 100)
+              this.config.onProgress?.({
+                id: `analyze-${sourceName}`,
+                type: 'content_analysis',
+                status: 'running',
+                startTime: new Date(startTime),
+                description: `Analyzing ${sourceName} content in parallel`,
+                details: `Completed ${item.name} (${processedCount}/${content.length})`,
+                progress
+              })
+              
+              return { moments: extractedMoments, errors: [] }
+            } catch (error) {
+              const errorMessage = `Failed to analyze ${item.name}: ${error instanceof Error ? error.message : 'Unknown error'}`
+              console.error('MomentExtractor parallel error for', item.name, ':', error)
+              return { moments: [], errors: [errorMessage] }
             }
-          )
-          moments.push(...extractedMoments)
-        } catch (error) {
-          const errorMessage = `Failed to analyze ${item.name}: ${error instanceof Error ? error.message : 'Unknown error'}`
-          errors.push(errorMessage)
-          console.error('MomentExtractor error for', item.name, ':', error)
-          console.log('Content preview:', item.content?.substring(0, 200))
+          }
+          return { moments: [], errors: [] }
+        })
+        
+        results.push(...batchPromises)
+        
+        // Wait for current batch to complete before starting next batch
+        await Promise.all(batchPromises)
+      }
+      
+      // Collect all results
+      const allResults = await Promise.all(results)
+      moments = allResults.flatMap(r => r.moments)
+      errors = allResults.flatMap(r => r.errors)
+      
+    } else {
+      // Sequential processing mode (fallback)
+      console.log(`[MomentExtractor] Processing ${content.length} items sequentially`)
+      
+      for (let i = 0; i < content.length; i++) {
+        const item = content[i]
+        const progress = Math.round(((i + 1) / content.length) * 100)
+
+        // Update progress
+        this.config.onProgress?.({
+          id: `analyze-${sourceName}`,
+          type: 'content_analysis',
+          status: 'running',
+          startTime: new Date(startTime),
+          description: `Analyzing ${sourceName} content`,
+          details: `Processing ${item.name} (${i + 1}/${content.length})`,
+          progress
+        })
+
+        // Update agent activity
+        this.config.onAgentActivity?.({
+          agentId: `extractor-${sourceName}`,
+          agentType: 'moment_extractor',
+          status: 'processing',
+          currentTask: `Processing: ${item.name}`,
+          model: this.config.model!,
+          startTime: new Date(startTime),
+          lastActivity: new Date(),
+          processingCount: i + 1
+        })
+
+        if (item.type === 'markdown' && item.content) {
+          try {
+            const extractedMoments = await this.extractMomentsFromText(
+              item.content,
+              {
+                sourceType,
+                sourceName,
+                contentId: item.id,
+                filePath: item.path,
+                contentName: item.name
+              }
+            )
+            moments.push(...extractedMoments)
+          } catch (error) {
+            const errorMessage = `Failed to analyze ${item.name}: ${error instanceof Error ? error.message : 'Unknown error'}`
+            errors.push(errorMessage)
+            console.error('MomentExtractor error for', item.name, ':', error)
+            console.log('Content preview:', item.content?.substring(0, 200))
+          }
         }
       }
     }
@@ -186,7 +252,8 @@ export class MomentExtractor {
     }
   }
 
-  private async extractMomentsFromText(
+  // Made public to support parallel processing from external functions
+  async extractMomentsFromText(
     text: string,
     context: {
       sourceType: 'company' | 'technology'

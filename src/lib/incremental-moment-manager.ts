@@ -445,20 +445,20 @@ export class IncrementalMomentManager {
         }
       }
 
-      // Process each source group
+      // Process each source group in parallel for improved performance
       let processedSources = 0
-      for (const [sourceKey, sourceData] of Array.from(contentBySource.entries())) {
+      const sourcePromises = Array.from(contentBySource.entries()).map(async ([sourceKey, sourceData]) => {
         const [sourceType, sourceName] = sourceKey.split(':')
         
         try {
+          // Use parallel processing for content within each source
           const result = await extractor.analyzeContent(
             sourceData.items,
             sourceData.sourceType,
-            sourceName
+            sourceName,
+            true, // Enable parallel processing
+            3     // Max 3 concurrent API calls per source
           )
-          
-          newMoments.push(...result.moments)
-          errors.push(...result.errors)
           
           processedSources++
           config.onProgress?.({
@@ -466,14 +466,27 @@ export class IncrementalMomentManager {
             type: 'content_analysis',
             status: 'running',
             startTime: new Date(startTime),
-            description: `Processing changed content`,
+            description: `Processing changed content in parallel`,
             details: `Completed ${sourceName} (${processedSources}/${contentBySource.size})`,
             progress: 30 + Math.round((processedSources / contentBySource.size) * 40)
           })
           
+          return result
         } catch (error) {
           errors.push(`Failed to process ${sourceName}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+          return { moments: [], totalProcessed: 0, processingTime: 0, errors: [error instanceof Error ? error.message : 'Unknown error'] }
         }
+      })
+      
+      console.log(`[IncrementalManager] Processing ${contentBySource.size} source groups in parallel`)
+      
+      // Wait for all source processing to complete
+      const sourceResults = await Promise.all(sourcePromises)
+      
+      // Combine results from all sources
+      for (const result of sourceResults) {
+        newMoments.push(...result.moments)
+        errors.push(...result.errors)
       }
     }
 
