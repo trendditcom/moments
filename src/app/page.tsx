@@ -5,6 +5,7 @@ import { CatalogView } from '@/components/catalog-view'
 import { CatalogDetail } from '@/components/catalog-detail'
 import { MomentsView } from '@/components/moments-view'
 import { StorageManager } from '@/components/storage-manager'
+import { SettingsContent } from '@/components/settings-content'
 import { CatalogStatus } from '@/components/catalog-status'
 import { LoadingScreen } from '@/components/loading-screen'
 import { CatalogSkeleton, CatalogHeaderSkeleton } from '@/components/catalog-skeleton'
@@ -18,7 +19,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Badge } from '@/components/ui/badge'
-import { Cog6ToothIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
+import { 
+  Cog6ToothIcon, 
+  ShieldCheckIcon, 
+  DocumentTextIcon, 
+  WrenchScrewdriverIcon 
+} from '@heroicons/react/24/outline'
 
 type ViewState = 
   | { type: 'catalog', tab: 'companies' | 'technologies' | 'moments' }
@@ -26,6 +32,7 @@ type ViewState =
 
 export default function HomePage() {
   const [showStorageManager, setShowStorageManager] = useState(false)
+  const [settingsSection, setSettingsSection] = useState<'health' | 'data' | 'management'>('health')
   const { phase, status, error, progress, isInitializing, hasData, isLoading } = useAppInitialization()
   const { companies, technologies } = useCatalogStore()
   const { 
@@ -41,7 +48,6 @@ export default function HomePage() {
     // Progress tracking actions
     updateProgress,
     addStep,
-    updateStep,
     addAgent,
     updateAgent,
     setCurrentPrompt,
@@ -205,125 +211,197 @@ export default function HomePage() {
     )
   }
   
+  // Settings sidebar state
+  const isSettingsOpen = showStorageManager
+
   return (
-    <div className="flex flex-col h-screen">
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Moments</h1>
-            <p className="text-sm text-muted-foreground">
-              AI Business Intelligence Dashboard
-            </p>
+    <div className="flex h-screen bg-background">
+      {/* Settings Sidebar */}
+      {isSettingsOpen && (
+        <div className="w-80 border-r border-border bg-card/50 backdrop-blur-sm flex flex-col">
+          <div className="p-6 border-b border-border">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-xl font-semibold text-foreground">Settings</h1>
+                <p className="text-sm text-muted-foreground">Storage & Data Management</p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowStorageManager(false)}
+                className="ml-4"
+              >
+                <Cog6ToothIcon className="w-5 h-5" />
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            {hasData ? (
-              <CatalogStatus 
-                hydrationStatus={status} 
-                hydrationError={error}
-                isHydrating={isLoading}
-              />
-            ) : (
-              <CatalogHeaderSkeleton />
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowStorageManager(!showStorageManager)}
-              title="Storage Manager"
-            >
-              <Cog6ToothIcon className="w-5 h-5" />
-            </Button>
-          </div>
+          
+          <nav className="flex-1 p-4">
+            <div className="space-y-1">
+              <button
+                onClick={() => setSettingsSection('health')}
+                className={`w-full flex items-center gap-3 px-3 py-2 text-left rounded-lg transition-colors ${
+                  settingsSection === 'health'
+                    ? 'bg-primary/10 text-primary border border-primary/20'
+                    : 'hover:bg-muted/50 text-foreground'
+                }`}
+              >
+                <ShieldCheckIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">Storage Health</span>
+              </button>
+              
+              <button
+                onClick={() => setSettingsSection('data')}
+                className={`w-full flex items-center gap-3 px-3 py-2 text-left rounded-lg transition-colors ${
+                  settingsSection === 'data'
+                    ? 'bg-primary/10 text-primary border border-primary/20'
+                    : 'hover:bg-muted/50 text-foreground'
+                }`}
+              >
+                <DocumentTextIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">Current Data</span>
+              </button>
+              
+              <button
+                onClick={() => setSettingsSection('management')}
+                className={`w-full flex items-center gap-3 px-3 py-2 text-left rounded-lg transition-colors ${
+                  settingsSection === 'management'
+                    ? 'bg-primary/10 text-primary border border-primary/20'
+                    : 'hover:bg-muted/50 text-foreground'
+                }`}
+              >
+                <WrenchScrewdriverIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">Storage Management</span>
+              </button>
+            </div>
+          </nav>
         </div>
-      </header>
+      )}
 
-      <Collapsible open={showStorageManager} onOpenChange={setShowStorageManager}>
-        <CollapsibleContent className="border-b border-border bg-card/95 backdrop-blur-sm">
-          <div className="p-6">
-            <StorageManager />
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header className="border-b border-border bg-card/50 backdrop-blur-sm px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col items-center text-center min-w-0">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mb-2">
+                <span className="text-white text-sm font-bold">M</span>
+              </div>
+              <h1 className="text-2xl font-bold text-foreground">Moments</h1>
+              <p className="text-sm text-muted-foreground">
+                AI Business Intelligence Dashboard
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              {hasData ? (
+                <CatalogStatus 
+                  hydrationStatus={status} 
+                  hydrationError={error}
+                  isHydrating={isLoading}
+                />
+              ) : (
+                <CatalogHeaderSkeleton />
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowStorageManager(!showStorageManager)}
+                title="Settings"
+                className={isSettingsOpen ? 'bg-muted' : ''}
+              >
+                <Cog6ToothIcon className="w-5 h-5" />
+              </Button>
+            </div>
           </div>
-        </CollapsibleContent>
-      </Collapsible>
+        </header>
 
-      <div className="flex-1 overflow-hidden">
-        {!hasData ? (
-          <CatalogSkeleton />
+        {/* Settings Content or Main App Content */}
+        {isSettingsOpen ? (
+          <div className="flex-1 overflow-y-auto p-6">
+            <SettingsContent section={settingsSection} />
+          </div>
         ) : (
-          <div className="flex flex-col h-full">
-            {viewState.type === 'catalog' && (
-              <div className="border-b border-border">
-                <nav className="flex space-x-8 px-6 py-2">
-                  <button
-                    onClick={() => handleTabChange('companies')}
-                    className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                      activeTab === 'companies'
-                        ? 'border-primary text-primary'
-                        : 'border-transparent text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    Companies ({companies.length})
-                  </button>
-                  <button
-                    onClick={() => handleTabChange('technologies')}
-                    className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                      activeTab === 'technologies'
-                        ? 'border-primary text-primary'
-                        : 'border-transparent text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    Technologies ({technologies.length})
-                  </button>
-                  <button
-                    onClick={() => handleTabChange('moments')}
-                    className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                      activeTab === 'moments'
-                        ? 'border-primary text-primary'
-                        : 'border-transparent text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    Moments ({momentStats.totalMoments})
-                    {momentStats.highImpactCount > 0 && (
-                      <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-800">
-                        {momentStats.highImpactCount} high impact
-                      </span>
-                    )}
-                  </button>
-                </nav>
+          <div className="flex-1 overflow-hidden">
+            {!hasData ? (
+              <CatalogSkeleton />
+            ) : (
+              <div className="flex flex-col h-full">
+                {viewState.type === 'catalog' && (
+                  <div className="border-b border-border">
+                    <nav className="flex space-x-8 px-6 py-2">
+                      <button
+                        onClick={() => handleTabChange('companies')}
+                        className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                          activeTab === 'companies'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Companies ({companies.length})
+                      </button>
+                      <button
+                        onClick={() => handleTabChange('technologies')}
+                        className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                          activeTab === 'technologies'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Technologies ({technologies.length})
+                      </button>
+                      <button
+                        onClick={() => handleTabChange('moments')}
+                        className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                          activeTab === 'moments'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Moments ({momentStats.totalMoments})
+                        {momentStats.highImpactCount > 0 && (
+                          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-800">
+                            {momentStats.highImpactCount} high impact
+                          </span>
+                        )}
+                      </button>
+                    </nav>
+                  </div>
+                )}
+                
+                <div className="flex-1 overflow-hidden">
+                  {isLoading ? (
+                    <CatalogSkeleton />
+                  ) : viewState.type === 'detail' ? (
+                    <CatalogDetail
+                      item={viewState.item}
+                      type={viewState.itemType}
+                      moments={moments}
+                      onBack={handleBackToCatalog}
+                      onMomentSelect={handleMomentSelect}
+                      onEntityClick={handleEntityClick}
+                    />
+                  ) : viewState.tab === 'moments' ? (
+                    <div className="h-full overflow-y-auto p-6">
+                      <MomentsView
+                        moments={moments}
+                        isLoading={isAnalyzing}
+                        error={analysisError}
+                        progress={analysisProgress}
+                        onAnalyzeMoments={handleAnalyzeMoments}
+                        onMomentSelect={handleMomentSelect}
+                        onEntityClick={handleEntityClick}
+                      />
+                    </div>
+                  ) : (
+                    <CatalogView 
+                      key={viewState.tab} 
+                      type={viewState.tab} 
+                      onItemClick={handleCatalogItemClick}
+                    />
+                  )}
+                </div>
               </div>
             )}
-            
-            <div className="flex-1 overflow-hidden">
-              {isLoading ? (
-                <CatalogSkeleton />
-              ) : viewState.type === 'detail' ? (
-                <CatalogDetail
-                  item={viewState.item}
-                  type={viewState.itemType}
-                  moments={moments}
-                  onBack={handleBackToCatalog}
-                  onMomentSelect={handleMomentSelect}
-                  onEntityClick={handleEntityClick}
-                />
-              ) : viewState.tab === 'moments' ? (
-                <div className="h-full overflow-y-auto p-6">
-                  <MomentsView
-                    moments={moments}
-                    isLoading={isAnalyzing}
-                    error={analysisError}
-                    progress={analysisProgress}
-                    onAnalyzeMoments={handleAnalyzeMoments}
-                    onMomentSelect={handleMomentSelect}
-                    onEntityClick={handleEntityClick}
-                  />
-                </div>
-              ) : (
-                <CatalogView 
-                  key={viewState.tab} 
-                  type={viewState.tab} 
-                  onItemClick={handleCatalogItemClick}
-                />
-              )}
-            </div>
           </div>
         )}
       </div>

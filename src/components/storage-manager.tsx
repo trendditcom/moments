@@ -469,7 +469,11 @@ export function StorageManager() {
 
       {/* Status Messages */}
       {message && (
-        <Card className={`border-${message.type === 'error' ? 'red' : message.type === 'success' ? 'green' : 'blue'}-500`}>
+        <Card className={
+          message.type === 'error' ? 'border-red-500' : 
+          message.type === 'success' ? 'border-green-500' : 
+          'border-blue-500'
+        }>
           <CardContent className="pt-4">
             <div className="flex items-start gap-3">
               {message.type === 'error' && <ExclamationTriangleIcon className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />}
