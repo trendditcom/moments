@@ -14,6 +14,7 @@ import { useCatalogStore } from '@/store/catalog-store'
 import { useMomentsStore } from '@/store/moments-store'
 import { analyzeMomentsFromCatalog } from '@/store/moments-store'
 import { useAppInitialization } from '@/hooks/use-app-initialization'
+import { useMomentsHydration } from '@/hooks/use-moments-hydration'
 import { Company, Technology } from '@/types/catalog'
 import { PivotalMoment } from '@/types/moments'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -37,6 +38,11 @@ export default function HomePage() {
   const [showStorageManager, setShowStorageManager] = useState(false)
   const [settingsSection, setSettingsSection] = useState<'health' | 'data' | 'management'>('health')
   const { phase, status, error, progress, isInitializing, hasData, isLoading } = useAppInitialization()
+  const { 
+    isHydrating: isMomentsHydrating, 
+    hydrationStatus: momentsHydrationStatus, 
+    hydrationError: momentsHydrationError 
+  } = useMomentsHydration()
   const { companies, technologies } = useCatalogStore()
   const { 
     moments, 

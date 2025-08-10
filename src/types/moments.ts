@@ -129,12 +129,17 @@ export interface MomentState {
 
 export interface MomentActions {
   analyzeMoments: (sourceType: 'companies' | 'technologies' | 'all') => Promise<void>
-  addMoments: (moments: PivotalMoment[]) => void
+  addMoments: (moments: PivotalMoment[]) => Promise<void>
   addCorrelations: (correlations: MomentCorrelation[]) => void
   setAnalyzing: (analyzing: boolean) => void
   setAnalysisError: (error: string | null) => void
   clearMoments: () => void
   updateProcessingStats: (stats: Partial<MomentState['processingStats']>) => void
+  // File-based persistence actions
+  hydrateFromFiles: () => Promise<{ loaded: number; errors: number }>
+  saveToFiles: (moments?: PivotalMoment[]) => Promise<{ saved: number; failed: number }>
+  deleteMomentFile: (momentId: string) => Promise<boolean>
+  checkFileSystemStatus: () => Promise<{ exists: boolean; writable: boolean; count: number }>
   // Progress tracking actions
   updateProgress: (progress: Partial<AnalysisProgress>) => void
   addStep: (step: AnalysisStep) => void

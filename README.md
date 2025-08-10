@@ -765,6 +765,177 @@ The latest update adds comprehensive detail views for individual moments, creati
 
 This comprehensive moment detail system completes the unified navigation experience in Moments, allowing users to explore any piece of content (companies, technologies, or moments) with the same level of depth and interconnection.
 
+### Testing File-Based Moment Persistence
+
+The latest update introduces comprehensive two-way file-based persistence for moments, extending the existing companies/technologies folder pattern to moments with human-readable markdown files.
+
+#### 13. File-Based Persistence System
+
+**What to Test:**
+- **Automatic File Generation**: Moments are automatically saved to `moments/` folder as markdown files
+- **Two-Way Sync**: Moments load from filesystem on app startup and save back when analyzed
+- **Human-Readable Format**: Files use YAML frontmatter with complete moment metadata
+- **File Management UI**: Storage Manager provides file operations with user-friendly interface
+
+**How It Works:**
+1. When you analyze moments, they are automatically saved to `moments/` folder
+2. Each moment becomes a markdown file: `YYYY-MM-DD-{type}-{title}-{id}.md`
+3. Files contain YAML frontmatter with all metadata and readable markdown content
+4. On app restart, moments load from files instead of relying only on browser storage
+5. Manual file editing is supported - changes will be loaded back into the app
+
+**Testing Scenarios:**
+
+**Scenario 1: Automatic File Generation**
+1. Run moment analysis to generate some moments
+2. Check the `moments/` folder in your project directory
+3. Verify moment files are created with proper naming convention
+4. Open a moment file and examine the YAML frontmatter and markdown content
+5. Confirm all moment data (classification, entities, impact, etc.) is present
+
+**Scenario 2: File-Based Hydration**
+1. After generating moments, close the browser completely
+2. Reopen the app and navigate to Moments tab
+3. Observe moments loading from files instead of showing empty state
+4. Verify all moment data and relationships are preserved
+5. Check browser console for hydration log messages
+
+**Scenario 3: Storage Manager File Operations**
+1. Navigate to Storage Manager (settings icon in header)
+2. Go to "Storage Management" section
+3. Look for "File Management" section with "Save to Files" and "Load from Files" buttons
+4. Test "Save to Files" to manually save moments to filesystem
+5. Test "Load from Files" to refresh moments from filesystem files
+
+**Scenario 4: Manual File Editing**
+1. Open a moment file in `moments/` folder with a text editor
+2. Edit the title or description in the YAML frontmatter
+3. Save the file and return to the Moments app
+4. Use "Load from Files" in Storage Manager to refresh from files
+5. Verify your changes appear in the moment card
+
+**Scenario 5: Configuration Verification**
+1. Check `config.yml` for moments configuration section
+2. Verify `auto_save: true` and `sync_mode: "bidirectional"`
+3. Test changing `auto_save: false` and confirm moments don't auto-save
+4. Test different file patterns or folder paths
+
+**File Structure to Evaluate:**
+
+**Folder Organization:**
+- `moments/` folder should be created automatically
+- Files should follow naming pattern: `2024-01-15-c-openai-partnership-abc12345.md`
+- Each file should be self-contained with complete moment data
+
+**File Content Structure:**
+```markdown
+---
+id: unique-moment-id
+title: "Moment Title"
+description: "Description"
+extractedAt: "2024-01-01T00:00:00.000Z"
+source:
+  type: company
+  name: "Company Name"
+  # ... complete source metadata
+classification:
+  microFactors: ["company", "partners"]
+  macroFactors: ["technology"]
+  confidence: "high"
+  reasoning: "AI analysis reasoning"
+  keywords: ["keyword1", "keyword2"]
+impact:
+  score: 85
+  reasoning: "Impact analysis"
+entities:
+  companies: ["Company1", "Company2"]
+  technologies: ["Tech1", "Tech2"]
+  # ... etc
+---
+
+# Moment Title
+
+Brief description...
+
+## Analysis Summary
+[Readable analysis content]
+```
+
+**Configuration Options to Test:**
+
+**In `config.yml`:**
+```yaml
+catalogs:
+  moments:
+    auto_save: true          # Test enabling/disabling auto-save
+    sync_mode: "bidirectional"  # Test "one-way" vs "bidirectional"
+    metadata_format: "frontmatter"  # YAML frontmatter format
+    file_patterns: ["*.md", "*.mdx"]  # Test different patterns
+```
+
+**Evaluation Criteria:**
+- ✅ Moment files are automatically created in `moments/` folder
+- ✅ Files contain complete moment data in YAML frontmatter
+- ✅ Markdown content is human-readable with structured analysis
+- ✅ App successfully loads moments from files on startup
+- ✅ File Management UI provides easy save/load operations
+- ✅ Manual file edits are preserved when loading from files
+- ✅ Configuration options work as expected
+- ✅ No data loss when switching between memory and file storage
+
+**Advanced Features to Test:**
+
+**Bidirectional Sync:**
+- Files → Memory: Changes to files appear in app after "Load from Files"
+- Memory → Files: New moments automatically save to files (if auto_save enabled)
+- Mixed operations: Some moments from analysis, some edited manually
+
+**Error Handling:**
+- Invalid YAML frontmatter in moment files
+- Missing or corrupted moment files
+- Filesystem permissions issues
+- Large numbers of moment files (performance)
+
+**Performance Testing:**
+- Time to save large numbers of moments to files
+- Loading speed with many moment files in folder
+- Memory usage with file-based persistence enabled
+- Browser storage usage before/after file persistence
+
+**Integration Testing:**
+- Moment detail views work with file-loaded moments
+- Entity navigation works with file-persisted moments
+- Keyword filtering works across file and memory moments
+- Related moments correlation works with mixed sources
+
+**Troubleshooting Common Issues:**
+
+**Moments Not Saving to Files:**
+- Check config.yml has `auto_save: true`
+- Verify filesystem write permissions in moments/ folder
+- Check browser console for save operation errors
+- Use Storage Manager "Save to Files" as fallback
+
+**Moments Not Loading from Files:**
+- Verify `sync_mode: "bidirectional"` in config.yml
+- Check moment files have valid YAML frontmatter
+- Look for hydration errors in browser console
+- Try "Load from Files" in Storage Manager manually
+
+**File Format Issues:**
+- Ensure YAML frontmatter is properly formatted with `---` delimiters
+- Check all required fields are present (id, title, extractedAt)
+- Verify date formats are ISO strings
+- Validate enum values (confidence, etc.)
+
+**Performance Issues:**
+- Monitor filesystem operations in browser dev tools
+- Check for excessive save/load operations
+- Test with representative numbers of moment files
+- Use "Inspect Storage" to check memory usage
+
+This file-based persistence system provides a robust foundation for moments data management, ensuring your AI analysis results are preserved as human-readable files that can be version controlled, edited manually, and shared across different environments.
+
 ## 🔧 Configuration
 
 ### Custom Content Sources

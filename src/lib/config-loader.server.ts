@@ -60,6 +60,8 @@ function isObject(item: any): boolean {
   return item && typeof item === 'object' && !Array.isArray(item)
 }
 
+export const loadConfigServer = loadConfig
+
 export function getDefaultConfig(): Config {
   return {
     catalogs: {
@@ -76,6 +78,16 @@ export function getDefaultConfig(): Config {
         source_folders: ['./technologies'],
         default_folder: './technologies',
         file_patterns: ['*.md', '*.mdx', '*.png', '*.jpg', '*.jpeg', '*.webp', '*.svg']
+      },
+      moments: {
+        name: 'Moments',
+        description: 'Pivotal business moments extracted and analyzed by AI',
+        source_folders: ['./moments'],
+        default_folder: './moments',
+        file_patterns: ['*.md', '*.mdx'],
+        metadata_format: 'frontmatter' as const,
+        auto_save: true,
+        sync_mode: 'bidirectional' as const
       }
     },
     app: {

@@ -31,6 +31,19 @@ catalogs:
       - "*.jpeg"
       - "*.webp"
       - "*.svg"
+      
+  moments:
+    name: "Moments"
+    description: "Pivotal business moments extracted and analyzed by AI"
+    source_folders:
+      - ./moments
+    default_folder: ./moments
+    file_patterns:
+      - "*.md"
+      - "*.mdx"
+    metadata_format: "frontmatter" # yaml frontmatter for moment metadata
+    auto_save: true # automatically save analyzed moments to files
+    sync_mode: "bidirectional" # file ↔ memory sync
 
 # Application settings
 app:

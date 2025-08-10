@@ -6,6 +6,12 @@ export interface CatalogConfig {
   file_patterns: string[]
 }
 
+export interface MomentsCatalogConfig extends CatalogConfig {
+  metadata_format: 'frontmatter' | 'json'
+  auto_save: boolean
+  sync_mode: 'one-way' | 'bidirectional'
+}
+
 export interface AppConfig {
   name: string
   description: string
@@ -37,6 +43,7 @@ export interface Config {
   catalogs: {
     companies: CatalogConfig
     technologies: CatalogConfig
+    moments?: MomentsCatalogConfig
   }
   app: AppConfig
   factors: FactorsConfig

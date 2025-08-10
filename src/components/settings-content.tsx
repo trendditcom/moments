@@ -220,6 +220,54 @@ export function SettingsContent({ section }: SettingsContentProps) {
     }
   }
 
+  const handleSaveToFiles = async () => {
+    try {
+      setMessage({ type: 'info', text: 'Saving moments to files...' })
+      
+      const { saveToFiles } = useMomentsStore.getState()
+      const result = await saveToFiles()
+      
+      if (result.saved > 0) {
+        setMessage({ 
+          type: 'success', 
+          text: `Successfully saved ${result.saved} moments to files${result.failed > 0 ? ` (${result.failed} failed)` : ''}.` 
+        })
+      } else {
+        setMessage({ type: 'info', text: 'No moments to save.' })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to save moments to files.' })
+      console.error('Error saving to files:', error)
+    }
+  }
+
+  const handleLoadFromFiles = async () => {
+    try {
+      const confirmMessage = moments.length > 0 
+        ? `This will replace your current ${moments.length} moments with data from files. Continue?`
+        : 'Load moments from filesystem files?'
+        
+      if (!confirm(confirmMessage)) return
+
+      setMessage({ type: 'info', text: 'Loading moments from files...' })
+      
+      const { hydrateFromFiles } = useMomentsStore.getState()
+      const result = await hydrateFromFiles()
+      
+      if (result.loaded > 0) {
+        setMessage({ 
+          type: 'success', 
+          text: `Successfully loaded ${result.loaded} moments from files${result.errors > 0 ? ` (${result.errors} errors)` : ''}.` 
+        })
+      } else {
+        setMessage({ type: 'info', text: 'No moment files found to load.' })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to load moments from files.' })
+      console.error('Error loading from files:', error)
+    }
+  }
+
   const getStorageStatus = () => {
     if (!storageHealth) return { variant: 'default' as const, text: 'Unknown' }
     if (!storageHealth.available) return { variant: 'destructive' as const, text: 'Unavailable' }
@@ -354,6 +402,15 @@ export function SettingsContent({ section }: SettingsContentProps) {
             value={lastAnalysisAt ? new Date(lastAnalysisAt).toLocaleString() : 'Never'}
             description="When you last ran AI analysis to extract moments"
           />
+          <StorageMetric
+            label="File System Status"
+            value={
+              <Badge variant="outline" className="text-blue-600">
+                File Persistence Enabled
+              </Badge>
+            }
+            description="Moments are automatically saved to filesystem as markdown files"
+          />
         </div>
       </div>
     )
@@ -428,6 +485,27 @@ export function SettingsContent({ section }: SettingsContentProps) {
               label="Reload Application"
               description="Refresh the entire application to resolve display or loading issues"
               onClick={handleReload}
+            />
+          </div>
+          
+          {/* File Management */}
+          <div className="space-y-4">
+            <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
+              File Management
+            </h4>
+            
+            <ActionButton
+              icon={ArrowDownTrayIcon}
+              label="Save to Files"
+              description="Save all current moments to filesystem as markdown files"
+              onClick={handleSaveToFiles}
+            />
+            
+            <ActionButton
+              icon={ArrowUpTrayIcon}
+              label="Load from Files"
+              description="Load moments from filesystem markdown files"
+              onClick={handleLoadFromFiles}
             />
           </div>
         </div>

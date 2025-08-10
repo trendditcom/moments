@@ -16,6 +16,8 @@ import { Company, Technology } from '@/types/catalog'
 import { MomentExtractor, createMomentExtractor } from '@/lib/moment-extractor'
 import { SubAgentManager, createSubAgentManager } from '@/lib/sub-agents'
 import { createPersistStorage } from '@/lib/persistence'
+import { momentFileProcessor } from '@/lib/moment-file-processor'
+import { loadConfigClient } from '@/lib/config-loader.client'
 
 interface MomentStore extends MomentState, MomentActions {
   // Additional helper methods
@@ -113,10 +115,24 @@ export const useMomentsStore = create<MomentStore>()(
         }
       },
 
-      addMoments: (moments) =>
+      addMoments: async (moments) => {
         set((state) => ({
           moments: [...state.moments, ...moments],
-        })),
+        }))
+        
+        // Auto-save to files if enabled
+        try {
+          const config = await loadConfigClient()
+          if (config.catalogs.moments?.auto_save && moments.length > 0) {
+            console.log(`Auto-saving ${moments.length} moments to files...`)
+            const result = await momentFileProcessor.saveMoments(moments)
+            console.log(`File save result: ${result.saved} saved, ${result.failed} failed`)
+          }
+        } catch (error) {
+          console.error('Error auto-saving moments:', error)
+          // Don't throw - file save errors shouldn't break the app
+        }
+      },
 
       addCorrelations: (correlations) =>
         set((state) => ({
@@ -161,6 +177,76 @@ export const useMomentsStore = create<MomentStore>()(
             ...stats,
           },
         })),
+
+      // File-based persistence methods
+      hydrateFromFiles: async () => {
+        try {
+          console.log('Loading moments from files...')
+          const fileMoments = await momentFileProcessor.loadMoments()
+          
+          if (fileMoments.length > 0) {
+            set((state) => ({
+              moments: [...fileMoments], // Replace with file-based moments
+              lastAnalysisAt: new Date() // Update last analysis time
+            }))
+            
+            console.log(`Hydrated ${fileMoments.length} moments from files`)
+            return { loaded: fileMoments.length, errors: 0 }
+          }
+          
+          return { loaded: 0, errors: 0 }
+        } catch (error) {
+          console.error('Error hydrating moments from files:', error)
+          return { loaded: 0, errors: 1 }
+        }
+      },
+
+      saveToFiles: async (moments) => {
+        try {
+          const momentsToSave = moments || get().moments
+          if (momentsToSave.length === 0) {
+            return { saved: 0, failed: 0 }
+          }
+          
+          console.log(`Saving ${momentsToSave.length} moments to files...`)
+          const result = await momentFileProcessor.saveMoments(momentsToSave)
+          console.log(`Save result: ${result.saved} saved, ${result.failed} failed`)
+          return result
+        } catch (error) {
+          console.error('Error saving moments to files:', error)
+          return { saved: 0, failed: 1 }
+        }
+      },
+
+      deleteMomentFile: async (momentId) => {
+        try {
+          const success = await momentFileProcessor.deleteMoment(momentId)
+          if (success) {
+            // Also remove from memory
+            set((state) => ({
+              moments: state.moments.filter(m => m.id !== momentId)
+            }))
+          }
+          return success
+        } catch (error) {
+          console.error(`Error deleting moment file ${momentId}:`, error)
+          return false
+        }
+      },
+
+      checkFileSystemStatus: async () => {
+        try {
+          const status = await momentFileProcessor.checkMomentsFolder()
+          return {
+            exists: status.exists,
+            writable: status.writable,
+            count: status.count
+          }
+        } catch (error) {
+          console.error('Error checking file system status:', error)
+          return { exists: false, writable: false, count: 0 }
+        }
+      },
 
       // Progress tracking actions
       updateProgress: (progress) =>
