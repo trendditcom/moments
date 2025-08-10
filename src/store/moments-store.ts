@@ -7,7 +7,10 @@ import {
   MomentActions, 
   PivotalMoment, 
   MomentCorrelation,
-  MomentAnalysisResult
+  MomentAnalysisResult,
+  AnalysisProgress,
+  AnalysisStep,
+  AgentActivity
 } from '@/types/moments'
 import { Company, Technology } from '@/types/catalog'
 import { MomentExtractor, createMomentExtractor } from '@/lib/moment-extractor'
@@ -40,6 +43,21 @@ export const useMomentsStore = create<MomentStore>()(
         totalContent: 0,
         processedContent: 0,
         momentsFound: 0,
+      },
+      progress: {
+        isActive: false,
+        currentStep: null,
+        completedSteps: [],
+        activeAgents: [],
+        currentPrompt: undefined,
+        progressPercentage: 0,
+        estimatedTimeRemaining: undefined,
+        stats: {
+          totalItems: 0,
+          processedItems: 0,
+          momentsExtracted: 0,
+          errorsEncountered: 0
+        }
       },
 
       // Actions
@@ -118,6 +136,21 @@ export const useMomentsStore = create<MomentStore>()(
             processedContent: 0,
             momentsFound: 0,
           },
+          progress: {
+            isActive: false,
+            currentStep: null,
+            completedSteps: [],
+            activeAgents: [],
+            currentPrompt: undefined,
+            progressPercentage: 0,
+            estimatedTimeRemaining: undefined,
+            stats: {
+              totalItems: 0,
+              processedItems: 0,
+              momentsExtracted: 0,
+              errorsEncountered: 0
+            }
+          },
         }),
 
       updateProcessingStats: (stats) =>
@@ -125,6 +158,83 @@ export const useMomentsStore = create<MomentStore>()(
           processingStats: {
             ...state.processingStats,
             ...stats,
+          },
+        })),
+
+      // Progress tracking actions
+      updateProgress: (progress) =>
+        set((state) => ({
+          progress: {
+            ...state.progress,
+            ...progress,
+          },
+        })),
+
+      addStep: (step) =>
+        set((state) => ({
+          progress: {
+            ...state.progress,
+            currentStep: step,
+          },
+        })),
+
+      updateStep: (stepId, updates) =>
+        set((state) => ({
+          progress: {
+            ...state.progress,
+            currentStep: state.progress.currentStep?.id === stepId 
+              ? { ...state.progress.currentStep, ...updates } 
+              : state.progress.currentStep,
+            completedSteps: state.progress.completedSteps.map(step => 
+              step.id === stepId ? { ...step, ...updates } : step
+            ),
+          },
+        })),
+
+      addAgent: (agent) =>
+        set((state) => ({
+          progress: {
+            ...state.progress,
+            activeAgents: [...state.progress.activeAgents, agent],
+          },
+        })),
+
+      updateAgent: (agentId, updates) =>
+        set((state) => ({
+          progress: {
+            ...state.progress,
+            activeAgents: state.progress.activeAgents.map(agent => 
+              agent.agentId === agentId 
+                ? { ...agent, ...updates, lastActivity: new Date() } 
+                : agent
+            ),
+          },
+        })),
+
+      setCurrentPrompt: (prompt) =>
+        set((state) => ({
+          progress: {
+            ...state.progress,
+            currentPrompt: prompt,
+          },
+        })),
+
+      resetProgress: () =>
+        set((state) => ({
+          progress: {
+            isActive: false,
+            currentStep: null,
+            completedSteps: [],
+            activeAgents: [],
+            currentPrompt: undefined,
+            progressPercentage: 0,
+            estimatedTimeRemaining: undefined,
+            stats: {
+              totalItems: 0,
+              processedItems: 0,
+              momentsExtracted: 0,
+              errorsEncountered: 0
+            }
           },
         })),
 
@@ -195,13 +305,22 @@ export const useMomentsStore = create<MomentStore>()(
 export async function analyzeMomentsFromCatalog(
   companies: Company[], 
   technologies: Technology[],
-  sourceType: 'companies' | 'technologies' | 'all' = 'all'
+  sourceType: 'companies' | 'technologies' | 'all' = 'all',
+  progressCallbacks?: {
+    onProgress?: (step: AnalysisStep) => void
+    onAgentActivity?: (agent: AgentActivity) => void  
+    onPrompt?: (prompt: string) => void
+  }
 ): Promise<MomentAnalysisResult> {
   console.log('Starting moment analysis...')
   console.log('Companies:', companies.length, 'Technologies:', technologies.length)
   console.log('Source type:', sourceType)
   
-  const extractor = createMomentExtractor()
+  const extractor = createMomentExtractor({
+    onProgress: progressCallbacks?.onProgress,
+    onAgentActivity: progressCallbacks?.onAgentActivity,
+    onPrompt: progressCallbacks?.onPrompt
+  })
   const subAgents = createSubAgentManager()
   
   try {

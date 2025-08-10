@@ -15,11 +15,20 @@ export default function HomePage() {
     moments, 
     isAnalyzing, 
     analysisError, 
+    progress,
     addMoments, 
     setAnalyzing, 
     setAnalysisError,
     clearMoments,
-    getMomentStats
+    getMomentStats,
+    // Progress tracking actions
+    updateProgress,
+    addStep,
+    updateStep,
+    addAgent,
+    updateAgent,
+    setCurrentPrompt,
+    resetProgress
   } = useMomentsStore()
   
   const [activeTab, setActiveTab] = useState<'companies' | 'technologies' | 'moments'>('companies')
@@ -37,12 +46,69 @@ export default function HomePage() {
     try {
       setAnalyzing(true)
       setAnalysisError(null)
+      resetProgress()
       
-      const result = await analyzeMomentsFromCatalog(companies, technologies, 'all')
+      // Initialize progress
+      updateProgress({
+        isActive: true,
+        progressPercentage: 0,
+        stats: {
+          totalItems: companies.length + technologies.length,
+          processedItems: 0,
+          momentsExtracted: 0,
+          errorsEncountered: 0
+        }
+      })
+      
+      const result = await analyzeMomentsFromCatalog(
+        companies, 
+        technologies, 
+        'all',
+        {
+          onProgress: (step) => {
+            addStep(step)
+            // Calculate overall progress based on step progress
+            const overallProgress = step.progress || 0
+            updateProgress({
+              progressPercentage: overallProgress,
+              stats: {
+                totalItems: companies.length + technologies.length,
+                processedItems: Math.round((overallProgress / 100) * (companies.length + technologies.length)),
+                momentsExtracted: moments.length,
+                errorsEncountered: result?.errors?.length || 0
+              }
+            })
+          },
+          onAgentActivity: (agent) => {
+            // Check if agent already exists
+            const existingAgent = progress.activeAgents.find(a => a.agentId === agent.agentId)
+            if (existingAgent) {
+              updateAgent(agent.agentId, agent)
+            } else {
+              addAgent(agent)
+            }
+          },
+          onPrompt: (prompt) => {
+            setCurrentPrompt(prompt)
+          }
+        }
+      )
       
       // Clear existing moments and add new ones
       clearMoments()
       addMoments(result.moments)
+      
+      // Mark analysis complete
+      updateProgress({
+        isActive: false,
+        progressPercentage: 100,
+        stats: {
+          totalItems: companies.length + technologies.length,
+          processedItems: companies.length + technologies.length,
+          momentsExtracted: result.moments.length,
+          errorsEncountered: result.errors.length
+        }
+      })
       
       if (result.errors.length > 0) {
         console.log('Analysis warnings:', result.errors)
@@ -51,6 +117,7 @@ export default function HomePage() {
         setAnalysisError(`Analysis completed with ${result.errors.length} warnings:\n• ${errorDetails}${remainingCount}`)
       }
     } catch (error) {
+      updateProgress({ isActive: false })
       setAnalysisError(error instanceof Error ? error.message : 'Analysis failed')
     } finally {
       setAnalyzing(false)
@@ -137,6 +204,7 @@ export default function HomePage() {
                     moments={moments}
                     isLoading={isAnalyzing}
                     error={analysisError}
+                    progress={progress}
                     onAnalyzeMoments={handleAnalyzeMoments}
                   />
                 </div>

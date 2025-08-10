@@ -73,6 +73,46 @@ export interface MomentAnalysisResult {
   errors: string[]
 }
 
+// Progress tracking types
+export interface AnalysisStep {
+  id: string
+  type: 'content_analysis' | 'moment_extraction' | 'classification' | 'correlation' | 'validation'
+  status: 'pending' | 'running' | 'completed' | 'error'
+  startTime?: Date
+  endTime?: Date
+  description: string
+  details?: string
+  progress?: number // 0-100
+}
+
+export interface AgentActivity {
+  agentId: string
+  agentType: 'content_analyzer' | 'classification_agent' | 'correlation_engine' | 'report_generator' | 'moment_extractor'
+  status: 'spawning' | 'active' | 'processing' | 'waiting' | 'completed' | 'error'
+  currentTask?: string
+  prompt?: string
+  model: string
+  startTime: Date
+  lastActivity: Date
+  processingCount: number
+}
+
+export interface AnalysisProgress {
+  isActive: boolean
+  currentStep: AnalysisStep | null
+  completedSteps: AnalysisStep[]
+  activeAgents: AgentActivity[]
+  currentPrompt?: string
+  progressPercentage: number
+  estimatedTimeRemaining?: number
+  stats: {
+    totalItems: number
+    processedItems: number
+    momentsExtracted: number
+    errorsEncountered: number
+  }
+}
+
 export interface MomentState {
   moments: PivotalMoment[]
   correlations: MomentCorrelation[]
@@ -84,6 +124,7 @@ export interface MomentState {
     processedContent: number
     momentsFound: number
   }
+  progress: AnalysisProgress
 }
 
 export interface MomentActions {
@@ -94,6 +135,14 @@ export interface MomentActions {
   setAnalysisError: (error: string | null) => void
   clearMoments: () => void
   updateProcessingStats: (stats: Partial<MomentState['processingStats']>) => void
+  // Progress tracking actions
+  updateProgress: (progress: Partial<AnalysisProgress>) => void
+  addStep: (step: AnalysisStep) => void
+  updateStep: (stepId: string, updates: Partial<AnalysisStep>) => void
+  addAgent: (agent: AgentActivity) => void
+  updateAgent: (agentId: string, updates: Partial<AgentActivity>) => void
+  setCurrentPrompt: (prompt: string | undefined) => void
+  resetProgress: () => void
 }
 
 // Agent configuration types

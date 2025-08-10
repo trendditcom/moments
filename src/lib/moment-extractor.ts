@@ -6,7 +6,9 @@ import {
   MomentAnalysisResult,
   MicroFactor,
   MacroFactor,
-  ConfidenceLevel
+  ConfidenceLevel,
+  AnalysisStep,
+  AgentActivity
 } from '@/types/moments'
 import { ContentItem, Company, Technology } from '@/types/catalog'
 
@@ -14,6 +16,9 @@ interface ExtractorConfig {
   apiKey?: string
   model?: string
   temperature?: number
+  onProgress?: (step: AnalysisStep) => void
+  onAgentActivity?: (agent: AgentActivity) => void
+  onPrompt?: (prompt: string) => void
 }
 
 export class MomentExtractor {
@@ -75,7 +80,56 @@ export class MomentExtractor {
     const moments: PivotalMoment[] = []
     const errors: string[] = []
 
-    for (const item of content) {
+    // Report analysis start
+    this.config.onProgress?.({
+      id: `analyze-${sourceName}`,
+      type: 'content_analysis',
+      status: 'running',
+      startTime: new Date(),
+      description: `Analyzing ${sourceName} content`,
+      details: `Processing ${content.length} files`,
+      progress: 0
+    })
+
+    // Create agent activity for this extractor
+    this.config.onAgentActivity?.({
+      agentId: `extractor-${sourceName}`,
+      agentType: 'moment_extractor',
+      status: 'active',
+      currentTask: `Analyzing ${content.length} content items from ${sourceName}`,
+      model: this.config.model!,
+      startTime: new Date(),
+      lastActivity: new Date(),
+      processingCount: 0
+    })
+
+    for (let i = 0; i < content.length; i++) {
+      const item = content[i]
+      const progress = Math.round(((i + 1) / content.length) * 100)
+
+      // Update progress
+      this.config.onProgress?.({
+        id: `analyze-${sourceName}`,
+        type: 'content_analysis',
+        status: 'running',
+        startTime: new Date(startTime),
+        description: `Analyzing ${sourceName} content`,
+        details: `Processing ${item.name} (${i + 1}/${content.length})`,
+        progress
+      })
+
+      // Update agent activity
+      this.config.onAgentActivity?.({
+        agentId: `extractor-${sourceName}`,
+        agentType: 'moment_extractor',
+        status: 'processing',
+        currentTask: `Processing: ${item.name}`,
+        model: this.config.model!,
+        startTime: new Date(startTime),
+        lastActivity: new Date(),
+        processingCount: i + 1
+      })
+
       if (item.type === 'markdown' && item.content) {
         try {
           const extractedMoments = await this.extractMomentsFromText(
@@ -100,6 +154,30 @@ export class MomentExtractor {
 
     const processingTime = Date.now() - startTime
 
+    // Mark analysis complete
+    this.config.onProgress?.({
+      id: `analyze-${sourceName}`,
+      type: 'content_analysis',
+      status: 'completed',
+      startTime: new Date(startTime),
+      endTime: new Date(),
+      description: `Completed ${sourceName} analysis`,
+      details: `Found ${moments.length} moments, ${errors.length} errors`,
+      progress: 100
+    })
+
+    // Update agent to completed
+    this.config.onAgentActivity?.({
+      agentId: `extractor-${sourceName}`,
+      agentType: 'moment_extractor',
+      status: 'completed',
+      currentTask: `Completed analysis: ${moments.length} moments found`,
+      model: this.config.model!,
+      startTime: new Date(startTime),
+      lastActivity: new Date(),
+      processingCount: content.length
+    })
+
     return {
       moments,
       totalProcessed: content.length,
@@ -119,6 +197,9 @@ export class MomentExtractor {
     }
   ): Promise<PivotalMoment[]> {
     const prompt = this.buildExtractionPrompt(text, context)
+    
+    // Report the prompt being used
+    this.config.onPrompt?.(prompt)
     
     try {
       const response = await this.anthropic.messages.create({

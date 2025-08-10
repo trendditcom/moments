@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { PivotalMoment, Factor, ConfidenceLevel } from '@/types/moments'
+import { PivotalMoment, Factor, ConfidenceLevel, AnalysisProgress } from '@/types/moments'
 import { MomentCard } from './moment-card'
+import { ProgressIndicator } from './progress-indicator'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -23,6 +24,7 @@ interface MomentsViewProps {
   moments: PivotalMoment[]
   isLoading?: boolean
   error?: string | null
+  progress?: AnalysisProgress
   onAnalyzeMoments?: () => void
   onMomentSelect?: (moment: PivotalMoment) => void
 }
@@ -34,6 +36,7 @@ export function MomentsView({
   moments, 
   isLoading = false, 
   error = null,
+  progress,
   onAnalyzeMoments,
   onMomentSelect 
 }: MomentsViewProps) {
@@ -210,14 +213,21 @@ export function MomentsView({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <div>
-            <p className="text-lg font-medium">Analyzing Moments</p>
-            <p className="text-muted-foreground">AI agents are processing your content...</p>
+      <div className="space-y-6">
+        {progress && (
+          <ProgressIndicator progress={progress} />
+        )}
+        {!progress && (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <div>
+                <p className="text-lg font-medium">Analyzing Moments</p>
+                <p className="text-muted-foreground">AI agents are processing your content...</p>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     )
   }
