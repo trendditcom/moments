@@ -98,7 +98,20 @@ export class IncrementalMomentManager {
    * Generate hash for content item
    */
   private generateContentHash(content: ContentItem): string {
-    const hashSource = `${content.id}:${content.path}:${content.updatedAt?.toISOString()}:${content.content?.substring(0, 1000) || ''}`
+    // Handle both Date objects and string dates from persistence
+    let updatedAtString = ''
+    if (content.updatedAt) {
+      if (content.updatedAt instanceof Date) {
+        updatedAtString = content.updatedAt.toISOString()
+      } else if (typeof content.updatedAt === 'string') {
+        updatedAtString = content.updatedAt
+      } else {
+        // Handle case where updatedAt might be serialized in another format
+        updatedAtString = new Date(content.updatedAt).toISOString()
+      }
+    }
+    
+    const hashSource = `${content.id}:${content.path}:${updatedAtString}:${content.content?.substring(0, 1000) || ''}`
     return crypto.createHash('md5').update(hashSource).digest('hex')
   }
 
@@ -131,11 +144,17 @@ export class IncrementalMomentManager {
           unchangedContent.push(item)
         }
         
-        // Update hash record
+        // Update hash record - ensure lastModified is always a Date object
+        const lastModified = item.updatedAt instanceof Date 
+          ? item.updatedAt 
+          : item.updatedAt 
+            ? new Date(item.updatedAt) 
+            : new Date()
+
         this.contentHashes.set(item.id, {
           contentId: item.id,
           filePath: item.path,
-          lastModified: item.updatedAt || new Date(),
+          lastModified,
           contentHash,
           sourceType: 'company',
           sourceName: company.name
@@ -159,11 +178,17 @@ export class IncrementalMomentManager {
           unchangedContent.push(item)
         }
         
-        // Update hash record
+        // Update hash record - ensure lastModified is always a Date object
+        const lastModified = item.updatedAt instanceof Date 
+          ? item.updatedAt 
+          : item.updatedAt 
+            ? new Date(item.updatedAt) 
+            : new Date()
+
         this.contentHashes.set(item.id, {
           contentId: item.id,
           filePath: item.path,
-          lastModified: item.updatedAt || new Date(),
+          lastModified,
           contentHash,
           sourceType: 'technology',
           sourceName: technology.name
