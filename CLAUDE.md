@@ -19,6 +19,22 @@ Moments creates signal from noise by classifying and correlating these pivotal m
 - `backlog/` - Feature backlog definition files
 - Claude Code specific folders and files (reusable via Claude Code SDK)
 
+## Claude Code Documentation References
+
+### Essential Claude Code Resources
+- **[Overview](https://docs.anthropic.com/en/docs/claude-code/overview)** - Comprehensive introduction to Claude Code capabilities and features
+- **[Quickstart](https://docs.anthropic.com/en/docs/claude-code/quickstart)** - Getting started guide for initial setup and basic usage
+- **[Common Workflows](https://docs.anthropic.com/en/docs/claude-code/common-workflows)** - Best practices and typical development patterns
+- **[Hooks Guide](https://docs.anthropic.com/en/docs/claude-code/hooks-guide)** - Custom hooks for automated workflows and integrations
+- **[MCP](https://docs.anthropic.com/en/docs/claude-code/mcp)** - Model Context Protocol for external service integrations
+- **[Amazon Bedrock](https://docs.anthropic.com/en/docs/claude-code/amazon-bedrock)** - Enterprise deployment and scaling options
+
+### Integration Notes for Moments
+- Use **Common Workflows** patterns for AI startup data analysis pipelines
+- Implement **Hooks** for automated content discovery from companies/ and technologies/ folders
+- Leverage **MCP** for connecting to external AI research APIs and databases
+- Consider **Amazon Bedrock** for enterprise-scale moment analysis and correlation
+
 ## Development Principles
 
 ### Feature-Slice Approach
