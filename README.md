@@ -621,6 +621,150 @@ The latest update significantly improves the Storage Manager interface with bett
 
 This redesigned Storage Manager transforms a technical diagnostic tool into an intuitive, user-friendly interface that clearly communicates what each action does, where results appear, and how to resolve issues when they occur.
 
+### Testing Moment Detail Views
+
+The latest update adds comprehensive detail views for individual moments, creating a unified navigation experience across all content types.
+
+#### 12. Moment Detail Navigation System
+
+**What to Test:**
+- **Clickable Moment Cards**: Every moment card opens a dedicated detail view when clicked
+- **Four-Tab Interface**: Overview, Related, Source, and Timeline tabs with specialized content
+- **Advanced Correlation Analysis**: AI-powered discovery of related moments with similarity scoring
+- **Complete Information Display**: All AI analysis data accessible through organized tabs
+
+**How to Access:**
+1. Navigate to Moments tab and ensure moments are analyzed
+2. Click anywhere on a moment card (outside of existing interactive elements like keywords)
+3. Moment detail view opens with comprehensive four-tab interface
+
+**Detail Tabs to Evaluate:**
+
+**Overview Tab:**
+- **Factor Classification Display**: Complete micro/macro factor badges with color coding
+- **Impact Analysis Visualization**: Impact score (0-100) with detailed AI reasoning
+- **Entity Organization**: Companies, technologies, people, and locations in organized sections
+- **Interactive Keywords**: Clickable keywords for filtering (inherited from main moments view)
+- **Visual Hierarchy**: Professional layout with proper sections and visual indicators
+
+**Related Tab:**
+- **Intelligent Moment Correlation**: AI-powered similarity scoring based on multiple factors
+- **Correlation Reasoning**: Detailed explanation of why moments are related
+- **Similarity Metrics**: Numerical scores showing relationship strength
+- **Nested Navigation**: Click related moments to navigate between detail views
+- **Relationship Types**: Shared factors, entities, sources, and keywords
+
+**Source Tab:**
+- **Original Content Display**: Full text content that triggered moment detection
+- **Source Metadata**: Complete file path, source type, and content information
+- **Source Analytics**: Statistics about all moments from the same source
+- **File Context**: Integration with catalog system for source entity details
+
+**Timeline Tab:**
+- **Temporal Information**: Estimated dates, timeframes, and historical context
+- **Discovery Metadata**: When the moment was extracted and processed
+- **Timeline Visualization Placeholder**: Future enhancement area for visual timeline
+
+**Testing Scenarios:**
+
+**Scenario 1: Basic Navigation**
+1. From Moments tab, click any moment card
+2. Verify detail view opens with moment title and impact score prominently displayed
+3. Navigate through all four tabs (Overview, Related, Source, Timeline)
+4. Use "Back" button to return to moments list
+5. Test with different moment types (high impact, low confidence, etc.)
+
+**Scenario 2: Correlation Discovery**
+1. Open a moment with high impact or many entities
+2. Navigate to "Related" tab
+3. Verify related moments appear with similarity scores
+4. Click on a related moment to navigate to its detail view
+5. Test navigation between multiple related moments
+6. Check correlation reasoning explains relationship factors
+
+**Scenario 3: Entity Navigation**
+1. In Overview tab, click company or technology entities
+2. Verify navigation to appropriate catalog detail views
+3. From catalog detail, navigate back to moment detail
+4. Test with both existing and non-existing entities
+5. Ensure navigation context is preserved
+
+**Scenario 4: Source Integration**
+1. Navigate to Source tab in moment detail
+2. Review original content and source metadata
+3. Check source analytics show accurate statistics
+4. If source exists in catalog, verify entity connection
+5. Test with moments from different source types (company vs technology)
+
+**Scenario 5: Complete User Journey**
+1. Start from Moments tab with analyzed moments
+2. Click moment → navigate to detail → explore all tabs
+3. Click related moment → navigate to new detail
+4. Click entity → navigate to catalog detail → view related moments
+5. Click different moment → return to moment detail
+6. Verify seamless navigation throughout entire journey
+
+**Evaluation Criteria:**
+- ✅ Moment cards are clearly clickable with proper hover states
+- ✅ Detail view opens with comprehensive moment information
+- ✅ All four tabs load with appropriate, organized content
+- ✅ Related moments show meaningful correlations with scoring
+- ✅ Source tab displays complete original content and metadata
+- ✅ Timeline tab shows temporal context and discovery information
+- ✅ Navigation between detail views works smoothly
+- ✅ "Back" button consistently returns to appropriate view
+- ✅ Entity navigation integrates with catalog system
+- ✅ Visual design matches existing catalog detail views
+
+**Advanced Features to Test:**
+
+**Correlation Intelligence:**
+- Similarity scores reflect actual moment relationships
+- Correlation reasoning provides clear explanations
+- Top 6 most relevant moments displayed (not just random selection)
+- Different correlation types properly identified
+
+**Data Completeness:**
+- All AI agent analysis data accessible through detail view
+- Factor classifications show complete reasoning
+- Impact analysis displays both score and rationale
+- Entity extraction shows all detected entities (companies, technologies, people, locations)
+
+**Navigation Consistency:**
+- Detail view navigation behavior matches catalog detail views
+- Active tab highlighting works correctly
+- Context preservation throughout complex navigation paths
+- Proper handling of edge cases (moments without entities, correlations, etc.)
+
+**Performance Expectations:**
+- Moment detail opens within 200ms of click
+- Tab switching responds immediately (< 100ms)
+- Correlation calculation completes within 500ms
+- Navigation transitions smooth and responsive
+- No flickering or loading delays for local data
+
+**Common Issues to Watch For:**
+
+**Navigation Problems:**
+- Moment cards not responding to clicks
+- Detail view not opening or loading incorrectly
+- "Back" button not returning to correct view
+- Tab content not loading properly
+
+**Content Issues:**
+- Missing or incomplete moment information
+- Related moments not showing meaningful correlations
+- Source content not displaying correctly
+- Timeline information incomplete or incorrect
+
+**Integration Issues:**
+- Entity clicks not navigating to catalog details
+- Correlation with existing catalog items failing
+- Navigation context lost during complex journeys
+- Inconsistent behavior between different moment types
+
+This comprehensive moment detail system completes the unified navigation experience in Moments, allowing users to explore any piece of content (companies, technologies, or moments) with the same level of depth and interconnection.
+
 ## 🔧 Configuration
 
 ### Custom Content Sources

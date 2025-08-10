@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { CatalogView } from '@/components/catalog-view'
 import { CatalogDetail } from '@/components/catalog-detail'
+import { MomentDetail } from '@/components/moment-detail'
 import { MomentsView } from '@/components/moments-view'
 import { StorageManager } from '@/components/storage-manager'
 import { SettingsContent } from '@/components/settings-content'
@@ -30,6 +31,7 @@ import { Zap } from 'lucide-react'
 type ViewState = 
   | { type: 'catalog', tab: 'companies' | 'technologies' | 'moments' }
   | { type: 'detail', item: Company | Technology, itemType: 'company' | 'technology' }
+  | { type: 'moment-detail', moment: PivotalMoment }
 
 export default function HomePage() {
   const [showStorageManager, setShowStorageManager] = useState(false)
@@ -74,6 +76,8 @@ export default function HomePage() {
     if (viewState.type === 'detail') {
       const tabMap = { company: 'companies' as const, technology: 'technologies' as const }
       setViewState({ type: 'catalog', tab: tabMap[viewState.itemType] })
+    } else if (viewState.type === 'moment-detail') {
+      setViewState({ type: 'catalog', tab: 'moments' })
     } else {
       setViewState({ type: 'catalog', tab: 'companies' })
     }
@@ -103,13 +107,13 @@ export default function HomePage() {
   }
   
   const handleMomentSelect = (moment: PivotalMoment) => {
-    // Could open a modal or navigate to moment detail view
-    console.log('Moment selected:', moment)
+    setViewState({ type: 'moment-detail', moment })
   }
   
   // Get active tab for navigation highlighting
   const activeTab = viewState.type === 'catalog' ? viewState.tab : 
-    viewState.type === 'detail' ? (viewState.itemType === 'company' ? 'companies' : 'technologies') : 'companies'
+    viewState.type === 'detail' ? (viewState.itemType === 'company' ? 'companies' : 'technologies') :
+    viewState.type === 'moment-detail' ? 'moments' : 'companies'
 
   // Handle moment analysis
   const handleAnalyzeMoments = async () => {
@@ -379,6 +383,16 @@ export default function HomePage() {
                 <div className="flex-1 overflow-hidden">
                   {isLoading ? (
                     <CatalogSkeleton />
+                  ) : viewState.type === 'moment-detail' ? (
+                    <MomentDetail
+                      moment={viewState.moment}
+                      allMoments={moments}
+                      companies={companies}
+                      technologies={technologies}
+                      onBack={handleBackToCatalog}
+                      onMomentSelect={handleMomentSelect}
+                      onEntityClick={handleEntityClick}
+                    />
                   ) : viewState.type === 'detail' ? (
                     <CatalogDetail
                       item={viewState.item}
