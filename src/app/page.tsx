@@ -75,7 +75,7 @@ export default function HomePage() {
                 totalItems: companies.length + technologies.length,
                 processedItems: Math.round((overallProgress / 100) * (companies.length + technologies.length)),
                 momentsExtracted: moments.length,
-                errorsEncountered: result?.errors?.length || 0
+                errorsEncountered: 0 // Will be updated when analysis completes
               }
             })
           },
