@@ -34,8 +34,72 @@ Each code generation follows a feature-slice approach, generating working, usabl
 - Follow existing code patterns and conventions in the codebase
 - Integrate with the Claude Code SDK wherever possible
 
+## Development Workflow
+
+### Recommended Development Approach: Explore, Plan, Code, Commit
+1. **Explore** - Read relevant files and understand the codebase context
+2. **Plan** - Create detailed implementation plans using TodoWrite tool
+3. **Code** - Implement solutions following feature-slice approach
+4. **Commit** - Commit changes with descriptive messages
+
+### Test-Driven Development for Moments
+- Write tests first for AI data processing and analysis features
+- Confirm tests fail initially to validate test coverage
+- Implement code to pass tests incrementally
+- Focus testing on pivotal moment detection and classification logic
+
+## Environment Setup
+
+### Required Tools and Dependencies
+- Node.js/npm for web application development
+- Claude Code SDK for agent integration
+- Git for version control with descriptive commit messages
+- Testing framework (to be determined based on tech stack)
+
+### Development Environment Configuration
+- Configure VS Code or preferred IDE with relevant extensions
+- Set up local development server for the Moments web application
+- Configure content folder monitoring for companies/ and technologies/ data
+
+## Claude Code Optimization Techniques
+
+### Effective Communication with Claude Code
+- **Be specific** in feature requests and bug descriptions
+- **Reference specific files** when requesting changes (e.g., `src/components/MomentAnalyzer.js`)
+- **Provide visual references** like mockups or screenshots for UI features
+- **Use /clear** command to maintain focused context during long sessions
+
+### Leveraging Claude Code Tools
+- Use **bash tools** for content processing and data analysis tasks
+- Integrate **MCP servers** for external AI service connections
+- Create **custom slash commands** for repeated Moments app workflows
+- Use **GitHub CLI** for seamless repository management
+
+### Advanced Development Patterns
+- **Parallel development** using multiple Claude instances for complex features
+- **Git worktrees** for independent feature development
+- **Headless mode** for automated content analysis and classification
+- **Thinking modes** for complex AI moment detection algorithms
+
+## Code Style and Standards
+
+### Moments App Code Conventions
+- Use semantic naming for AI analysis components and functions
+- Implement proper error handling with descriptive messages for failed AI operations
+- Follow modern JavaScript/TypeScript patterns for web development
+- Maintain separation between UI components and AI processing logic
+
+### Testing Guidelines
+- Unit tests for moment classification algorithms
+- Integration tests for Claude Code SDK interactions
+- End-to-end tests for complete workflow from content discovery to analysis
+- Performance tests for large-scale AI startup data processing
+
 ## Backlog Management
 
 IMPORTANT: If user pastes an instruction in Claude Code that leads to code generation/changes and this instruction is not present in the backlog/ folder, after completing the code change, update the latest backlog file with a new item describing the instruction and change, marking it as complete
 
 Project features and requirements are defined in the `backlog/` folder. Development should follow the backlog items in sequence to ensure systematic progress toward the project goals.
+
+### Key Principle for Moments Development
+Claude performs best when it has a clear target to iterate against—visual mockups for UI components, test cases for AI analysis features, or specific output examples for moment classification results.
