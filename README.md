@@ -525,6 +525,102 @@ The latest update implements zero-configuration catalog loading that automatical
 
 This automatic loading feature eliminates setup friction and provides immediate value to users while maintaining all advanced functionality including manual refresh, persistence, and recovery capabilities.
 
+### Testing Improved Storage Manager
+
+The latest update significantly improves the Storage Manager interface with better explanations, clearer actions, and enhanced user guidance.
+
+#### 11. Enhanced Storage Manager Interface
+
+**What to Test:**
+- **Intuitive Action Organization**: Actions grouped into logical categories with clear descriptions
+- **Storage Health Explanations**: Each metric includes helpful explanatory text
+- **Improved Error Handling**: Better error messages with troubleshooting guidance
+- **In-App Inspection Results**: Storage inspection shown directly in UI instead of console-only
+
+**How to Access:**
+1. Click the settings/cog icon in the header
+2. Storage Manager panel expands with improved interface
+3. Notice organized layout with Data Management, System Diagnostics, and Danger Zone sections
+
+**Key Improvements to Evaluate:**
+
+**Storage Health Section:**
+- **Storage Status**: Overall health with color-coded badge (Healthy/Moderate Usage/High Usage/Unavailable)
+- **Space Usage**: Shows actual KB/MB usage with explanatory text about browser capacity
+- **Usage Percentage**: Color-coded percentage with warnings when approaching limits
+- **Storage Keys**: Number of data items with explanation of what this means
+- **Current Data**: Clear breakdown of companies, technologies, moments with descriptions
+
+**Redesigned Storage Actions:**
+
+**Data Management:**
+- **Create Backup**: Clear description "Download a complete backup of your catalogs and moments data as a JSON file"
+- **Restore Backup**: Explains it will "Upload a previous backup file to restore your data (will replace current data)"
+- File validation with helpful error messages for invalid files
+
+**System Diagnostics:**
+- **Run Health Check**: "Refresh storage capacity and health information displayed above" (updates UI metrics)
+- **Inspect Storage**: "View detailed storage contents and structure for troubleshooting" (shows results in collapsible panel)
+- **Reload Application**: "Refresh the entire application to resolve display or loading issues" (renamed from "Refresh Page")
+
+**Danger Zone:**
+- **Clear All Data**: Shows item counts "Clear All Data (X items)" with detailed confirmation dialog
+
+**Testing Scenarios:**
+
+**Scenario 1: Understanding Storage Health**
+1. Open Storage Manager
+2. Review each metric in Storage Health section
+3. Verify each metric has explanatory text below it
+4. Check color coding matches usage levels (green=healthy, amber=warning, red=critical)
+
+**Scenario 2: Action Clarity**
+1. Review each action button
+2. Verify each has descriptive text explaining what it does
+3. Test that categories make logical sense (Data vs Diagnostics vs Danger)
+4. Confirm button labels clearly indicate their function
+
+**Scenario 3: Enhanced Inspection**
+1. Click "Inspect Storage" button
+2. Verify results appear in collapsible UI panel (not just console)
+3. Check that explanation text helps users understand the data
+4. Confirm console logging still works for technical users
+
+**Scenario 4: Improved Error Handling**
+1. Try restore with invalid file (non-JSON)
+2. Verify helpful error message with specific guidance
+3. Test backup creation and verify success messaging
+4. Try operations with storage issues and check troubleshooting suggestions
+
+**Scenario 5: Smart Confirmations**
+1. Click "Clear All Data" with loaded catalogs
+2. Verify confirmation shows specific counts (companies, technologies, moments)
+3. Test "Reload Application" confirms about losing unsaved changes
+4. Check that destructive operations require explicit confirmation
+
+**Expected Benefits:**
+- **Reduced Confusion**: Clear action descriptions eliminate guesswork
+- **Better Error Resolution**: Specific troubleshooting guidance for common issues
+- **Improved Accessibility**: In-app inspection results accessible to all users
+- **Professional Feel**: Organized layout with proper visual hierarchy
+- **Safer Operations**: Smart confirmations prevent accidental data loss
+
+**Visual Design Improvements:**
+- Organized sections with clear headers and icons
+- Color-coded health indicators throughout
+- Responsive grid layout for mobile compatibility
+- Consistent visual feedback for all interactions
+- Professional spacing and typography
+
+**Performance Indicators:**
+- All actions provide immediate visual feedback
+- Loading states shown during health checks
+- Smooth transitions and hover effects
+- Clear success/error messaging with appropriate delays
+- No confusing console-only operations
+
+This redesigned Storage Manager transforms a technical diagnostic tool into an intuitive, user-friendly interface that clearly communicates what each action does, where results appear, and how to resolve issues when they occur.
+
 ## 🔧 Configuration
 
 ### Custom Content Sources
