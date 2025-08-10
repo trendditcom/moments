@@ -144,14 +144,16 @@ export function MomentsView({
 
   // Statistics
   const stats = useMemo(() => {
-    const highImpact = moments.filter(m => m.impact.score >= 80).length
-    const mediumImpact = moments.filter(m => m.impact.score >= 60 && m.impact.score < 80).length
-    const lowImpact = moments.filter(m => m.impact.score < 60).length
+    // Impact statistics should reflect the filtered moments, not all moments
+    const highImpact = filteredAndSortedMoments.filter(m => m.impact.score >= 80).length
+    const mediumImpact = filteredAndSortedMoments.filter(m => m.impact.score >= 60 && m.impact.score < 80).length
+    const lowImpact = filteredAndSortedMoments.filter(m => m.impact.score < 60).length
     
+    // Confidence statistics should also reflect filtered moments for consistency
     const byConfidence = {
-      high: moments.filter(m => m.classification.confidence === 'high').length,
-      medium: moments.filter(m => m.classification.confidence === 'medium').length,
-      low: moments.filter(m => m.classification.confidence === 'low').length
+      high: filteredAndSortedMoments.filter(m => m.classification.confidence === 'high').length,
+      medium: filteredAndSortedMoments.filter(m => m.classification.confidence === 'medium').length,
+      low: filteredAndSortedMoments.filter(m => m.classification.confidence === 'low').length
     }
 
     return {

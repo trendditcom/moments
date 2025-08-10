@@ -1568,6 +1568,44 @@ Test that button functions are clearly labeled and header shows comprehensive co
 - ✅ No naming confusion between similar operations
 - ✅ Consistent button styling indicates operation type (ghost=reload, primary=smart, outline=full)
 
+#### Search and Filtering Consistency (Latest Feature)
+Test that search and filtering show consistent results across all UI elements:
+
+1. **Search Functionality Testing**:
+   - Navigate to Moments tab with moments loaded
+   - Use search box to enter terms like "AI", "Claude", or company names
+   - Verify that moment count updates (e.g., "16 of 80 moments (filtered)")
+   - Confirm that only matching moment cards are displayed
+   - Check that impact badges (High/Medium/Low Impact) show counts for filtered moments only
+
+2. **Filter Functionality Testing**:
+   - Click "Filters" button to open filter panel
+   - Apply factor filters (select business factors like "company", "competition", etc.)
+   - Apply confidence filters (High/Medium/Low confidence levels)
+   - Apply source filters (Company/Technology sources)
+   - Verify filtered count updates in header
+   - Confirm impact statistics badges reflect filtered results, not total moments
+
+3. **Consistency Verification**:
+   - When filters are active, verify all elements show consistent data:
+     - **Moment cards**: Only filtered moments visible
+     - **Count display**: Shows "X of Y moments (filtered)" 
+     - **Impact badges**: Counts reflect filtered moments only
+     - **Filter indicators**: Clear indication of active filters
+
+4. **Clear Filters Testing**:
+   - Use "Clear All" button in filters panel or "Clear Filters" when no matches
+   - Verify all moments reappear and statistics return to full dataset
+   - Confirm "(filtered)" indicator disappears when no filters active
+
+#### Filtering Performance Verification
+- ✅ Search results update in real-time as user types
+- ✅ Impact statistics accurately reflect filtered dataset
+- ✅ Confidence statistics match filtered moments
+- ✅ No visual disconnect between counts and displayed cards
+- ✅ Filter state persists until cleared or changed
+- ✅ Multiple filters work together (search + factors + confidence)
+
 ## 🔐 Security & Privacy
 
 ### Local-First Design
