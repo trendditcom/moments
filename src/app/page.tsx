@@ -69,7 +69,7 @@ export default function HomePage() {
             </div>
             
             <div className="flex-1 overflow-hidden">
-              <CatalogView type={activeTab} />
+              <CatalogView key={activeTab} type={activeTab} />
             </div>
           </div>
         )}

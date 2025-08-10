@@ -263,7 +263,7 @@ with claude_session() as session:
 
 ## Backlog Management
 
-IMPORTANT: If user pastes an instruction in Claude Code that leads to code generation/changes and this instruction is not present in the backlog/ folder, after completing the code change, update the latest backlog file with a new item describing the instruction and change, marking it as complete
+**IMPORTANT:** If user pastes an instruction in Claude Code that leads to code generation/changes and this instruction is not present in the backlog/ folder, after completing the code change, update the latest backlog file with a new item describing the instruction and change, marking it as complete
 
 Project features and requirements are defined in the `backlog/` folder. Development should follow the backlog items in sequence to ensure systematic progress toward the project goals.
 

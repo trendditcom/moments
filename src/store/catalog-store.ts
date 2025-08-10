@@ -32,13 +32,13 @@ export const useCatalogStore = create<CatalogStore>()(
         })),
 
       addCompanies: (companies) =>
-        set((state) => ({
-          companies: [...state.companies, ...companies],
+        set(() => ({
+          companies: companies,
         })),
 
       addTechnologies: (technologies) =>
-        set((state) => ({
-          technologies: [...state.technologies, ...technologies],
+        set(() => ({
+          technologies: technologies,
         })),
 
       setLoading: (loading) => set({ isLoading: loading }),
@@ -53,11 +53,14 @@ export const useCatalogStore = create<CatalogStore>()(
         }),
 
       hydrateCatalogs: async (companiesPath, technologiesPath) => {
-        const { setLoading, setError, addCompanies, addTechnologies, setFolderSelection } = get()
+        const { setLoading, setError, addCompanies, addTechnologies, setFolderSelection, clearCatalogs } = get()
         
         try {
           setLoading(true)
           setError(null)
+
+          // Clear existing catalogs to prevent duplicates
+          clearCatalogs()
 
           // Update folder selection
           if (companiesPath || technologiesPath) {

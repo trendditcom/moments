@@ -13,6 +13,11 @@ interface CatalogViewProps {
 export function CatalogView({ type }: CatalogViewProps) {
   const { companies, technologies, isLoading, error } = useCatalogStore()
   const data = type === 'companies' ? companies : technologies
+  
+  // Remove duplicates based on ID (defensive programming)
+  const uniqueData = data.filter((item, index, self) => 
+    index === self.findIndex(t => t.id === item.id)
+  )
 
   if (isLoading) {
     return (
@@ -36,7 +41,7 @@ export function CatalogView({ type }: CatalogViewProps) {
     )
   }
 
-  if (data.length === 0) {
+  if (uniqueData.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
@@ -52,7 +57,7 @@ export function CatalogView({ type }: CatalogViewProps) {
   return (
     <div className="p-6 space-y-6 overflow-y-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {data.map((item) => (
+        {uniqueData.map((item) => (
           <CatalogItemCard
             key={item.id}
             item={item}
