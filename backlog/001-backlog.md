@@ -30,16 +30,17 @@
    **Completion Summary**: Successfully added comprehensive Claude Code Documentation References section to CLAUDE.md including: 1) Essential Claude Code Resources with all 6 required documentation links (Overview, Quickstart, Common Workflows, Hooks Guide, MCP, Amazon Bedrock), 2) Integration Notes specific to Moments app goals including AI startup data analysis pipelines, automated content discovery hooks, external API connections via MCP, and enterprise scaling considerations. The documentation provides clear reference points for development teams and contextualizes each resource within the Moments application architecture.
    
 
-4. [ ] Add these vibe coding, agents, and headless claude code best practices for this project and update CLAUDE.md with these:
+4. [x] Add these vibe coding, agents, and headless claude code best practices for this project and update CLAUDE.md with these:
    - @technologies/claude-code/headless-claude-code.md
    - https://docs.anthropic.com/en/docs/claude-code/sdk
    - https://docs.anthropic.com/en/docs/claude-code/sub-agents
    - @technologies/claude-code/vibe-coding-prod.md
    - https://www.anthropic.com/engineering/building-effective-agents
+   
+   **Completion Summary**: Successfully integrated comprehensive advanced Claude Code best practices into CLAUDE.md including: 1) **Headless Automation** section with SDK integration patterns, Unix tool philosophy, CI automation capabilities, and structured output for programmatic parsing, 2) **Vibe Coding Best Practices** section implementing Eric Breck's production methodology with "forget the code, not the product" philosophy, leaf node focus strategy, verification-first approach, and Claude-as-PM patterns, 3) **Effective Agent Development Principles** section covering Anthropic's methodology with simplicity-first approach, agent vs workflow distinction, sub-agent configuration for specialized tasks (Content Analyzer, Classification Agent, Correlation Engine, Report Generator), and SDK implementation patterns with multi-turn conversations. Updated Environment Setup and Advanced Development Patterns sections to reflect headless automation, vibe coding workflows, session management, and sub-agent orchestration capabilities. The enhanced documentation now provides production-ready guidance for responsible AI-driven development using cutting-edge Claude Code capabilities.
 
 5. Based on the Moments app goals and documentation available to CLAUDE.md create an architecture and technology stack specification in specs/stack.md following best practices for modern AI first app architecture. Update CLAUDE.md with IMPORTANT prefix to refer to specs/stack.md when building Moments app architecture and stack.
 
 6. Based on the Moments app goals, documentation available to CLAUDE.md, and specs/stack.md architecture and stack create a user interface design specification in specs/design.md following best practices for modern AI first app design. Update CLAUDE.md with IMPORTANT prefix to refer to specs/design.md when building Moments app user experience.
 
-6. [ ] Scaffold a minimalist moments app which has an intuitive and pleasing user interface inspired by modern IDEs (like VS Code) or markdown document explorers (like Obsidian). It has a folder, file hierarchy browser on left, a markdown code and rendered HTML switcher/viewer in center, two intuitively placed tool bars - one which has tools to work on folders/files explorer and one which has tools to work on the document viewer. The app should read current folder contents (folder running the app) and filter which folders to show/ignore based on intuitive `config.yml` configuration. By default configure to ignore any code/tests folders like src/ and tests/ folders, and ignore any .prefixed folders like .claude, and only show content oriented folders like companies/ and technologies/ folders.
    
