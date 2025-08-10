@@ -15,7 +15,7 @@ import {
 import { Company, Technology } from '@/types/catalog'
 import { MomentExtractor, createMomentExtractor } from '@/lib/moment-extractor'
 import { SubAgentManager, createSubAgentManager } from '@/lib/sub-agents'
-import { createPersistStorage } from '@/lib/persistence'
+import { createPersistStorage, createFileFirstStorage } from '@/lib/persistence'
 import { momentFileProcessor } from '@/lib/moment-file-processor'
 import { loadConfigClient } from '@/lib/config-loader.client'
 
@@ -399,7 +399,15 @@ export const useMomentsStore = create<MomentStore>()(
     {
       name: 'moments-store',
       version: 1,
-      storage: createJSONStorage(() => createPersistStorage('moments-store')),
+      storage: createJSONStorage(() => {
+        // Use file-first storage for moments
+        try {
+          return createFileFirstStorage('moments', 'moments')
+        } catch (error) {
+          console.warn('[MomentsStore] Falling back to localStorage-only persistence:', error)
+          return createPersistStorage('moments-store')
+        }
+      }),
       partialize: (state) => ({
         moments: state.moments,
         correlations: state.correlations,

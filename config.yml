@@ -16,6 +16,11 @@ catalogs:
       - "*.jpeg"
       - "*.webp"
       - "*.svg"
+    # File system persistence settings
+    persistence_mode: "file_primary" # file_primary | memory_primary | hybrid
+    auto_sync: true # automatically sync changes to filesystem
+    cache_enabled: true # use localStorage for performance caching
+    cache_ttl_seconds: 3600 # cache time-to-live
     
   technologies:
     name: "Technologies"
@@ -31,6 +36,11 @@ catalogs:
       - "*.jpeg"
       - "*.webp"
       - "*.svg"
+    # File system persistence settings
+    persistence_mode: "file_primary" # file_primary | memory_primary | hybrid
+    auto_sync: true # automatically sync changes to filesystem
+    cache_enabled: true # use localStorage for performance caching
+    cache_ttl_seconds: 3600 # cache time-to-live
       
   moments:
     name: "Moments"
@@ -42,8 +52,36 @@ catalogs:
       - "*.md"
       - "*.mdx"
     metadata_format: "frontmatter" # yaml frontmatter for moment metadata
+    # File system persistence settings
+    persistence_mode: "file_primary" # file_primary | memory_primary | hybrid
     auto_save: true # automatically save analyzed moments to files
+    auto_sync: true # automatically sync changes to filesystem
     sync_mode: "bidirectional" # file ↔ memory sync
+    cache_enabled: true # use localStorage for performance caching
+    cache_ttl_seconds: 3600 # cache time-to-live
+
+# Global persistence settings
+persistence:
+  # Primary storage strategy: file_system_first | local_storage_first | hybrid
+  strategy: "file_system_first"
+  
+  # Cache settings for performance optimization
+  cache:
+    enabled: true
+    default_ttl_seconds: 3600
+    max_size_mb: 50
+    
+  # File system settings
+  file_system:
+    auto_sync: true # automatically sync changes between memory and files
+    backup_enabled: true # create backup files before overwriting
+    compression_enabled: false # compress stored data (not implemented yet)
+    
+  # Local storage settings (used for temporary cache only when file_system_first)
+  local_storage:
+    used_for: ["session_cache", "temporary_data", "performance_optimization"]
+    clear_on_startup: false # whether to clear cache on app startup
+    versioning: true # use versioned storage for migration support
 
 # Application settings
 app:

@@ -936,6 +936,158 @@ catalogs:
 
 This file-based persistence system provides a robust foundation for moments data management, ensuring your AI analysis results are preserved as human-readable files that can be version controlled, edited manually, and shared across different environments.
 
+### Testing File-System-First Persistence Architecture
+
+The latest major architectural update transforms Moments from localStorage-primary to file-system-first persistence, making the filesystem the single source of truth for all catalog data (companies, technologies, and moments).
+
+#### 14. Enhanced Persistence Architecture
+
+**What Changed:**
+- **Primary Storage**: Filesystem is now the authoritative source for all catalog data
+- **Caching Role**: localStorage is used only for performance optimization and temporary storage
+- **Unified API**: Consistent file operations across all catalog types
+- **Intelligent Fallback**: Seamless transition from old localStorage-primary to new file-first architecture
+
+**What to Test:**
+
+**File-System-First Loading:**
+1. **Fresh Start**: Clear browser storage completely (dev tools → Application → Storage → Clear site data)
+2. **Automatic Hydration**: Refresh the app and observe loading behavior
+3. **Source Priority**: Check browser console logs for "Loading from file system first" messages
+4. **Fallback Behavior**: Verify localStorage is used only for caching, not primary storage
+
+**Enhanced Configuration:**
+1. **Persistence Settings**: Check `config.yml` for new persistence configuration
+   - `persistence.strategy: "file_system_first"`
+   - Individual catalog `persistence_mode: "file_primary"`
+   - `cache_enabled: true` for performance optimization
+2. **Cache Configuration**: Verify cache TTL settings and behavior
+3. **Auto-sync Settings**: Test `auto_sync: true` functionality
+
+**Storage Manager Integration:**
+1. **Enhanced Health Check**: Storage Manager now shows both localStorage AND filesystem status
+2. **Filesystem Metrics**: Check file counts and folder readiness indicators
+3. **Dual Status Display**: Verify both cache health and file system health are shown
+4. **Error Handling**: Test behavior when filesystem is unavailable
+
+**Testing Scenarios:**
+
+**Scenario 1: File-First vs Cache-First Comparison**
+1. **Before**: Load app with existing localStorage data
+2. **Clear Cache**: Use Storage Manager to clear localStorage only
+3. **Reload App**: App should load from filesystem, not show empty state
+4. **Performance**: Observe that data appears immediately (loaded from files, cached to localStorage)
+
+**Scenario 2: Cache Performance Validation**
+1. **Initial Load**: First app load reads from filesystem and caches in localStorage
+2. **Subsequent Loads**: Verify localStorage cache is used for immediate display
+3. **Cache Invalidation**: Test that stale cache is refreshed from filesystem when needed
+4. **Cache Health**: Monitor storage health shows both cache size and file system status
+
+**Scenario 3: Data Source Verification**
+1. **Modify Files**: Edit a moment file directly in `moments/` folder
+2. **Clear Cache**: Clear localStorage using Storage Manager
+3. **Reload App**: Verify file changes appear in the app
+4. **Cache Refresh**: Confirm modified data is cached for subsequent loads
+
+**Scenario 4: Migration from Old Architecture**
+1. **Existing Users**: App should work normally for users with existing localStorage data
+2. **Gradual Transition**: New data prioritizes filesystem while preserving existing data
+3. **No Data Loss**: Verify no existing moments, companies, or technologies are lost
+4. **Background Migration**: Existing data is gradually migrated to file-first approach
+
+**Expected Benefits:**
+
+**Data Reliability:**
+- ✅ Data survives browser storage clearing
+- ✅ Content persists across different browsers/devices (same filesystem)
+- ✅ Manual file editing is immediately reflected in the app
+- ✅ Version control friendly (files can be committed to git)
+
+**Performance Optimization:**
+- ✅ Immediate display using localStorage cache
+- ✅ Background file system sync for persistence
+- ✅ Intelligent cache invalidation prevents stale data
+- ✅ Reduced browser storage consumption (files stored externally)
+
+**Developer Experience:**
+- ✅ Human-readable data files for debugging
+- ✅ Direct file manipulation for testing/development
+- ✅ Clear separation between cache and source of truth
+- ✅ Consistent API across all catalog types
+
+**Configuration Testing:**
+
+**Test Different Persistence Strategies:**
+```yaml
+# In config.yml, test different strategies
+persistence:
+  strategy: "file_system_first"  # Test primary behavior
+  # strategy: "local_storage_first"  # Test legacy mode
+  # strategy: "hybrid"  # Test balanced approach
+```
+
+**Cache Settings Validation:**
+```yaml
+cache:
+  enabled: true  # Test with caching enabled/disabled
+  default_ttl_seconds: 3600  # Test different TTL values
+  max_size_mb: 50  # Test cache size limits
+```
+
+**Per-Catalog Configuration:**
+```yaml
+catalogs:
+  companies:
+    persistence_mode: "file_primary"  # Test file-first for companies
+    cache_enabled: true  # Test caching behavior
+  moments:
+    persistence_mode: "hybrid"  # Test mixed approach for moments
+```
+
+**Advanced Testing:**
+
+**Performance Metrics:**
+- File system operations: < 200ms for typical datasets
+- Cache hits: < 10ms response time
+- Cache misses: Graceful fallback to filesystem
+- Storage health checks: < 100ms including filesystem status
+
+**Error Scenarios:**
+- Filesystem unavailable: Graceful degradation to cache-only mode
+- Corrupted files: Automatic error recovery with detailed logging
+- Cache quota exceeded: Automatic cleanup and file-priority fallback
+- Mixed data sources: Proper merging and conflict resolution
+
+**Integration Validation:**
+- All existing features work with file-first persistence
+- Moment detail views display file-loaded data correctly  
+- Entity navigation works across file and cache sources
+- Correlation discovery works with mixed data sources
+- Export/import operations respect file-first architecture
+
+**Troubleshooting Guide:**
+
+**Issue: Data Not Loading from Files**
+- Check `config.yml` has `persistence.strategy: "file_system_first"`
+- Verify filesystem permissions for reading catalog folders
+- Check browser console for file loading error messages
+- Use Storage Manager to inspect filesystem status
+
+**Issue: Cache Not Working**
+- Verify `cache.enabled: true` in configuration
+- Check localStorage quota and available space
+- Monitor cache hit/miss ratios in browser dev tools
+- Test with different cache TTL settings
+
+**Issue: Mixed Data Sources**
+- Some data from files, some from cache - this is expected during migration
+- Use "Load from Files" in Storage Manager to force file reload
+- Clear localStorage to test pure file-first behavior
+- Check console logs for data source information
+
+This architectural transformation ensures Moments provides enterprise-grade data reliability while maintaining the performance benefits of intelligent caching, creating a robust foundation for local-first AI business intelligence applications.
+
 ## 🔧 Configuration
 
 ### Custom Content Sources

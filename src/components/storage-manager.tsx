@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { 
   checkStorageHealth, 
+  checkEnhancedStorageHealth,
   backupStorage, 
   restoreStorage, 
   clearAppStorage, 
@@ -107,11 +108,17 @@ export function StorageManager() {
     try {
       // Add a small delay to show loading state
       await new Promise(resolve => setTimeout(resolve, 300))
-      const health = checkStorageHealth()
+      
+      // Use enhanced health check that includes file system status
+      const health = await checkEnhancedStorageHealth()
       setStorageHealth(health)
       setMessage({ type: 'success', text: 'Storage health check completed successfully' })
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to check storage health' })
+      console.error('Storage health check error:', error)
+      // Fallback to basic health check
+      const basicHealth = checkStorageHealth()
+      setStorageHealth(basicHealth)
+      setMessage({ type: 'error', text: 'Enhanced storage check failed, showing basic status' })
     } finally {
       setIsRunningHealthCheck(false)
     }
