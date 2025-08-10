@@ -170,6 +170,159 @@ Monitor AI agent activities in real-time:
 - **Correlation Engine**: Discovering relationships
 - **Progress Tracking**: Step-by-step analysis visibility
 
+## 🧪 User Evaluation Guide
+
+### Testing Enhanced Interactivity Features
+
+The latest release includes comprehensive interactive features. Here's how to evaluate and test them:
+
+#### 1. Enhanced Moment Cards
+
+**What to Test:**
+- **Expandable Information Display**: Click "Show More" on any moment card to reveal complete AI analysis
+- **Classification Reasoning**: Expanded view shows why AI classified the moment with specific factors
+- **Impact Analysis**: Detailed reasoning for impact scores (0-100 scale)
+- **Content Extracts**: Full text snippets that triggered moment detection
+
+**Evaluation Criteria:**
+- ✅ Cards expand smoothly with additional information
+- ✅ All agent response data is displayed (reasoning, impact analysis, content)
+- ✅ "Show More/Less" buttons work correctly
+- ✅ Information is well-organized and readable
+
+#### 2. Interactive Keyword Filtering
+
+**What to Test:**
+- **Clickable Keywords**: Click any keyword badge in moment cards
+- **Search Integration**: Keywords should automatically add to search filter
+- **Visual Feedback**: Keywords show filter icons and hover states
+- **Multiple Keywords**: Add multiple keywords to build complex filters
+
+**How to Test:**
+1. Navigate to Moments tab and run analysis
+2. Find moment cards with keywords in "Key Terms" section
+3. Click different keywords and observe search field updates
+4. Combine multiple keyword clicks for advanced filtering
+
+**Evaluation Criteria:**
+- ✅ Keywords are visually distinguishable as clickable elements
+- ✅ Clicking keywords adds them to search immediately
+- ✅ Search results update in real-time
+- ✅ Multiple keywords can be combined effectively
+
+#### 3. Entity Navigation System
+
+**What to Test:**
+- **Company Links**: Click company names in moment cards
+- **Technology Links**: Click technology names in moment cards  
+- **Catalog Matching**: Test with both existing and non-existing entities
+- **Navigation Flow**: Verify smooth transitions to detail views
+
+**Test Scenarios:**
+1. **Existing Entities**: Click "Glean" or "Sierra AI" in moments (should navigate to company details)
+2. **Technology Entities**: Click "Claude Code" or "LLM Agents" (should navigate to technology details)
+3. **Non-existing Entities**: Click entities not in catalogs (should show appropriate handling)
+
+**Evaluation Criteria:**
+- ✅ Company and technology names show external link icons
+- ✅ Clicking navigates to appropriate catalog detail views
+- ✅ Non-existing entities are handled gracefully
+- ✅ Navigation maintains proper context
+
+#### 4. Catalog Detail Views
+
+**What to Test:**
+- **Three-Tab Interface**: Overview, Content, Moments tabs
+- **AI Insights**: Statistics and intelligence derived from related moments
+- **Content Display**: File listings with previews and metadata
+- **Related Moments**: Moments connected to the selected catalog item
+
+**Test Navigation:**
+1. Go to Companies or Technologies tab
+2. Click any catalog card to open detail view
+3. Navigate through all three tabs (Overview, Content, Moments)
+4. Test "Back" button functionality
+5. Try clicking entities within related moments for nested navigation
+
+**Evaluation Criteria:**
+- ✅ Detail view opens with proper catalog item information
+- ✅ All three tabs load correctly with appropriate content
+- ✅ AI insights show meaningful statistics and factors
+- ✅ Related moments are accurately identified and displayed
+- ✅ Navigation between catalog and detail views works smoothly
+
+#### 5. Clickable Catalog Cards
+
+**What to Test:**
+- **Visual Feedback**: Hover states and click animations
+- **Detail Navigation**: Cards open appropriate detail views
+- **Consistent Behavior**: Both company and technology cards work identically
+
+**Evaluation Steps:**
+1. Navigate to Companies tab
+2. Hover over catalog cards (should show visual feedback)
+3. Click cards to open detail views
+4. Repeat with Technologies tab
+5. Test navigation back to catalog views
+
+**Evaluation Criteria:**
+- ✅ Cards show clear hover states indicating they're clickable
+- ✅ Clicking opens detail view for the correct catalog item
+- ✅ Consistent behavior across different catalog types
+- ✅ Smooth visual transitions
+
+#### 6. End-to-End Workflow Testing
+
+**Complete User Journey:**
+1. **Start**: Load catalogs using folder selection
+2. **Analyze**: Run moment analysis and wait for completion
+3. **Explore Moments**: Use filters, search, and sorting
+4. **Keyword Interaction**: Click keywords to filter content
+5. **Entity Navigation**: Click companies/technologies in moments
+6. **Detail Exploration**: Navigate through catalog detail tabs
+7. **Correlation Discovery**: Find related moments in detail views
+
+**Success Indicators:**
+- ✅ Seamless flow from catalog loading to detailed analysis
+- ✅ All interactive elements respond appropriately
+- ✅ Information remains consistent across different views
+- ✅ Navigation context is preserved throughout the journey
+
+### Performance Evaluation
+
+**Expected Behavior:**
+- Moment cards expand/collapse smoothly (< 300ms animation)
+- Entity clicks navigate immediately (< 100ms response)
+- Detail views load efficiently (< 500ms for local data)
+- Search filtering updates in real-time (< 50ms)
+
+### Troubleshooting Common Issues
+
+**Keywords Not Clickable:**
+- Verify moments were analyzed successfully
+- Check that moment cards have expanded details visible
+- Ensure keywords array is populated in moment data
+
+**Entity Navigation Not Working:**
+- Confirm catalog data is loaded properly
+- Check browser console for navigation errors
+- Verify entity names match catalog entries
+
+**Detail Views Not Loading:**
+- Ensure catalog items have proper data structure
+- Check that moments store contains analyzed moments
+- Verify navigation state management
+
+### Reporting Issues
+
+When testing, please note:
+- Browser and version used
+- Specific user actions that caused issues
+- Console error messages (if any)
+- Expected vs actual behavior
+
+This enhanced interactivity transforms Moments from a static dashboard into a fully interactive business intelligence platform for AI industry analysis.
+
 ## 🔧 Configuration
 
 ### Custom Content Sources

@@ -27,6 +27,7 @@ interface MomentsViewProps {
   progress?: AnalysisProgress
   onAnalyzeMoments?: () => void
   onMomentSelect?: (moment: PivotalMoment) => void
+  onEntityClick?: (entity: string, type: 'company' | 'technology') => void
 }
 
 type SortOption = 'impact' | 'date' | 'confidence' | 'title'
@@ -38,7 +39,8 @@ export function MomentsView({
   error = null,
   progress,
   onAnalyzeMoments,
-  onMomentSelect 
+  onMomentSelect,
+  onEntityClick 
 }: MomentsViewProps) {
   const [sortBy, setSortBy] = useState<SortOption>('impact')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
@@ -177,6 +179,14 @@ export function MomentsView({
     setFilterConfidence(new Set())
     setFilterSource(new Set())
     setSearchQuery('')
+  }
+  
+  const handleKeywordClick = (keyword: string) => {
+    // Add keyword to search query
+    if (!searchQuery.includes(keyword)) {
+      const newQuery = searchQuery ? `${searchQuery} ${keyword}` : keyword
+      setSearchQuery(newQuery)
+    }
   }
 
   if (error) {
@@ -420,6 +430,8 @@ export function MomentsView({
             key={moment.id}
             moment={moment}
             onSelect={onMomentSelect}
+            onKeywordClick={handleKeywordClick}
+            onEntityClick={onEntityClick}
           />
         ))}
       </div>

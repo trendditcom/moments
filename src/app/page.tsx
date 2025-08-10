@@ -3,11 +3,18 @@
 import { useState, useEffect } from 'react'
 import { FolderSelection } from '@/components/folder-selection'
 import { CatalogView } from '@/components/catalog-view'
+import { CatalogDetail } from '@/components/catalog-detail'
 import { MomentsView } from '@/components/moments-view'
 import { useCatalogStore } from '@/store/catalog-store'
 import { useMomentsStore } from '@/store/moments-store'
 import { analyzeMomentsFromCatalog } from '@/store/moments-store'
+import { Company, Technology } from '@/types/catalog'
+import { PivotalMoment } from '@/types/moments'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+
+type ViewState = 
+  | { type: 'catalog', tab: 'companies' | 'technologies' | 'moments' }
+  | { type: 'detail', item: Company | Technology, itemType: 'company' | 'technology' }
 
 export default function HomePage() {
   const { companies, technologies } = useCatalogStore()
@@ -31,10 +38,57 @@ export default function HomePage() {
     resetProgress
   } = useMomentsStore()
   
-  const [activeTab, setActiveTab] = useState<'companies' | 'technologies' | 'moments'>('companies')
+  const [viewState, setViewState] = useState<ViewState>({ type: 'catalog', tab: 'companies' })
 
   const hasData = companies.length > 0 || technologies.length > 0
   const momentStats = getMomentStats()
+  
+  // Navigation handlers
+  const handleCatalogItemClick = (item: Company | Technology) => {
+    const itemType = 'category' in item ? 'company' : 'technology'
+    setViewState({ type: 'detail', item, itemType })
+  }
+  
+  const handleBackToCatalog = () => {
+    if (viewState.type === 'detail') {
+      const tabMap = { company: 'companies' as const, technology: 'technologies' as const }
+      setViewState({ type: 'catalog', tab: tabMap[viewState.itemType] })
+    } else {
+      setViewState({ type: 'catalog', tab: 'companies' })
+    }
+  }
+  
+  const handleTabChange = (tab: 'companies' | 'technologies' | 'moments') => {
+    setViewState({ type: 'catalog', tab })
+  }
+  
+  const handleEntityClick = (entity: string, type: 'company' | 'technology') => {
+    // Find matching catalog item
+    const searchList = type === 'company' ? companies : technologies
+    const matchingItem = searchList.find(item => 
+      item.name.toLowerCase().includes(entity.toLowerCase()) ||
+      entity.toLowerCase().includes(item.name.toLowerCase())
+    )
+    
+    if (matchingItem) {
+      setViewState({ type: 'detail', item: matchingItem, itemType: type })
+    } else {
+      // Could show a "create new catalog entry" dialog here
+      console.log(`No catalog entry found for ${entity}. Could create new ${type} entry.`)
+      // For now, just switch to the appropriate catalog tab to show the option
+      const tabMap = { company: 'companies' as const, technology: 'technologies' as const }
+      setViewState({ type: 'catalog', tab: tabMap[type] })
+    }
+  }
+  
+  const handleMomentSelect = (moment: PivotalMoment) => {
+    // Could open a modal or navigate to moment detail view
+    console.log('Moment selected:', moment)
+  }
+  
+  // Get active tab for navigation highlighting
+  const activeTab = viewState.type === 'catalog' ? viewState.tab : 
+    viewState.type === 'detail' ? (viewState.itemType === 'company' ? 'companies' : 'technologies') : 'companies'
 
   // Handle moment analysis
   const handleAnalyzeMoments = async () => {
@@ -157,48 +211,59 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="flex flex-col h-full">
-            <div className="border-b border-border">
-              <nav className="flex space-x-8 px-6 py-2">
-                <button
-                  onClick={() => setActiveTab('companies')}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                    activeTab === 'companies'
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  Companies ({companies.length})
-                </button>
-                <button
-                  onClick={() => setActiveTab('technologies')}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                    activeTab === 'technologies'
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  Technologies ({technologies.length})
-                </button>
-                <button
-                  onClick={() => setActiveTab('moments')}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                    activeTab === 'moments'
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  Moments ({momentStats.totalMoments})
-                  {momentStats.highImpactCount > 0 && (
-                    <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-800">
-                      {momentStats.highImpactCount} high impact
-                    </span>
-                  )}
-                </button>
-              </nav>
-            </div>
+            {viewState.type === 'catalog' && (
+              <div className="border-b border-border">
+                <nav className="flex space-x-8 px-6 py-2">
+                  <button
+                    onClick={() => handleTabChange('companies')}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                      activeTab === 'companies'
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    Companies ({companies.length})
+                  </button>
+                  <button
+                    onClick={() => handleTabChange('technologies')}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                      activeTab === 'technologies'
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    Technologies ({technologies.length})
+                  </button>
+                  <button
+                    onClick={() => handleTabChange('moments')}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                      activeTab === 'moments'
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    Moments ({momentStats.totalMoments})
+                    {momentStats.highImpactCount > 0 && (
+                      <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-red-100 text-red-800">
+                        {momentStats.highImpactCount} high impact
+                      </span>
+                    )}
+                  </button>
+                </nav>
+              </div>
+            )}
             
             <div className="flex-1 overflow-hidden">
-              {activeTab === 'moments' ? (
+              {viewState.type === 'detail' ? (
+                <CatalogDetail
+                  item={viewState.item}
+                  type={viewState.itemType}
+                  moments={moments}
+                  onBack={handleBackToCatalog}
+                  onMomentSelect={handleMomentSelect}
+                  onEntityClick={handleEntityClick}
+                />
+              ) : viewState.tab === 'moments' ? (
                 <div className="h-full overflow-y-auto p-6">
                   <MomentsView
                     moments={moments}
@@ -206,10 +271,16 @@ export default function HomePage() {
                     error={analysisError}
                     progress={progress}
                     onAnalyzeMoments={handleAnalyzeMoments}
+                    onMomentSelect={handleMomentSelect}
+                    onEntityClick={handleEntityClick}
                   />
                 </div>
               ) : (
-                <CatalogView key={activeTab} type={activeTab} />
+                <CatalogView 
+                  key={viewState.tab} 
+                  type={viewState.tab} 
+                  onItemClick={handleCatalogItemClick}
+                />
               )}
             </div>
           </div>

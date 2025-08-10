@@ -4,19 +4,39 @@ import { PivotalMoment } from '@/types/moments'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { getFactorColor, getConfidenceColor } from '@/lib/factor-classifier'
-import { Calendar, TrendingUp, Users, Building, Globe, AlertTriangle } from 'lucide-react'
+import { Calendar, TrendingUp, Users, Building, Globe, AlertTriangle, ChevronDown, ChevronUp, Filter, ExternalLink } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
+import { useState } from 'react'
 
 interface MomentCardProps {
   moment: PivotalMoment
   onSelect?: (moment: PivotalMoment) => void
+  onKeywordClick?: (keyword: string) => void
+  onEntityClick?: (entity: string, type: 'company' | 'technology') => void
   showDetails?: boolean
   className?: string
 }
 
-export function MomentCard({ moment, onSelect, showDetails = true, className = '' }: MomentCardProps) {
+export function MomentCard({ moment, onSelect, onKeywordClick, onEntityClick, showDetails = true, className = '' }: MomentCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  
   const handleClick = () => {
     onSelect?.(moment)
+  }
+  
+  const handleKeywordClick = (e: React.MouseEvent, keyword: string) => {
+    e.stopPropagation()
+    onKeywordClick?.(keyword)
+  }
+  
+  const handleEntityClick = (e: React.MouseEvent, entity: string, type: 'company' | 'technology') => {
+    e.stopPropagation()
+    onEntityClick?.(entity, type)
+  }
+  
+  const toggleExpanded = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsExpanded(!isExpanded)
   }
 
   const getImpactColor = (score: number): string => {
@@ -131,40 +151,64 @@ export function MomentCard({ moment, onSelect, showDetails = true, className = '
                 </div>
               </div>
 
-              {/* Keywords */}
+              {/* Keywords - Interactive */}
               {moment.classification.keywords.length > 0 && (
                 <div>
-                  <div className="text-xs font-medium text-muted-foreground mb-1">Key Terms</div>
+                  <div className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                    <Filter className="w-3 h-3" />
+                    Key Terms (click to filter)
+                  </div>
                   <div className="flex flex-wrap gap-1">
-                    {moment.classification.keywords.slice(0, 5).map((keyword) => (
-                      <span
+                    {moment.classification.keywords.slice(0, isExpanded ? undefined : 5).map((keyword) => (
+                      <button
                         key={keyword}
-                        className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700"
+                        onClick={(e) => handleKeywordClick(e, keyword)}
+                        className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors cursor-pointer"
+                        title={`Click to filter by "${keyword}"`}
                       >
                         {keyword}
-                      </span>
+                      </button>
                     ))}
-                    {moment.classification.keywords.length > 5 && (
-                      <span className="text-xs text-muted-foreground">
+                    {!isExpanded && moment.classification.keywords.length > 5 && (
+                      <button
+                        onClick={toggleExpanded}
+                        className="text-xs text-muted-foreground hover:text-foreground underline"
+                      >
                         +{moment.classification.keywords.length - 5} more
-                      </span>
+                      </button>
                     )}
                   </div>
                 </div>
               )}
 
-              {/* Entities */}
+              {/* Entities - Interactive */}
               {Object.values(moment.entities).some(arr => arr.length > 0) && (
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   {moment.entities.companies.length > 0 && (
                     <div>
-                      <div className="font-medium text-muted-foreground mb-1">Companies</div>
+                      <div className="font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                        <Building className="w-3 h-3" />
+                        Companies
+                      </div>
                       <div className="space-y-1">
-                        {moment.entities.companies.slice(0, 3).map((company) => (
-                          <div key={company} className="text-blue-600">{company}</div>
+                        {moment.entities.companies.slice(0, isExpanded ? undefined : 3).map((company) => (
+                          <button
+                            key={company}
+                            onClick={(e) => handleEntityClick(e, company, 'company')}
+                            className="text-blue-600 hover:text-blue-800 hover:underline text-left flex items-center gap-1 transition-colors"
+                            title={`View ${company} details`}
+                          >
+                            {company}
+                            <ExternalLink className="w-3 h-3" />
+                          </button>
                         ))}
-                        {moment.entities.companies.length > 3 && (
-                          <div className="text-muted-foreground">+{moment.entities.companies.length - 3} more</div>
+                        {!isExpanded && moment.entities.companies.length > 3 && (
+                          <button
+                            onClick={toggleExpanded}
+                            className="text-muted-foreground hover:text-foreground underline"
+                          >
+                            +{moment.entities.companies.length - 3} more
+                          </button>
                         )}
                       </div>
                     </div>
@@ -172,19 +216,120 @@ export function MomentCard({ moment, onSelect, showDetails = true, className = '
                   
                   {moment.entities.technologies.length > 0 && (
                     <div>
-                      <div className="font-medium text-muted-foreground mb-1">Technologies</div>
+                      <div className="font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                        <Globe className="w-3 h-3" />
+                        Technologies
+                      </div>
                       <div className="space-y-1">
-                        {moment.entities.technologies.slice(0, 3).map((tech) => (
-                          <div key={tech} className="text-indigo-600">{tech}</div>
+                        {moment.entities.technologies.slice(0, isExpanded ? undefined : 3).map((tech) => (
+                          <button
+                            key={tech}
+                            onClick={(e) => handleEntityClick(e, tech, 'technology')}
+                            className="text-indigo-600 hover:text-indigo-800 hover:underline text-left flex items-center gap-1 transition-colors"
+                            title={`View ${tech} details`}
+                          >
+                            {tech}
+                            <ExternalLink className="w-3 h-3" />
+                          </button>
                         ))}
-                        {moment.entities.technologies.length > 3 && (
-                          <div className="text-muted-foreground">+{moment.entities.technologies.length - 3} more</div>
+                        {!isExpanded && moment.entities.technologies.length > 3 && (
+                          <button
+                            onClick={toggleExpanded}
+                            className="text-muted-foreground hover:text-foreground underline"
+                          >
+                            +{moment.entities.technologies.length - 3} more
+                          </button>
                         )}
                       </div>
                     </div>
                   )}
                 </div>
               )}
+              
+              {/* Additional Details - Expandable */}
+              {isExpanded && (
+                <div className="mt-4 pt-4 border-t border-border space-y-4">
+                  {/* Classification Reasoning */}
+                  {moment.classification.reasoning && (
+                    <div>
+                      <div className="text-xs font-medium text-muted-foreground mb-2">Classification Reasoning</div>
+                      <div className="text-xs text-muted-foreground bg-muted p-3 rounded-md">
+                        {moment.classification.reasoning}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Impact Analysis */}
+                  {moment.impact.reasoning && (
+                    <div>
+                      <div className="text-xs font-medium text-muted-foreground mb-2">
+                        Impact Analysis (Score: {moment.impact.score}/100)
+                      </div>
+                      <div className="text-xs text-muted-foreground bg-muted p-3 rounded-md">
+                        {moment.impact.reasoning}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Full Content Extract */}
+                  {moment.content && (
+                    <div>
+                      <div className="text-xs font-medium text-muted-foreground mb-2">Content Extract</div>
+                      <div className="text-xs text-muted-foreground bg-muted p-3 rounded-md max-h-32 overflow-y-auto">
+                        {moment.content}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Additional Entities */}
+                  {(moment.entities.people.length > 0 || moment.entities.locations.length > 0) && (
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      {moment.entities.people.length > 0 && (
+                        <div>
+                          <div className="font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            People
+                          </div>
+                          <div className="space-y-1">
+                            {moment.entities.people.map((person) => (
+                              <div key={person} className="text-purple-600">{person}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {moment.entities.locations.length > 0 && (
+                        <div>
+                          <div className="font-medium text-muted-foreground mb-1">Locations</div>
+                          <div className="space-y-1">
+                            {moment.entities.locations.map((location) => (
+                              <div key={location} className="text-green-600">{location}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* Expand/Collapse Toggle */}
+              <div className="flex justify-center mt-4">
+                <button
+                  onClick={toggleExpanded}
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {isExpanded ? (
+                    <>
+                      Show Less <ChevronUp className="w-3 h-3" />
+                    </>
+                  ) : (
+                    <>
+                      Show More <ChevronDown className="w-3 h-3" />
+                    </>
+                  )}
+                </button>
+              </div>
             </>
           )}
         </div>

@@ -8,9 +8,10 @@ import { Company, Technology } from '@/types/catalog'
 
 interface CatalogViewProps {
   type: 'companies' | 'technologies'
+  onItemClick?: (item: Company | Technology) => void
 }
 
-export function CatalogView({ type }: CatalogViewProps) {
+export function CatalogView({ type, onItemClick }: CatalogViewProps) {
   const { companies, technologies, isLoading, error } = useCatalogStore()
   const data = type === 'companies' ? companies : technologies
   
@@ -62,6 +63,7 @@ export function CatalogView({ type }: CatalogViewProps) {
             key={item.id}
             item={item}
             type={type}
+            onClick={onItemClick}
           />
         ))}
       </div>
@@ -72,11 +74,21 @@ export function CatalogView({ type }: CatalogViewProps) {
 interface CatalogItemCardProps {
   item: Company | Technology
   type: 'companies' | 'technologies'
+  onClick?: (item: Company | Technology) => void
 }
 
-function CatalogItemCard({ item, type }: CatalogItemCardProps) {
+function CatalogItemCard({ item, type, onClick }: CatalogItemCardProps) {
+  const handleClick = () => {
+    onClick?.(item)
+  }
+  
   return (
-    <Card className="h-full hover:shadow-md transition-shadow">
+    <Card 
+      className={`h-full hover:shadow-md transition-shadow ${
+        onClick ? 'cursor-pointer hover:border-primary/50' : ''
+      }`}
+      onClick={handleClick}
+    >
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
