@@ -317,8 +317,8 @@ export class IncrementalMomentManager {
    * Calculate Jaccard similarity between two sets
    */
   private calculateJaccardSimilarity<T>(set1: Set<T>, set2: Set<T>): number {
-    const intersection = new Set([...set1].filter(x => set2.has(x)))
-    const union = new Set([...set1, ...set2])
+    const intersection = new Set(Array.from(set1).filter(x => set2.has(x)))
+    const union = new Set([...Array.from(set1), ...Array.from(set2)])
     return union.size === 0 ? 0 : intersection.size / union.size
   }
 
@@ -422,7 +422,7 @@ export class IncrementalMomentManager {
 
       // Process each source group
       let processedSources = 0
-      for (const [sourceKey, sourceData] of contentBySource) {
+      for (const [sourceKey, sourceData] of Array.from(contentBySource.entries())) {
         const [sourceType, sourceName] = sourceKey.split(':')
         
         try {
@@ -473,7 +473,7 @@ export class IncrementalMomentManager {
     const allMoments = [...unaffectedExistingMoments, ...newMoments]
 
     // Update correlations for impacted temporal windows
-    for (const windowKey of assessment.impactedTimeWindows) {
+    for (const windowKey of Array.from(assessment.impactedTimeWindows)) {
       await this.correlateMomentsInWindow(allMoments, windowKey)
     }
 
