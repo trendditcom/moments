@@ -330,20 +330,30 @@ export function MomentsView({
                 size="sm"
                 disabled={isRefreshing}
                 className="text-muted-foreground hover:text-foreground"
+                title="Reload moments from filesystem files"
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-                {isRefreshing ? 'Refreshing...' : 'Refresh'}
+                {isRefreshing ? 'Reloading...' : 'Reload from Files'}
               </Button>
             )}
             {onAnalyzeIncremental && (
-              <Button onClick={onAnalyzeIncremental} variant="default">
+              <Button 
+                onClick={onAnalyzeIncremental} 
+                variant="default"
+                title="Analyze only new or changed content"
+              >
                 <TrendingUp className="w-4 h-4 mr-2" />
                 Smart Update
               </Button>
             )}
             {onForceFullAnalysis && (
-              <Button onClick={onForceFullAnalysis} variant="outline" size="sm">
-                Full Refresh
+              <Button 
+                onClick={onForceFullAnalysis} 
+                variant="outline" 
+                size="sm"
+                title="Re-analyze all content from scratch"
+              >
+                Analyze All
               </Button>
             )}
           </div>

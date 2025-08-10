@@ -5,6 +5,7 @@ import { Database, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useCatalogStore } from '@/store/catalog-store'
+import { useMomentsStore } from '@/store/moments-store'
 import { loadConfigClient } from '@/lib/config-loader.client'
 import { Config } from '@/lib/config-types'
 
@@ -16,6 +17,7 @@ interface CatalogStatusProps {
 
 export function CatalogStatus({ hydrationStatus, hydrationError, isHydrating }: CatalogStatusProps) {
   const { companies, technologies, folderSelection, hydrateCatalogs, isLoading } = useCatalogStore()
+  const { moments } = useMomentsStore()
   const [config, setConfig] = useState<Config | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
 
@@ -58,14 +60,23 @@ export function CatalogStatus({ hydrationStatus, hydrationError, isHydrating }: 
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">Catalogs</span>
-            {totalItems > 0 && (
+            {(totalItems > 0 || moments.length > 0) && (
               <div className="flex gap-1">
-                <Badge variant="secondary" className="text-xs px-1.5 py-0">
-                  {companies.length} {config?.catalogs.companies?.name || 'Companies'}
-                </Badge>
-                <Badge variant="secondary" className="text-xs px-1.5 py-0">
-                  {technologies.length} {config?.catalogs.technologies?.name || 'Technologies'}
-                </Badge>
+                {companies.length > 0 && (
+                  <Badge variant="secondary" className="text-xs px-1.5 py-0">
+                    {companies.length} {config?.catalogs.companies?.name || 'Companies'}
+                  </Badge>
+                )}
+                {technologies.length > 0 && (
+                  <Badge variant="secondary" className="text-xs px-1.5 py-0">
+                    {technologies.length} {config?.catalogs.technologies?.name || 'Technologies'}
+                  </Badge>
+                )}
+                {moments.length > 0 && (
+                  <Badge variant="secondary" className="text-xs px-1.5 py-0">
+                    {moments.length} {config?.catalogs.moments?.name || 'Moments'}
+                  </Badge>
+                )}
               </div>
             )}
           </div>
@@ -89,7 +100,7 @@ export function CatalogStatus({ hydrationStatus, hydrationError, isHydrating }: 
           variant="ghost"
           size="icon"
           onClick={handleRefresh}
-          title="Refresh catalogs"
+          title="Refresh Catalogs - Reload companies and technologies from filesystem"
           className="h-8 w-8"
         >
           <RefreshCw className="w-4 h-4" />

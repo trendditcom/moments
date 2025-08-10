@@ -1533,6 +1533,41 @@ Test that new moments appear immediately after analysis without requiring app re
 - ✅ Status indicators show data freshness
 - ✅ Auto-refresh works for all analysis types (Full, Smart Update, Force Full)
 
+#### Clear Button Labeling and Header Status (Latest Feature)
+Test that button functions are clearly labeled and header shows comprehensive counts:
+
+1. **Header Status Enhancement**:
+   - Check header area shows "Catalogs" with count badges
+   - Verify "X Companies", "X Technologies", and "X Moments" badges appear
+   - Confirm moments badge shows/hides based on actual moment count
+   - Test that counts update in real-time as content changes
+
+2. **Catalog Refresh Button Clarity**:
+   - Look for refresh icon in header area next to catalog status
+   - Hover over button to see tooltip: "Refresh Catalogs - Reload companies and technologies from filesystem"
+   - Click to verify it reloads companies/technologies from filesystem only
+   - Confirm this button doesn't affect moments
+
+3. **Moments Operation Button Clarity**:
+   - Navigate to Moments tab to see operation buttons
+   - **"Reload from Files"** button (ghost style): Hover for tooltip explaining filesystem reload
+   - **"Smart Update"** button (primary blue): Hover for tooltip about analyzing new/changed content
+   - **"Analyze All"** button (outline): Hover for tooltip about full re-analysis
+   - Verify each button has distinct visual styling and clear purpose
+
+4. **Functional Verification**:
+   - Test "Reload from Files" only reloads existing moment files
+   - Test "Smart Update" runs incremental AI analysis  
+   - Test "Analyze All" runs complete AI analysis
+   - Confirm no confusion between "refresh" and "analysis" operations
+
+#### User Experience Validation
+- ✅ All buttons have descriptive tooltips explaining their function
+- ✅ Clear visual distinction between file operations and AI analysis
+- ✅ Header shows comprehensive count of all content types
+- ✅ No naming confusion between similar operations
+- ✅ Consistent button styling indicates operation type (ghost=reload, primary=smart, outline=full)
+
 ## 🔐 Security & Privacy
 
 ### Local-First Design
