@@ -1460,6 +1460,47 @@ npm run type-check   # TypeScript validation
 npm run lint         # Code linting
 ```
 
+## 🧪 User Evaluation Guide
+
+### Testing Recent Features
+
+#### Scrolling Functionality (Fixed in Latest Update)
+Test that content scrolls properly when extending below the viewport:
+
+1. **Company/Technology Catalogs**:
+   - Navigate to Companies or Technologies tab
+   - Verify all cards are accessible by scrolling
+   - Check that scrollbar appears when content exceeds viewport
+
+2. **Moments View**:
+   - Navigate to Moments tab
+   - Run "Smart Update" or "Full Refresh" to generate moments
+   - Verify you can scroll through all moment cards
+   - Test filtering to reduce/increase card count
+
+3. **Detail Views**:
+   - Click on any Company, Technology, or Moment card
+   - Navigate through Overview, Content, and Moments tabs
+   - Verify scrolling works in each tab when content is long
+
+4. **Settings Sidebar**:
+   - Click the settings icon (gear) in header
+   - Test scrolling in Storage Health, Current Data, and Storage Management sections
+   - Verify all content is accessible
+
+#### Performance Verification
+- Check that scrolling is smooth without jank
+- Verify no double scrollbars appear
+- Test on different screen sizes and resolutions
+- Confirm header and navigation remain fixed while content scrolls
+
+#### Known Working States
+- ✅ All catalog views scroll properly
+- ✅ Moment cards accessible below fold
+- ✅ Detail pages scroll independently
+- ✅ Settings sidebar content scrollable
+- ✅ No overflow issues or hidden content
+
 ## 🔐 Security & Privacy
 
 ### Local-First Design

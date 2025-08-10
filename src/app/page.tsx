@@ -377,7 +377,7 @@ export default function HomePage() {
             <SettingsContent section={settingsSection} />
           </div>
         ) : (
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 flex flex-col overflow-hidden">
             {!hasData ? (
               <CatalogSkeleton />
             ) : (
@@ -424,7 +424,7 @@ export default function HomePage() {
                   </div>
                 )}
                 
-                <div className="flex-1 overflow-hidden">
+                <div className="flex-1 overflow-y-auto">
                   {isLoading ? (
                     <CatalogSkeleton />
                   ) : viewState.type === 'moment-detail' ? (
@@ -447,7 +447,7 @@ export default function HomePage() {
                       onEntityClick={handleEntityClick}
                     />
                   ) : viewState.tab === 'moments' ? (
-                    <div className="h-full overflow-y-auto p-6">
+                    <div className="p-6">
                       <MomentsView
                         moments={moments}
                         isLoading={isAnalyzing}
