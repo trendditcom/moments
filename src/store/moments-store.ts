@@ -31,6 +31,8 @@ interface MomentStore extends MomentState, MomentActions {
     byConfidence: { high: number; medium: number; low: number }
     bySource: { company: number; technology: number }
   }
+  // Debug helper
+  debugStoreState: () => MomentState
 }
 
 export const useMomentsStore = create<MomentStore>()(
@@ -203,8 +205,11 @@ export const useMomentsStore = create<MomentStore>()(
 
       saveToFiles: async (moments) => {
         try {
-          const momentsToSave = moments || get().moments
+          const currentState = get()
+          const momentsToSave = moments || currentState.moments
+          
           if (momentsToSave.length === 0) {
+            console.warn('No moments found to save to files')
             return { saved: 0, failed: 0 }
           }
           
@@ -375,6 +380,20 @@ export const useMomentsStore = create<MomentStore>()(
           byConfidence,
           bySource
         }
+      },
+
+      // Debug helper to check store state
+      debugStoreState: () => {
+        const state = get()
+        console.log('=== MOMENTS STORE DEBUG ===')
+        console.log('Moments count:', state.moments.length)
+        console.log('Sample moments:', state.moments.slice(0, 3).map(m => ({ id: m.id, title: m.title })))
+        console.log('Last analysis:', state.lastAnalysisAt)
+        console.log('Is analyzing:', state.isAnalyzing)
+        console.log('Analysis error:', state.analysisError)
+        console.log('Processing stats:', state.processingStats)
+        console.log('=== END DEBUG ===')
+        return state
       },
     }),
     {

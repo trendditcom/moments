@@ -224,8 +224,8 @@ export function SettingsContent({ section }: SettingsContentProps) {
     try {
       setMessage({ type: 'info', text: 'Saving moments to files...' })
       
-      const { saveToFiles } = useMomentsStore.getState()
-      const result = await saveToFiles()
+      const store = useMomentsStore.getState()
+      const result = await store.saveToFiles()
       
       if (result.saved > 0) {
         setMessage({ 
@@ -233,7 +233,7 @@ export function SettingsContent({ section }: SettingsContentProps) {
           text: `Successfully saved ${result.saved} moments to files${result.failed > 0 ? ` (${result.failed} failed)` : ''}.` 
         })
       } else {
-        setMessage({ type: 'info', text: 'No moments to save.' })
+        setMessage({ type: 'info', text: `No moments to save. Store has ${store.moments.length} moments.` })
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to save moments to files.' })
@@ -265,6 +265,20 @@ export function SettingsContent({ section }: SettingsContentProps) {
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to load moments from files.' })
       console.error('Error loading from files:', error)
+    }
+  }
+
+  const handleDebugStore = () => {
+    try {
+      const { debugStoreState } = useMomentsStore.getState()
+      const state = debugStoreState()
+      setMessage({ 
+        type: 'info', 
+        text: `Debug info logged to console. Store has ${state.moments.length} moments.` 
+      })
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to debug store state.' })
+      console.error('Error debugging store:', error)
     }
   }
 
@@ -506,6 +520,13 @@ export function SettingsContent({ section }: SettingsContentProps) {
               label="Load from Files"
               description="Load moments from filesystem markdown files"
               onClick={handleLoadFromFiles}
+            />
+            
+            <ActionButton
+              icon={MagnifyingGlassIcon}
+              label="Debug Store State"
+              description="Log current moments store state to browser console for debugging"
+              onClick={handleDebugStore}
             />
           </div>
         </div>
