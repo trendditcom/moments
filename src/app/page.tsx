@@ -45,7 +45,10 @@ export default function HomePage() {
       addMoments(result.moments)
       
       if (result.errors.length > 0) {
-        setAnalysisError(`Analysis completed with ${result.errors.length} warnings`)
+        console.log('Analysis warnings:', result.errors)
+        const errorDetails = result.errors.slice(0, 3).join('\n• ')
+        const remainingCount = result.errors.length > 3 ? ` and ${result.errors.length - 3} more...` : ''
+        setAnalysisError(`Analysis completed with ${result.errors.length} warnings:\n• ${errorDetails}${remainingCount}`)
       }
     } catch (error) {
       setAnalysisError(error instanceof Error ? error.message : 'Analysis failed')

@@ -73,7 +73,8 @@ export class MomentExtractor {
         } catch (error) {
           const errorMessage = `Failed to analyze ${item.name}: ${error instanceof Error ? error.message : 'Unknown error'}`
           errors.push(errorMessage)
-          console.error(errorMessage, error)
+          console.error('MomentExtractor error for', item.name, ':', error)
+          console.log('Content preview:', item.content?.substring(0, 200))
         }
       }
     }
@@ -117,8 +118,11 @@ export class MomentExtractor {
 
       return this.parseMomentsResponse(responseText, context)
     } catch (error) {
-      console.error('Error calling Anthropic API:', error)
-      throw new Error(`Failed to extract moments: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      console.error('Error calling Anthropic API for', context.sourceName, '/', context.contentName, ':', error)
+      if (error instanceof Error && error.message.includes('API key')) {
+        throw new Error(`API Key Error: Please check your NEXT_PUBLIC_ANTHROPIC_API_KEY in .env.local`)
+      }
+      throw new Error(`Failed to extract moments from ${context.contentName}: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 

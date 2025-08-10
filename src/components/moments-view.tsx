@@ -177,21 +177,30 @@ export function MomentsView({
   }
 
   if (error) {
+    const isWarning = error.includes('warnings:')
+    const iconColor = isWarning ? 'text-orange-500' : 'text-red-500'
+    const titleColor = isWarning ? 'text-orange-600' : 'text-red-600'
+    const title = isWarning ? 'Analysis Warnings' : 'Analysis Error'
+    
     return (
       <div className="flex items-center justify-center h-64">
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-2xl">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <AlertCircle className="w-12 h-12 text-red-500" />
+              <AlertCircle className={`w-12 h-12 ${iconColor}`} />
             </div>
-            <CardTitle className="text-red-600">Analysis Error</CardTitle>
+            <CardTitle className={titleColor}>{title}</CardTitle>
           </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-muted-foreground">{error}</p>
+          <CardContent className="space-y-4">
+            <pre className="text-sm text-muted-foreground whitespace-pre-wrap text-left bg-muted p-4 rounded-md max-h-64 overflow-y-auto">
+              {error}
+            </pre>
             {onAnalyzeMoments && (
-              <Button onClick={onAnalyzeMoments} variant="outline">
-                Try Again
-              </Button>
+              <div className="text-center">
+                <Button onClick={onAnalyzeMoments} variant="outline">
+                  {isWarning ? 'Analyze Again' : 'Try Again'}
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>

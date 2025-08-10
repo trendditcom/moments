@@ -197,6 +197,10 @@ export async function analyzeMomentsFromCatalog(
   technologies: Technology[],
   sourceType: 'companies' | 'technologies' | 'all' = 'all'
 ): Promise<MomentAnalysisResult> {
+  console.log('Starting moment analysis...')
+  console.log('Companies:', companies.length, 'Technologies:', technologies.length)
+  console.log('Source type:', sourceType)
+  
   const extractor = createMomentExtractor()
   const subAgents = createSubAgentManager()
   
@@ -207,19 +211,29 @@ export async function analyzeMomentsFromCatalog(
     // Analyze companies if requested
     if (sourceType === 'companies' || sourceType === 'all') {
       if (companies.length > 0) {
+        console.log('Analyzing companies:', companies.map(c => c.name))
         companiesResult = await extractor.analyzeCompanies(companies)
+        console.log('Companies analysis result:', companiesResult.moments.length, 'moments,', companiesResult.errors.length, 'errors')
       }
     }
 
     // Analyze technologies if requested  
     if (sourceType === 'technologies' || sourceType === 'all') {
       if (technologies.length > 0) {
+        console.log('Analyzing technologies:', technologies.map(t => t.name))
         technologiesResult = await extractor.analyzeTechnologies(technologies)
+        console.log('Technologies analysis result:', technologiesResult.moments.length, 'moments,', technologiesResult.errors.length, 'errors')
       }
     }
 
     // Combine results
     const allMoments = [...companiesResult.moments, ...technologiesResult.moments]
+    const allErrors = [...companiesResult.errors, ...technologiesResult.errors]
+    
+    console.log('Combined analysis result:', allMoments.length, 'total moments,', allErrors.length, 'total errors')
+    if (allErrors.length > 0) {
+      console.log('All errors:', allErrors)
+    }
     
     // Enhance classifications using sub-agents if available
     try {
@@ -236,7 +250,7 @@ export async function analyzeMomentsFromCatalog(
       moments: allMoments,
       totalProcessed: companiesResult.totalProcessed + technologiesResult.totalProcessed,
       processingTime: Math.max(companiesResult.processingTime, technologiesResult.processingTime),
-      errors: [...companiesResult.errors, ...technologiesResult.errors]
+      errors: allErrors
     }
   } catch (error) {
     throw new Error(`Failed to analyze moments: ${error instanceof Error ? error.message : 'Unknown error'}`)
