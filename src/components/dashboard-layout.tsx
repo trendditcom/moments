@@ -1,0 +1,347 @@
+'use client'
+
+import React, { useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { 
+  CalendarDaysIcon,
+  BellIcon,
+  AdjustmentsHorizontalIcon,
+  EyeIcon,
+  BookmarkIcon,
+  ChartBarIcon,
+  CpuChipIcon,
+  ServerStackIcon
+} from '@heroicons/react/24/outline'
+
+// Types for dashboard layout components
+interface DashboardHeaderProps {
+  onTimeframeChange: (timeframe: string) => void
+  selectedTimeframe: string
+  alertsCount: number
+}
+
+interface DashboardGridProps {
+  analysisDepth: 'strategic' | 'tactical' | 'operational'
+  children: React.ReactNode
+}
+
+interface DashboardSidebarProps {
+  isVisible: boolean
+  onToggle: () => void
+  children?: React.ReactNode
+}
+
+interface DashboardFooterProps {
+  systemHealth: {
+    dataHealth: 'healthy' | 'warning' | 'error'
+    processing: number
+    performance: number
+  }
+}
+
+// Dashboard Header Component
+export function DashboardHeader({ onTimeframeChange, selectedTimeframe, alertsCount }: DashboardHeaderProps) {
+  const timeframes = [
+    { value: '24h', label: '24 Hours' },
+    { value: '7d', label: '7 Days' },
+    { value: '30d', label: '30 Days' },
+    { value: '90d', label: '90 Days' },
+    { value: '1y', label: '1 Year' }
+  ]
+
+  return (
+    <div className="flex items-center justify-between p-4 border-b border-border bg-card/50 backdrop-blur-sm">
+      {/* Navigation Tabs */}
+      <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-4">
+          <h2 className="text-lg font-semibold text-foreground">Dashboard</h2>
+          <div className="flex space-x-2">
+            <Badge variant="outline" className="text-xs">
+              Live
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      {/* Timeframe Selector and Alerts */}
+      <div className="flex items-center space-x-4">
+        {/* Timeframe Selector */}
+        <div className="flex items-center space-x-2">
+          <CalendarDaysIcon className="w-4 h-4 text-muted-foreground" />
+          <select
+            value={selectedTimeframe}
+            onChange={(e) => onTimeframeChange(e.target.value)}
+            className="bg-background border border-border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          >
+            {timeframes.map(timeframe => (
+              <option key={timeframe.value} value={timeframe.value}>
+                {timeframe.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Trending Alerts */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex items-center space-x-2"
+        >
+          <BellIcon className="w-4 h-4" />
+          {alertsCount > 0 && (
+            <Badge variant="destructive" className="text-xs">
+              {alertsCount}
+            </Badge>
+          )}
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+// Responsive Dashboard Grid Component
+export function DashboardGrid({ analysisDepth, children }: DashboardGridProps) {
+  const getGridClasses = () => {
+    switch (analysisDepth) {
+      case 'strategic':
+        return 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'
+      case 'tactical':
+        return 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4'
+      case 'operational':
+        return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3'
+      default:
+        return 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'
+    }
+  }
+
+  return (
+    <div className={`grid ${getGridClasses()} p-6`}>
+      {children}
+    </div>
+  )
+}
+
+// Dashboard Sidebar Component
+export function DashboardSidebar({ isVisible, onToggle, children }: DashboardSidebarProps) {
+  const [activeSection, setActiveSection] = useState<'filters' | 'insights' | 'bookmarks'>('filters')
+
+  if (!isVisible) {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onToggle}
+        className="fixed right-4 top-1/2 transform -translate-y-1/2 z-10"
+        title="Show filters and insights"
+      >
+        <AdjustmentsHorizontalIcon className="w-5 h-5" />
+      </Button>
+    )
+  }
+
+  return (
+    <div className="w-80 border-l border-border bg-card/50 backdrop-blur-sm flex flex-col">
+      <div className="p-4 border-b border-border">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-foreground">Insights</h3>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggle}
+            className="ml-4"
+          >
+            <EyeIcon className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+      
+      <nav className="flex-none p-2">
+        <div className="grid grid-cols-3 gap-1">
+          <button
+            onClick={() => setActiveSection('filters')}
+            className={`p-2 text-xs font-medium rounded-md transition-colors ${
+              activeSection === 'filters'
+                ? 'bg-primary/10 text-primary border border-primary/20'
+                : 'hover:bg-muted/50 text-muted-foreground'
+            }`}
+          >
+            <AdjustmentsHorizontalIcon className="w-4 h-4 mx-auto mb-1" />
+            Filters
+          </button>
+          
+          <button
+            onClick={() => setActiveSection('insights')}
+            className={`p-2 text-xs font-medium rounded-md transition-colors ${
+              activeSection === 'insights'
+                ? 'bg-primary/10 text-primary border border-primary/20'
+                : 'hover:bg-muted/50 text-muted-foreground'
+            }`}
+          >
+            <ChartBarIcon className="w-4 h-4 mx-auto mb-1" />
+            AI Insights
+          </button>
+          
+          <button
+            onClick={() => setActiveSection('bookmarks')}
+            className={`p-2 text-xs font-medium rounded-md transition-colors ${
+              activeSection === 'bookmarks'
+                ? 'bg-primary/10 text-primary border border-primary/20'
+                : 'hover:bg-muted/50 text-muted-foreground'
+            }`}
+          >
+            <BookmarkIcon className="w-4 h-4 mx-auto mb-1" />
+            Views
+          </button>
+        </div>
+      </nav>
+      
+      <div className="flex-1 overflow-y-auto p-4">
+        {activeSection === 'filters' && (
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium text-foreground">Smart Filters</h4>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>Filter controls will be implemented in future iterations</p>
+            </div>
+          </div>
+        )}
+        
+        {activeSection === 'insights' && (
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium text-foreground">AI Insights</h4>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>AI-powered insights and recommendations will appear here</p>
+            </div>
+          </div>
+        )}
+        
+        {activeSection === 'bookmarks' && (
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium text-foreground">Saved Views</h4>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>Bookmarked dashboard views will be listed here</p>
+            </div>
+          </div>
+        )}
+        
+        {children}
+      </div>
+    </div>
+  )
+}
+
+// Dashboard Footer Component  
+export function DashboardFooter({ systemHealth }: DashboardFooterProps) {
+  const getHealthColor = (status: string) => {
+    switch (status) {
+      case 'healthy': return 'text-green-600'
+      case 'warning': return 'text-yellow-600'
+      case 'error': return 'text-red-600'
+      default: return 'text-muted-foreground'
+    }
+  }
+
+  const getHealthBadge = (status: string) => {
+    switch (status) {
+      case 'healthy': return 'bg-green-100 text-green-800'
+      case 'warning': return 'bg-yellow-100 text-yellow-800'
+      case 'error': return 'bg-red-100 text-red-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  return (
+    <footer className="border-t border-border bg-card/50 backdrop-blur-sm p-4">
+      <div className="flex items-center justify-between">
+        {/* Data Source Status */}
+        <div className="flex items-center space-x-4 text-sm">
+          <div className="flex items-center space-x-2">
+            <ServerStackIcon className="w-4 h-4 text-muted-foreground" />
+            <span className="text-muted-foreground">Data Health:</span>
+            <Badge className={`text-xs ${getHealthBadge(systemHealth.dataHealth)}`}>
+              {systemHealth.dataHealth.charAt(0).toUpperCase() + systemHealth.dataHealth.slice(1)}
+            </Badge>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <CpuChipIcon className="w-4 h-4 text-muted-foreground" />
+            <span className="text-muted-foreground">Processing Queue:</span>
+            <Badge variant="outline" className="text-xs">
+              {systemHealth.processing} items
+            </Badge>
+          </div>
+        </div>
+
+        {/* Performance Metrics */}
+        <div className="flex items-center space-x-4 text-sm">
+          <div className="flex items-center space-x-2">
+            <ChartBarIcon className="w-4 h-4 text-muted-foreground" />
+            <span className="text-muted-foreground">Performance:</span>
+            <Badge 
+              variant="outline" 
+              className={`text-xs ${systemHealth.performance > 80 ? 'text-green-600' : 
+                systemHealth.performance > 60 ? 'text-yellow-600' : 'text-red-600'}`}
+            >
+              {systemHealth.performance}%
+            </Badge>
+          </div>
+          
+          <div className="text-xs text-muted-foreground">
+            Last updated: {new Date().toLocaleTimeString()}
+          </div>
+        </div>
+      </div>
+    </footer>
+  )
+}
+
+// Main Dashboard Layout Wrapper
+interface DashboardLayoutProps {
+  children: React.ReactNode
+  analysisDepth?: 'strategic' | 'tactical' | 'operational'
+  timeframe?: string
+  onTimeframeChange?: (timeframe: string) => void
+  systemHealth?: {
+    dataHealth: 'healthy' | 'warning' | 'error'
+    processing: number
+    performance: number
+  }
+}
+
+export function DashboardLayout({ 
+  children, 
+  analysisDepth = 'strategic',
+  timeframe = '7d',
+  onTimeframeChange = () => {},
+  systemHealth = { dataHealth: 'healthy', processing: 0, performance: 95 }
+}: DashboardLayoutProps) {
+  const [sidebarVisible, setSidebarVisible] = useState(false)
+
+  return (
+    <div className="flex flex-col h-full">
+      <DashboardHeader
+        selectedTimeframe={timeframe}
+        onTimeframeChange={onTimeframeChange}
+        alertsCount={0} // Will be dynamic in future
+      />
+      
+      <div className="flex flex-1 overflow-hidden">
+        <div className="flex-1 overflow-y-auto">
+          <DashboardGrid analysisDepth={analysisDepth}>
+            {children}
+          </DashboardGrid>
+        </div>
+        
+        <DashboardSidebar
+          isVisible={sidebarVisible}
+          onToggle={() => setSidebarVisible(!sidebarVisible)}
+        >
+          {/* Additional sidebar content can be passed as children */}
+        </DashboardSidebar>
+      </div>
+      
+      <DashboardFooter systemHealth={systemHealth} />
+    </div>
+  )
+}

@@ -361,6 +361,45 @@ This guide helps you systematically evaluate the completed features and capabili
    - ✅ **Verify**: Macro factor classification (economic, geo-political, regulation, technology, etc.)
    - ✅ **Check**: Impact scoring (High/Medium/Low) with confidence indicators
 
+### 📊 Dashboard Features Evaluation
+
+**Test Foundation Dashboard System**
+1. **Dashboard Navigation**:
+   - Click the "Dashboard" tab in main navigation
+   - ✅ **Expected**: Professional dashboard interface with three-tier information architecture
+   - ✅ **Verify**: Header with timeframe selector (24h/7d/30d/90d/1y) and alert indicators
+   - ✅ **Check**: Responsive grid layout adapting to screen size
+
+2. **Analysis Depth Controls**:
+   - Test Analysis Depth Selector component
+   - ✅ **Expected**: Three depth levels (Strategic Overview, Tactical Insights, Operational Details)
+   - ✅ **Verify**: Grid layout changes complexity based on selected depth
+   - ✅ **Check**: Information density increases progressively (1-3, 2-4, 3-5 columns)
+
+3. **Core Dashboard Components**:
+   - Review Knowledge Base Growth card with real metrics
+   - ✅ **Expected**: Live data showing total moments, growth percentage, trend indicators
+   - ✅ **Verify**: Trending Factors card displays top factor categories with counts
+   - ✅ **Check**: Entity Network card shows companies, technologies, concepts counts
+
+4. **Interactive Sidebar Features**:
+   - Toggle dashboard sidebar using button or main control
+   - ✅ **Expected**: Collapsible insights panel with three sections
+   - ✅ **Verify**: Smart Filters, AI Insights, and Saved Views tabs
+   - ✅ **Check**: Professional hover states and smooth transitions
+
+5. **System Health Footer**:
+   - Monitor footer metrics during dashboard use
+   - ✅ **Expected**: Real-time data health status (healthy/warning/error)
+   - ✅ **Verify**: Processing queue count updates during analysis
+   - ✅ **Check**: Performance metrics with color-coded indicators
+
+6. **Dashboard Data Integration**:
+   - Verify dashboard reflects actual application data
+   - ✅ **Expected**: Knowledge Growth card shows real moment counts from store
+   - ✅ **Verify**: Trending Factors based on actual factor classification data
+   - ✅ **Check**: Recent Activity reflects real moment timeline data
+
 ### 🎯 Interactive Features Evaluation
 
 **Test Navigation and Interactivity**
