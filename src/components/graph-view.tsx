@@ -625,6 +625,145 @@ function NetworkAnalysisInsightsSidebar({ networkData, stats, selectedNode }: {
   )
 }
 
+// Relationship Strength Matrix Component
+function RelationshipStrengthMatrix({ matrix }: { matrix: RelationshipMatrix }) {
+  const [sortBy, setSortBy] = useState<'name' | 'connections' | 'type'>('connections')
+  const [selectedCell, setSelectedCell] = useState<{ row: number, col: number } | null>(null)
+  
+  const sortedIndices = useMemo(() => {
+    const indices = matrix.entities.map((_, i) => i)
+    
+    return indices.sort((a, b) => {
+      if (sortBy === 'name') {
+        return matrix.entities[a].localeCompare(matrix.entities[b])
+      } else if (sortBy === 'type') {
+        const typeA = matrix.entityTypes[matrix.entities[a]]
+        const typeB = matrix.entityTypes[matrix.entities[b]]
+        return typeA.localeCompare(typeB)
+      } else {
+        const connectionsA = matrix.matrix[a].reduce((sum, val) => sum + val, 0)
+        const connectionsB = matrix.matrix[b].reduce((sum, val) => sum + val, 0)
+        return connectionsB - connectionsA
+      }
+    })
+  }, [matrix, sortBy])
+  
+  const maxValue = Math.max(...matrix.matrix.flat())
+  
+  const getEntityColor = (type: string) => {
+    switch (type) {
+      case 'company': return 'bg-blue-100 text-blue-800'
+      case 'technology': return 'bg-green-100 text-green-800'
+      case 'concept': return 'bg-yellow-100 text-yellow-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+  
+  const getCellColor = (value: number) => {
+    if (value === 0) return 'bg-gray-50'
+    const intensity = value / maxValue
+    return `rgba(59, 130, 246, ${0.1 + intensity * 0.8})`
+  }
+  
+  const displayEntities = sortedIndices.slice(0, 10) // Show top 10 for readability
+  
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center space-x-4 text-xs">
+        <div className="flex items-center space-x-2">
+          <span>Sort by:</span>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="border rounded px-2 py-1"
+          >
+            <option value="connections">Connections</option>
+            <option value="name">Name</option>
+            <option value="type">Type</option>
+          </select>
+        </div>
+      </div>
+      
+      <div className="overflow-auto max-h-96">
+        <table className="text-xs border-collapse">
+          <thead>
+            <tr>
+              <th className="p-2 border text-left min-w-32">Entity</th>
+              {displayEntities.map(colIndex => (
+                <th key={colIndex} className="p-1 border text-center min-w-8 max-w-20">
+                  <div className="transform -rotate-45 origin-center truncate">
+                    {matrix.entities[colIndex].length > 8 
+                      ? matrix.entities[colIndex].substring(0, 6) + '...'
+                      : matrix.entities[colIndex]
+                    }
+                  </div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {displayEntities.map((rowIndex, i) => (
+              <tr key={rowIndex}>
+                <td className="p-2 border">
+                  <Badge 
+                    variant="outline"
+                    className={getEntityColor(matrix.entityTypes[matrix.entities[rowIndex]])}
+                  >
+                    {matrix.entities[rowIndex]}
+                  </Badge>
+                </td>
+                {displayEntities.map((colIndex, j) => (
+                  <td 
+                    key={colIndex}
+                    className="p-1 border text-center cursor-pointer hover:opacity-80 transition-opacity"
+                    style={{ backgroundColor: getCellColor(matrix.matrix[rowIndex][colIndex]) }}
+                    onClick={() => setSelectedCell({ row: rowIndex, col: colIndex })}
+                  >
+                    {matrix.matrix[rowIndex][colIndex] || '-'}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      
+      {selectedCell && (
+        <div className="p-3 bg-blue-50 rounded-lg">
+          <div className="flex items-start space-x-2">
+            <InformationCircleIcon className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-blue-900">
+              <div className="font-medium mb-1">Relationship Analysis</div>
+              <div>
+                <strong>{matrix.entities[selectedCell.row]}</strong> ↔ <strong>{matrix.entities[selectedCell.col]}</strong>
+              </div>
+              <div>Strength: {matrix.matrix[selectedCell.row][selectedCell.col]} co-occurrences</div>
+              <div>
+                Entity Types: {matrix.entityTypes[matrix.entities[selectedCell.row]]} × {matrix.entityTypes[matrix.entities[selectedCell.col]]}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+        <div className="flex items-center space-x-2">
+          <div className="w-3 h-3 bg-blue-100 rounded"></div>
+          <span>Weak (1-2)</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <div className="w-3 h-3 bg-blue-300 rounded"></div>
+          <span>Medium (3-5)</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <div className="w-3 h-3 bg-blue-600 rounded"></div>
+          <span>Strong (5+)</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Main Graph View Component
 interface GraphViewProps {
   companies: any[]
@@ -777,11 +916,7 @@ export function GraphView({ companies, technologies, moments, isLoading = false 
               onNodeSelect={setSelectedNode}
             />
           ) : (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center text-muted-foreground">
-                Matrix view will be implemented in future iterations
-              </div>
-            </div>
+            <RelationshipStrengthMatrix matrix={networkData.matrix} />
           )}
         </div>
       </div>
