@@ -419,72 +419,72 @@ export function KnowledgeBaseHealthIndicators() {
         <CardDescription className="text-xs">Quality metrics and system status</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Overall Health Score */}
-          <div className="flex flex-col items-center justify-center p-4 bg-muted rounded-lg">
-            <div className="text-3xl font-bold" style={{ 
-              color: overallHealth >= 70 ? '#10b981' : overallHealth >= 40 ? '#f59e0b' : '#ef4444' 
-            }}>
-              {Math.round(overallHealth)}%
-            </div>
-            <div className="text-xs text-muted-foreground mt-1">Overall Health</div>
-          </div>
-          
-          {/* Health Metrics Grid */}
-          <div className="lg:col-span-2">
-            <div className="grid grid-cols-2 gap-3">
-              {healthMetrics.map((metric, index) => (
-                <div key={index} className="flex flex-col items-center text-center">
-                  <div className="relative w-16 h-16">
-                    <svg className="transform -rotate-90 w-16 h-16">
-                      <circle
-                        cx="32"
-                        cy="32"
-                        r="24"
-                        stroke="#e5e7eb"
-                        strokeWidth="6"
-                        fill="none"
-                      />
-                      <circle
-                        cx="32"
-                        cy="32"
-                        r="24"
-                        stroke={metric.status === 'healthy' ? '#10b981' : metric.status === 'warning' ? '#f59e0b' : '#ef4444'}
-                        strokeWidth="6"
-                        fill="none"
-                        strokeDasharray={`${(metric.value / metric.max) * 150} 150`}
-                        className="transition-all duration-500"
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-xs font-bold">{metric.value}{metric.unit}</div>
+        <div className="space-y-6">
+          {/* First Row: Circle Charts */}
+          <div className="flex items-center justify-between">
+            {healthMetrics.map((metric, index) => (
+              <div key={index} className="flex flex-col items-center text-center">
+                <div className="relative w-20 h-20">
+                  <svg className="transform -rotate-90 w-20 h-20">
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="30"
+                      stroke="#e5e7eb"
+                      strokeWidth="6"
+                      fill="none"
+                    />
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="30"
+                      stroke={metric.status === 'healthy' ? '#10b981' : metric.status === 'warning' ? '#f59e0b' : '#ef4444'}
+                      strokeWidth="6"
+                      fill="none"
+                      strokeDasharray={`${(metric.value / metric.max) * 188} 188`}
+                      className="transition-all duration-500"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-sm font-bold">{metric.value}{metric.unit}</div>
+                      <div className={`text-xs mt-0.5 ${
+                        metric.status === 'healthy' ? 'text-green-600' : 
+                        metric.status === 'warning' ? 'text-yellow-600' : 'text-red-600'
+                      }`}>
+                        {metric.status}
+                      </div>
                     </div>
                   </div>
-                  <div className="text-xs font-medium mt-1">{metric.label}</div>
-                  <div className={`text-xs mt-0.5 ${
-                    metric.status === 'healthy' ? 'text-green-600' : 
-                    metric.status === 'warning' ? 'text-yellow-600' : 'text-red-600'
-                  }`}>
-                    {metric.status}
-                  </div>
                 </div>
-              ))}
-            </div>
+                <div className="text-xs font-medium mt-2">{metric.label}</div>
+              </div>
+            ))}
           </div>
           
-          {/* Quality Scores & Industry Coverage */}
-          <div className="space-y-4">
+          {/* Second Row: Health Box, Quality Scores, Industry Coverage */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Overall Health Score */}
+            <div className="flex flex-col items-center justify-center p-6 bg-muted rounded-lg">
+              <div className="text-4xl font-bold mb-2" style={{ 
+                color: overallHealth >= 70 ? '#10b981' : overallHealth >= 40 ? '#f59e0b' : '#ef4444' 
+              }}>
+                {Math.round(overallHealth)}%
+              </div>
+              <div className="text-sm text-muted-foreground">Overall Health</div>
+            </div>
+            
             {/* Quality Scores */}
-            <div>
-              <div className="text-xs font-medium mb-2">Quality Scores</div>
-              <div className="space-y-1.5">
+            <div className="space-y-3">
+              <div className="text-sm font-medium">Quality Scores</div>
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-muted-foreground">Completeness</span>
                   <span className="text-xs font-medium">{qualityScores.completeness}%</span>
                 </div>
-                <div className="w-full bg-muted rounded-full h-1.5">
+                <div className="w-full bg-muted rounded-full h-2">
                   <div 
-                    className="bg-blue-500 h-1.5 rounded-full transition-all"
+                    className="bg-blue-500 h-2 rounded-full transition-all"
                     style={{ width: `${qualityScores.completeness}%` }}
                   />
                 </div>
@@ -493,9 +493,9 @@ export function KnowledgeBaseHealthIndicators() {
                   <span className="text-xs text-muted-foreground">Accuracy</span>
                   <span className="text-xs font-medium">{qualityScores.accuracy}%</span>
                 </div>
-                <div className="w-full bg-muted rounded-full h-1.5">
+                <div className="w-full bg-muted rounded-full h-2">
                   <div 
-                    className="bg-green-500 h-1.5 rounded-full transition-all"
+                    className="bg-green-500 h-2 rounded-full transition-all"
                     style={{ width: `${qualityScores.accuracy}%` }}
                   />
                 </div>
@@ -504,9 +504,9 @@ export function KnowledgeBaseHealthIndicators() {
                   <span className="text-xs text-muted-foreground">Freshness</span>
                   <span className="text-xs font-medium">{qualityScores.freshness}%</span>
                 </div>
-                <div className="w-full bg-muted rounded-full h-1.5">
+                <div className="w-full bg-muted rounded-full h-2">
                   <div 
-                    className="bg-yellow-500 h-1.5 rounded-full transition-all"
+                    className="bg-yellow-500 h-2 rounded-full transition-all"
                     style={{ width: `${qualityScores.freshness}%` }}
                   />
                 </div>
@@ -515,9 +515,9 @@ export function KnowledgeBaseHealthIndicators() {
                   <span className="text-xs text-muted-foreground">Coverage</span>
                   <span className="text-xs font-medium">{qualityScores.coverage}%</span>
                 </div>
-                <div className="w-full bg-muted rounded-full h-1.5">
+                <div className="w-full bg-muted rounded-full h-2">
                   <div 
-                    className="bg-purple-500 h-1.5 rounded-full transition-all"
+                    className="bg-purple-500 h-2 rounded-full transition-all"
                     style={{ width: `${qualityScores.coverage}%` }}
                   />
                 </div>
@@ -525,13 +525,13 @@ export function KnowledgeBaseHealthIndicators() {
             </div>
             
             {/* Industry Coverage */}
-            <div>
-              <div className="text-xs font-medium mb-2">Industry Coverage</div>
-              <div className="grid grid-cols-2 gap-1">
+            <div className="space-y-3">
+              <div className="text-sm font-medium">Industry Coverage</div>
+              <div className="grid grid-cols-2 gap-2">
                 {['AI/ML', 'Enterprise', 'Security', 'Cloud', 'Data', 'DevOps'].map((sector, i) => (
                   <div 
                     key={sector}
-                    className={`text-xs px-1.5 py-0.5 rounded text-center ${
+                    className={`text-xs px-2 py-1 rounded text-center font-medium ${
                       i < 2 ? 'bg-green-100 text-green-800' : 
                       i < 4 ? 'bg-yellow-100 text-yellow-800' : 
                       'bg-gray-100 text-gray-600'

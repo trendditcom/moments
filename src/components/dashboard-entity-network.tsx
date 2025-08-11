@@ -252,8 +252,8 @@ function InteractiveNetworkGraph({
     const svg = d3.select(svgRef.current)
     svg.selectAll("*").remove()
     
-    const width = 600
-    const height = 400
+    const width = 1000
+    const height = 500
     const centerX = width / 2
     const centerY = height / 2
     
@@ -379,61 +379,11 @@ function InteractiveNetworkGraph({
   
   return (
     <div className="space-y-4">
-      <svg ref={svgRef} width="100%" height="400" className="border rounded" />
+      <svg ref={svgRef} width="100%" height="500" className="border rounded" />
       
-      {/* Legend */}
-      <div className="grid grid-cols-3 gap-4 text-xs">
-        <div>
-          <div className="font-medium mb-2">Entity Types</div>
-          <div className="space-y-1">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span>Companies</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span>Technologies</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <span>Concepts</span>
-            </div>
-          </div>
-        </div>
-        
-        <div>
-          <div className="font-medium mb-2">Relationship Types</div>
-          <div className="space-y-1">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-1 bg-green-600"></div>
-              <span>Collaboration</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-1 bg-red-500"></div>
-              <span>Competition</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-1 bg-purple-500"></div>
-              <span>Technology Use</span>
-            </div>
-          </div>
-        </div>
-        
-        <div>
-          <div className="font-medium mb-2">Node Information</div>
-          {hoveredNode && (
-            <div className="space-y-1">
-              <div><strong>{hoveredNode.name}</strong></div>
-              <div>Type: {hoveredNode.type}</div>
-              <div>Connections: {hoveredNode.connections}</div>
-              <div>Impact: {Math.round(hoveredNode.impact)}</div>
-            </div>
-          )}
-        </div>
-      </div>
-      
+      {/* Selected Node Information */}
       {selectedNode && (
-        <div className="mt-4 p-3 bg-muted rounded-lg">
+        <div className="p-3 bg-muted rounded-lg">
           <h4 className="text-sm font-medium mb-2">Selected: {selectedNode.name}</h4>
           <div className="grid grid-cols-2 gap-4 text-xs">
             <div>
@@ -448,9 +398,15 @@ function InteractiveNetworkGraph({
         </div>
       )}
       
-      <div className="text-xs text-muted-foreground text-center">
-        Drag nodes to reposition • Click to select • Scroll to zoom • Node size reflects connection count and impact
-      </div>
+      {/* Hovered Node Information */}
+      {hoveredNode && !selectedNode && (
+        <div className="p-2 bg-background border rounded-lg text-xs">
+          <div className="font-medium">{hoveredNode.name}</div>
+          <div className="text-muted-foreground">
+            {hoveredNode.type} • {hoveredNode.connections} connections • Impact: {Math.round(hoveredNode.impact)}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -620,9 +576,9 @@ export function EntityRelationshipNetwork() {
   }, [networkData])
   
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-      {/* Interactive Network Graph */}
-      <Card className="col-span-1">
+    <div className="space-y-4">
+      {/* Interactive Network Graph - Full Width */}
+      <Card className="w-full">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div>
@@ -657,80 +613,139 @@ export function EntityRelationshipNetwork() {
         
         <CardContent>
           <div className="space-y-4">
-            {/* Controls */}
-            <div className="flex items-center space-x-2">
-              <div className="relative flex-1">
-                <MagnifyingGlassIcon className="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Search entities..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1 text-xs border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-              </div>
-              <select
-                value={selectedNodeType}
-                onChange={(e) => setSelectedNodeType(e.target.value as any)}
-                className="text-xs px-2 py-1 border rounded"
-              >
-                <option value="all">All Types</option>
-                <option value="company">Companies</option>
-                <option value="technology">Technologies</option>
-                <option value="concept">Concepts</option>
-              </select>
-            </div>
-            
-            {/* Statistics */}
-            <div className="grid grid-cols-4 gap-2 text-center text-xs">
-              <div>
-                <div className="font-bold">{stats.totalNodes}</div>
-                <div className="text-muted-foreground">Entities</div>
-              </div>
-              <div>
-                <div className="font-bold">{stats.totalEdges}</div>
-                <div className="text-muted-foreground">Relations</div>
-              </div>
-              <div>
-                <div className="font-bold">{Math.round(stats.avgConnections * 10) / 10}</div>
-                <div className="text-muted-foreground">Avg Links</div>
-              </div>
-              <div>
-                <div className="font-bold truncate" title={stats.mostConnected.name}>
-                  {stats.mostConnected.name.length > 8 
-                    ? stats.mostConnected.name.substring(0, 6) + '...'
-                    : stats.mostConnected.name
-                  }
+            {/* Search Controls and Statistics Pills */}
+            <div className="flex items-center justify-between gap-4">
+              {/* Search Controls */}
+              <div className="flex items-center space-x-2 flex-1">
+                <div className="relative flex-1 max-w-md">
+                  <MagnifyingGlassIcon className="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Search entities..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-8 pr-3 py-1 text-xs border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
                 </div>
-                <div className="text-muted-foreground">Most Connected</div>
+                <select
+                  value={selectedNodeType}
+                  onChange={(e) => setSelectedNodeType(e.target.value as any)}
+                  className="text-xs px-2 py-1 border rounded"
+                >
+                  <option value="all">All Types</option>
+                  <option value="company">Companies</option>
+                  <option value="technology">Technologies</option>
+                  <option value="concept">Concepts</option>
+                </select>
+              </div>
+              
+              {/* Statistics Pills */}
+              <div className="flex items-center space-x-2">
+                <Badge variant="secondary" className="text-xs">
+                  {stats.totalNodes} Entities
+                </Badge>
+                <Badge variant="secondary" className="text-xs">
+                  {stats.totalEdges} Relations
+                </Badge>
+                <Badge variant="secondary" className="text-xs">
+                  {Math.round(stats.avgConnections * 10) / 10} Avg Links
+                </Badge>
+                <Badge variant="secondary" className="text-xs" title={stats.mostConnected.name}>
+                  {stats.mostConnected.name.length > 10 
+                    ? stats.mostConnected.name.substring(0, 8) + '...'
+                    : stats.mostConnected.name
+                  } Top Connected
+                </Badge>
               </div>
             </div>
             
-            {viewMode === 'network' ? (
-              <InteractiveNetworkGraph
-                nodes={networkData.nodes}
-                edges={networkData.edges}
-                searchQuery={searchQuery}
-                selectedNodeType={selectedNodeType}
-              />
-            ) : (
-              <RelationshipStrengthMatrix matrix={networkData.matrix} />
-            )}
+            {/* Legend */}
+            <div className="grid grid-cols-3 gap-6 py-2 border-b border-border">
+              <div>
+                <div className="text-xs font-medium mb-2">Entity Types</div>
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-1.5">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <span className="text-xs">Companies</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="text-xs">Technologies</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <span className="text-xs">Concepts</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <div className="text-xs font-medium mb-2">Relationship Types</div>
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-1.5">
+                    <div className="w-3 h-1 bg-green-600 rounded"></div>
+                    <span className="text-xs">Collaboration</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <div className="w-3 h-1 bg-red-500 rounded"></div>
+                    <span className="text-xs">Competition</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <div className="w-3 h-1 bg-purple-500 rounded"></div>
+                    <span className="text-xs">Technology Use</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <div className="text-xs font-medium mb-2">Interactions</div>
+                <div className="text-xs text-muted-foreground">
+                  Drag nodes • Click to select • Scroll to zoom • Node size reflects connections and impact
+                </div>
+              </div>
+            </div>
+            
+            {/* Network Visualization */}
+            <div className="min-h-[500px]">
+              {viewMode === 'network' ? (
+                <InteractiveNetworkGraph
+                  nodes={networkData.nodes}
+                  edges={networkData.edges}
+                  searchQuery={searchQuery}
+                  selectedNodeType={selectedNodeType}
+                />
+              ) : (
+                <RelationshipStrengthMatrix matrix={networkData.matrix} />
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
       
-      {/* Network Analysis Insights */}
-      <Card className="col-span-1">
+      {/* Network Analysis Insights - Full Width Horizontal Card */}
+      <Card className="w-full">
         <CardHeader className="pb-2">
-          <CardTitle className="text-xs font-medium">Network Analysis Insights</CardTitle>
-          <CardDescription className="text-xs">
-            AI-powered analysis of entity relationships and network patterns
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-xs font-medium">Network Analysis Insights</CardTitle>
+              <CardDescription className="text-xs">
+                AI-powered analysis of entity relationships and network patterns
+              </CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs"
+              onClick={() => console.log('Export network data')}
+            >
+              <ArrowDownTrayIcon className="w-3 h-3 mr-1" />
+              Export Network Data
+            </Button>
+          </div>
         </CardHeader>
         
         <CardContent>
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
             {/* Clustering Analysis */}
             <div className="p-3 bg-blue-50 rounded-lg">
               <div className="flex items-start space-x-2">
@@ -739,8 +754,7 @@ export function EntityRelationshipNetwork() {
                   <div className="font-medium mb-1">Cluster Detection</div>
                   <div>
                     Network analysis reveals {Math.ceil(stats.totalNodes / 5)} distinct entity clusters 
-                    with companies forming the strongest interconnected groups around core AI technologies 
-                    and business concepts like &quot;artificial intelligence,&quot; &quot;machine learning,&quot; and &quot;enterprise solutions.&quot;
+                    with companies forming the strongest interconnected groups around core AI technologies.
                   </div>
                 </div>
               </div>
@@ -754,8 +768,7 @@ export function EntityRelationshipNetwork() {
                   <div className="font-medium mb-1">Key Relationships</div>
                   <div>
                     Strongest entity connections show technology adoption patterns, with AI startups 
-                    clustering around foundational technologies like &quot;large language models&quot; and 
-                    &quot;generative AI,&quot; indicating market convergence around these core technologies.
+                    clustering around foundational technologies like &quot;large language models&quot; and &quot;generative AI.&quot;
                   </div>
                 </div>
               </div>
@@ -769,55 +782,41 @@ export function EntityRelationshipNetwork() {
                   <div className="font-medium mb-1">Emerging Patterns</div>
                   <div>
                     Network evolution shows increasing interconnection between enterprise companies 
-                    and AI technologies, suggesting accelerating adoption across traditional industries 
-                    and emerging partnerships between established enterprises and AI-native startups.
+                    and AI technologies, suggesting accelerating adoption across traditional industries.
                   </div>
                 </div>
               </div>
             </div>
             
             {/* Top Connected Entities */}
-            <div>
-              <h4 className="text-xs font-medium mb-2">Most Connected Entities</h4>
-              <div className="space-y-2">
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <div className="text-xs font-medium mb-2">Most Connected Entities</div>
+              <div className="space-y-1.5">
                 {networkData.nodes
                   .sort((a, b) => b.connections - a.connections)
-                  .slice(0, 5)
+                  .slice(0, 4)
                   .map((node, index) => (
                     <div key={node.id} className="flex items-center justify-between text-xs">
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-1.5">
                         <Badge 
                           variant="outline"
-                          className={
-                            node.type === 'company' ? 'border-blue-300' :
-                            node.type === 'technology' ? 'border-green-300' : 'border-yellow-300'
-                          }
+                          className={`text-xs px-1 py-0 ${
+                            node.type === 'company' ? 'border-blue-300 text-blue-700' :
+                            node.type === 'technology' ? 'border-green-300 text-green-700' : 'border-yellow-300 text-yellow-700'
+                          }`}
                         >
                           #{index + 1}
                         </Badge>
-                        <span className="truncate max-w-32" title={node.name}>
-                          {node.name}
+                        <span className="truncate max-w-20" title={node.name}>
+                          {node.name.length > 12 ? node.name.substring(0, 10) + '...' : node.name}
                         </span>
                       </div>
-                      <div className="text-muted-foreground">
-                        {node.connections} links
+                      <div className="text-xs text-muted-foreground">
+                        {node.connections}
                       </div>
                     </div>
                   ))}
               </div>
-            </div>
-            
-            {/* Export Options */}
-            <div className="pt-2 border-t border-border">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full text-xs"
-                onClick={() => console.log('Export network data')}
-              >
-                <ArrowDownTrayIcon className="w-3 h-3 mr-1" />
-                Export Network Data
-              </Button>
             </div>
           </div>
         </CardContent>
