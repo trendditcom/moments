@@ -12,7 +12,9 @@ import {
   BookmarkIcon,
   ChartBarIcon,
   CpuChipIcon,
-  ServerStackIcon
+  ServerStackIcon,
+  PresentationChartBarIcon,
+  Cog6ToothIcon
 } from '@heroicons/react/24/outline'
 
 // Types for dashboard layout components
@@ -20,6 +22,8 @@ interface DashboardHeaderProps {
   onTimeframeChange: (timeframe: string) => void
   selectedTimeframe: string
   alertsCount: number
+  analysisDepth: 'strategic' | 'tactical' | 'operational'
+  onAnalysisDepthChange: (depth: 'strategic' | 'tactical' | 'operational') => void
 }
 
 interface DashboardGridProps {
@@ -42,13 +46,19 @@ interface DashboardFooterProps {
 }
 
 // Dashboard Header Component
-export function DashboardHeader({ onTimeframeChange, selectedTimeframe, alertsCount }: DashboardHeaderProps) {
+export function DashboardHeader({ onTimeframeChange, selectedTimeframe, alertsCount, analysisDepth, onAnalysisDepthChange }: DashboardHeaderProps) {
   const timeframes = [
     { value: '24h', label: '24 Hours' },
     { value: '7d', label: '7 Days' },
     { value: '30d', label: '30 Days' },
     { value: '90d', label: '90 Days' },
     { value: '1y', label: '1 Year' }
+  ]
+
+  const depthOptions = [
+    { value: 'strategic' as const, label: 'Strategic', icon: EyeIcon, description: 'Executive overview' },
+    { value: 'tactical' as const, label: 'Tactical', icon: PresentationChartBarIcon, description: 'Analysis insights' },
+    { value: 'operational' as const, label: 'Operational', icon: Cog6ToothIcon, description: 'Detailed operations' }
   ]
 
   return (
@@ -65,8 +75,32 @@ export function DashboardHeader({ onTimeframeChange, selectedTimeframe, alertsCo
         </div>
       </div>
 
-      {/* Timeframe Selector and Alerts */}
+      {/* Analysis Depth Selector, Timeframe Selector and Alerts */}
       <div className="flex items-center space-x-4">
+        {/* Analysis Depth Selector */}
+        <div className="flex items-center space-x-1 bg-muted/50 rounded-lg p-1">
+          {depthOptions.map((option) => {
+            const IconComponent = option.icon
+            return (
+              <Button
+                key={option.value}
+                variant={analysisDepth === option.value ? "default" : "ghost"}
+                size="sm"
+                onClick={() => onAnalysisDepthChange(option.value)}
+                className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium transition-all ${
+                  analysisDepth === option.value 
+                    ? 'bg-primary text-primary-foreground shadow-sm' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-background/80'
+                }`}
+                title={option.description}
+              >
+                <IconComponent className="w-3.5 h-3.5" />
+                <span>{option.label}</span>
+              </Button>
+            )
+          })}
+        </div>
+
         {/* Timeframe Selector */}
         <div className="flex items-center space-x-2">
           <CalendarDaysIcon className="w-4 h-4 text-muted-foreground" />
@@ -300,6 +334,7 @@ export function DashboardFooter({ systemHealth }: DashboardFooterProps) {
 interface DashboardLayoutProps {
   children: React.ReactNode
   analysisDepth?: 'strategic' | 'tactical' | 'operational'
+  onAnalysisDepthChange?: (depth: 'strategic' | 'tactical' | 'operational') => void
   timeframe?: string
   onTimeframeChange?: (timeframe: string) => void
   systemHealth?: {
@@ -312,17 +347,20 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ 
   children, 
   analysisDepth = 'strategic',
+  onAnalysisDepthChange = () => {},
   timeframe = '7d',
   onTimeframeChange = () => {},
   systemHealth = { dataHealth: 'healthy', processing: 0, performance: 95 }
 }: DashboardLayoutProps) {
-  const [sidebarVisible, setSidebarVisible] = useState(false)
+  const [sidebarVisible, setSidebarVisible] = useState(true) // Always open by default
 
   return (
     <div className="flex flex-col h-full">
       <DashboardHeader
         selectedTimeframe={timeframe}
         onTimeframeChange={onTimeframeChange}
+        analysisDepth={analysisDepth}
+        onAnalysisDepthChange={onAnalysisDepthChange}
         alertsCount={0} // Will be dynamic in future
       />
       

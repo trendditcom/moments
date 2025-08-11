@@ -370,11 +370,12 @@ This guide helps you systematically evaluate the completed features and capabili
    - ✅ **Verify**: Header with timeframe selector (24h/7d/30d/90d/1y) and alert indicators
    - ✅ **Check**: Responsive grid layout adapting to screen size
 
-2. **Analysis Depth Controls**:
-   - Test Analysis Depth Selector component
-   - ✅ **Expected**: Three depth levels (Strategic Overview, Tactical Insights, Operational Details)
-   - ✅ **Verify**: Grid layout changes complexity based on selected depth
-   - ✅ **Check**: Information density increases progressively (1-3, 2-4, 3-5 columns)
+2. **Header-Integrated Analysis Depth Controls**:
+   - Test Analysis Depth buttons in dashboard header (right-aligned before calendar)
+   - ✅ **Expected**: Three depth levels with appropriate icons (Eye/Strategic, Chart/Tactical, Cog/Operational)
+   - ✅ **Verify**: Segmented button group with muted background container and smooth active states
+   - ✅ **Check**: Grid layout changes complexity based on selected depth (1-3, 2-4, 3-5 columns)
+   - ✅ **Validate**: Tooltips appear on hover with descriptive help text for each depth level
 
 3. **Core Dashboard Components**:
    - Review Knowledge Base Growth card with real metrics
@@ -382,11 +383,12 @@ This guide helps you systematically evaluate the completed features and capabili
    - ✅ **Verify**: Trending Factors card displays top factor categories with counts
    - ✅ **Check**: Entity Network card shows companies, technologies, concepts counts
 
-4. **Interactive Sidebar Features**:
-   - Toggle dashboard sidebar using button or main control
-   - ✅ **Expected**: Collapsible insights panel with three sections
-   - ✅ **Verify**: Smart Filters, AI Insights, and Saved Views tabs
-   - ✅ **Check**: Professional hover states and smooth transitions
+4. **Persistent Insights Sidebar**:
+   - Verify insights sidebar is always visible by default on dashboard load
+   - ✅ **Expected**: Persistent insights panel with three sections (Smart Filters, AI Insights, Saved Views)
+   - ✅ **Verify**: Sidebar top aligns with dashboard header level for visual consistency
+   - ✅ **Check**: Toggle functionality available for hiding/showing when needed
+   - ✅ **Validate**: Professional hover states and smooth transitions throughout interface
 
 5. **System Health Footer**:
    - Monitor footer metrics during dashboard use
@@ -394,7 +396,14 @@ This guide helps you systematically evaluate the completed features and capabili
    - ✅ **Verify**: Processing queue count updates during analysis
    - ✅ **Check**: Performance metrics with color-coded indicators
 
-6. **Dashboard Data Integration**:
+6. **Enhanced Dashboard UX Integration**:
+   - Test complete workflow from header controls to grid adaptation
+   - ✅ **Expected**: Seamless switching between Strategic/Tactical/Operational views using header buttons
+   - ✅ **Verify**: Grid immediately adapts layout density (columns and spacing) based on depth selection
+   - ✅ **Check**: Sidebar remains persistent during depth changes for continuous access to insights
+   - ✅ **Validate**: Professional visual hierarchy with proper icon semantics and responsive design
+
+7. **Dashboard Data Integration**:
    - Verify dashboard reflects actual application data
    - ✅ **Expected**: Knowledge Growth card shows real moment counts from store
    - ✅ **Verify**: Trending Factors based on actual factor classification data

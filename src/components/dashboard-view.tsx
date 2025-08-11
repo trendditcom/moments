@@ -9,7 +9,6 @@ import {
   MomentTimelineCard,
   CorrelationInsightsCard,
   AIInsightsCard,
-  AnalysisDepthSelector,
   DashboardPlaceholder
 } from '@/components/dashboard-components'
 import { Company, Technology } from '@/types/catalog'
@@ -92,6 +91,7 @@ export function DashboardView({ companies, technologies, moments, isLoading = fa
     return (
       <DashboardLayout
         analysisDepth={analysisDepth}
+        onAnalysisDepthChange={setAnalysisDepth}
         timeframe={selectedTimeframe}
         onTimeframeChange={setSelectedTimeframe}
         systemHealth={systemHealth}
@@ -109,6 +109,7 @@ export function DashboardView({ companies, technologies, moments, isLoading = fa
   return (
     <DashboardLayout
       analysisDepth={analysisDepth}
+      onAnalysisDepthChange={setAnalysisDepth}
       timeframe={selectedTimeframe}
       onTimeframeChange={setSelectedTimeframe}
       systemHealth={systemHealth}
@@ -153,12 +154,6 @@ export function DashboardView({ companies, technologies, moments, isLoading = fa
           />
         </>
       )}
-
-      {/* Analysis Depth Control - Always visible as last item */}
-      <AnalysisDepthSelector
-        currentDepth={analysisDepth}
-        onDepthChange={setAnalysisDepth}
-      />
     </DashboardLayout>
   )
 }
