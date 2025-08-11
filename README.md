@@ -383,20 +383,35 @@ This guide helps you systematically evaluate the completed features and capabili
    - ✅ **Verify**: Trending Factors card displays top factor categories with counts
    - ✅ **Check**: Entity Network card shows companies, technologies, concepts counts
 
-4. **Persistent Insights Sidebar**:
+4. **Knowledge Base Growth Metrics Visualization** (NEW):
+   - Review the enhanced Growth Velocity Chart in dashboard
+   - ✅ **Expected**: Multi-series area chart with gradient fills showing moments, companies, technologies, and high-impact trends
+   - ✅ **Verify**: Time window selector (24H/7D/30D/90D/1Y) filters data display in real-time
+   - ✅ **Check**: Interactive tooltips on hover showing exact values for each data point
+   - ✅ **Validate**: Growth statistics panel shows Total Growth %, Avg Daily rate, Peak Day, and Projections
+   
+5. **Knowledge Base Health Indicators** (NEW):
+   - Examine the health metrics dashboard component
+   - ✅ **Expected**: Overall Health Score displayed prominently with color-coded percentage
+   - ✅ **Verify**: Four circular gauge visualizations for Total Moments, Analysis Velocity, Data Quality, Industry Coverage
+   - ✅ **Check**: Color-coded status indicators (green=healthy, amber=warning, red=critical) for each metric
+   - ✅ **Validate**: Quality Score progress bars for Completeness, Accuracy, Freshness, Coverage with percentages
+   - ✅ **Test**: Industry Coverage Map preview grid showing sector coverage (AI/ML, Enterprise, Security, Cloud, etc.)
+
+6. **Persistent Insights Sidebar**:
    - Verify insights sidebar is always visible by default on dashboard load
    - ✅ **Expected**: Persistent insights panel with three sections (Smart Filters, AI Insights, Saved Views)
    - ✅ **Verify**: Sidebar top aligns with dashboard header level for visual consistency
    - ✅ **Check**: Toggle functionality available for hiding/showing when needed
    - ✅ **Validate**: Professional hover states and smooth transitions throughout interface
 
-5. **System Health Footer**:
+7. **System Health Footer**:
    - Monitor footer metrics during dashboard use
    - ✅ **Expected**: Real-time data health status (healthy/warning/error)
    - ✅ **Verify**: Processing queue count updates during analysis
    - ✅ **Check**: Performance metrics with color-coded indicators
 
-6. **Enhanced Dashboard UX Integration**:
+8. **Enhanced Dashboard UX Integration**:
    - Test complete workflow from header controls to grid adaptation
    - ✅ **Expected**: Seamless switching between Strategic/Tactical/Operational views using header buttons
    - ✅ **Verify**: Grid immediately adapts layout density (columns and spacing) based on depth selection

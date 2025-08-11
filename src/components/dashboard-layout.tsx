@@ -24,6 +24,8 @@ interface DashboardHeaderProps {
   alertsCount: number
   analysisDepth: 'strategic' | 'tactical' | 'operational'
   onAnalysisDepthChange: (depth: 'strategic' | 'tactical' | 'operational') => void
+  sidebarVisible: boolean
+  onSidebarToggle: () => void
 }
 
 interface DashboardGridProps {
@@ -46,7 +48,15 @@ interface DashboardFooterProps {
 }
 
 // Dashboard Header Component
-export function DashboardHeader({ onTimeframeChange, selectedTimeframe, alertsCount, analysisDepth, onAnalysisDepthChange }: DashboardHeaderProps) {
+export function DashboardHeader({ 
+  onTimeframeChange, 
+  selectedTimeframe, 
+  alertsCount, 
+  analysisDepth, 
+  onAnalysisDepthChange,
+  sidebarVisible,
+  onSidebarToggle 
+}: DashboardHeaderProps) {
   const timeframes = [
     { value: '24h', label: '24 Hours' },
     { value: '7d', label: '7 Days' },
@@ -130,6 +140,19 @@ export function DashboardHeader({ onTimeframeChange, selectedTimeframe, alertsCo
             </Badge>
           )}
         </Button>
+        
+        {/* Sidebar Toggle */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onSidebarToggle}
+          className="flex items-center space-x-1.5 px-3 py-1.5"
+        >
+          <EyeIcon className="w-4 h-4" />
+          <span className="text-xs font-medium">
+            {sidebarVisible ? 'Hide' : 'Show'} Insights
+          </span>
+        </Button>
       </div>
     </div>
   )
@@ -137,21 +160,8 @@ export function DashboardHeader({ onTimeframeChange, selectedTimeframe, alertsCo
 
 // Responsive Dashboard Grid Component
 export function DashboardGrid({ analysisDepth, children }: DashboardGridProps) {
-  const getGridClasses = () => {
-    switch (analysisDepth) {
-      case 'strategic':
-        return 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'
-      case 'tactical':
-        return 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4'
-      case 'operational':
-        return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3'
-      default:
-        return 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'
-    }
-  }
-
   return (
-    <div className={`grid ${getGridClasses()} p-6`}>
+    <div className="flex flex-col gap-4 p-6">
       {children}
     </div>
   )
@@ -162,33 +172,13 @@ export function DashboardSidebar({ isVisible, onToggle, children }: DashboardSid
   const [activeSection, setActiveSection] = useState<'filters' | 'insights' | 'bookmarks'>('filters')
 
   if (!isVisible) {
-    return (
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onToggle}
-        className="fixed right-4 top-1/2 transform -translate-y-1/2 z-10"
-        title="Show filters and insights"
-      >
-        <AdjustmentsHorizontalIcon className="w-5 h-5" />
-      </Button>
-    )
+    return null
   }
 
   return (
     <div className="w-80 border-l border-border bg-card/50 backdrop-blur-sm flex flex-col">
       <div className="p-4 border-b border-border">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-foreground">Insights</h3>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onToggle}
-            className="ml-4"
-          >
-            <EyeIcon className="w-4 h-4" />
-          </Button>
-        </div>
+        <h3 className="text-lg font-semibold text-foreground">Insights</h3>
       </div>
       
       <nav className="flex-none p-2">
@@ -362,6 +352,8 @@ export function DashboardLayout({
         analysisDepth={analysisDepth}
         onAnalysisDepthChange={onAnalysisDepthChange}
         alertsCount={0} // Will be dynamic in future
+        sidebarVisible={sidebarVisible}
+        onSidebarToggle={() => setSidebarVisible(!sidebarVisible)}
       />
       
       <div className="flex flex-1 overflow-hidden">

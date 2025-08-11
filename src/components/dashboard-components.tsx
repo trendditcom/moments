@@ -39,7 +39,7 @@ export function KnowledgeGrowthCard({ metrics }: { metrics: KnowledgeGrowthMetri
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Knowledge Base Growth</CardTitle>
+        <CardTitle className="text-xs font-medium">Knowledge Base Growth</CardTitle>
         <ChartBarIcon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
@@ -81,9 +81,9 @@ export function TrendingFactorsCard({ factors }: { factors: TrendingFactorData[]
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-sm font-medium">Trending Factors</CardTitle>
-        <CardDescription>Most active factor categories</CardDescription>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xs font-medium">Trending Factors</CardTitle>
+        <CardDescription className="text-xs">Most active factor categories</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
@@ -118,7 +118,7 @@ export function EntityNetworkCard({ entityCount }: { entityCount: { companies: n
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Entity Network</CardTitle>
+        <CardTitle className="text-xs font-medium">Entity Network</CardTitle>
         <GlobeAltIcon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
@@ -157,7 +157,7 @@ export function MomentTimelineCard({ recentMoments }: { recentMoments: number })
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
+        <CardTitle className="text-xs font-medium">Recent Activity</CardTitle>
         <ClockIcon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
@@ -196,7 +196,7 @@ export function CorrelationInsightsCard({ correlationCount }: { correlationCount
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Correlation Insights</CardTitle>
+        <CardTitle className="text-xs font-medium">Correlation Insights</CardTitle>
         <LinkIcon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
@@ -235,7 +235,7 @@ export function AIInsightsCard({ insightCount }: { insightCount: number }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">AI Insights</CardTitle>
+        <CardTitle className="text-xs font-medium">AI Insights</CardTitle>
         <LightBulbIcon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
@@ -319,10 +319,10 @@ export function DashboardPlaceholder({ title, description, icon: Icon }: {
   icon: React.ComponentType<{ className?: string }>
 }) {
   return (
-    <Card className="border-dashed">
+    <Card className="border-dashed h-full">
       <CardContent className="flex flex-col items-center justify-center py-8">
         <Icon className="w-8 h-8 text-muted-foreground mb-4" />
-        <h3 className="text-sm font-medium text-center mb-2">{title}</h3>
+        <h3 className="text-xs font-medium text-center mb-2">{title}</h3>
         <p className="text-xs text-muted-foreground text-center mb-4 max-w-xs">
           {description}
         </p>
