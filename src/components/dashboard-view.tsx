@@ -12,6 +12,7 @@ import {
   DashboardPlaceholder
 } from '@/components/dashboard-components'
 import { KnowledgeGrowthMetrics } from '@/components/dashboard-growth-metrics'
+import { FactorDistributionAnalytics } from '@/components/dashboard-factor-analytics'
 import { Company, Technology } from '@/types/catalog'
 import { PivotalMoment } from '@/types/moments'
 import { 
@@ -144,29 +145,26 @@ export function DashboardView({ companies, technologies, moments, isLoading = fa
 
       {/* Operational Tier - Visible only at operational level */}
       {analysisDepth === 'operational' && (
-        <div className="flex flex-wrap gap-4">
-          <div className="flex-1 min-w-[300px]">
-            <DashboardPlaceholder
-              title="Factor Distribution Sunburst"
-              description="Interactive visualization showing factor classification breakdown"
-              icon={ChartPieIcon}
-            />
+        <>
+          <FactorDistributionAnalytics />
+          
+          <div className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-[300px]">
+              <DashboardPlaceholder
+                title="Entity Network Graph"
+                description="Interactive network visualization of company and technology relationships"
+                icon={MapIcon}
+              />
+            </div>
+            <div className="flex-1 min-w-[300px]">
+              <DashboardPlaceholder
+                title="Temporal Analysis"
+                description="Time-series analysis with trend detection and forecasting"
+                icon={CalendarIcon}
+              />
+            </div>
           </div>
-          <div className="flex-1 min-w-[300px]">
-            <DashboardPlaceholder
-              title="Entity Network Graph"
-              description="Interactive network visualization of company and technology relationships"
-              icon={MapIcon}
-            />
-          </div>
-          <div className="flex-1 min-w-[300px]">
-            <DashboardPlaceholder
-              title="Temporal Analysis"
-              description="Time-series analysis with trend detection and forecasting"
-              icon={CalendarIcon}
-            />
-          </div>
-        </div>
+        </>
       )}
     </DashboardLayout>
   )

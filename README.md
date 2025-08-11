@@ -418,11 +418,34 @@ This guide helps you systematically evaluate the completed features and capabili
    - ✅ **Check**: Sidebar remains persistent during depth changes for continuous access to insights
    - ✅ **Validate**: Professional visual hierarchy with proper icon semantics and responsive design
 
-7. **Dashboard Data Integration**:
-   - Verify dashboard reflects actual application data
-   - ✅ **Expected**: Knowledge Growth card shows real moment counts from store
-   - ✅ **Verify**: Trending Factors based on actual factor classification data
-   - ✅ **Check**: Recent Activity reflects real moment timeline data
+9. **Factor Distribution Analytics** (NEW):
+   - Switch to Operational depth level to access advanced visualizations
+   - ✅ **Expected**: Factor Classification Sunburst chart with three-ring hierarchical structure
+   - ✅ **Verify**: Inner ring shows micro (blue) vs macro (green) factor categories
+   - ✅ **Check**: Outer ring displays specific factor types with color-coded classification
+   - ✅ **Test**: Hover interactions show tooltips with factor names, counts, and classification levels
+   - ✅ **Validate**: Click-to-zoom functionality for detailed factor exploration
+
+10. **Impact Distribution Heatmap** (NEW):
+    - Review the heatmap visualization alongside the sunburst chart
+    - ✅ **Expected**: Grid-based heatmap showing factor categories vs impact levels (low/medium/high)
+    - ✅ **Verify**: Color-intensity mapping with red (low), yellow (medium), green (high) impact levels
+    - ✅ **Check**: Interactive cell selection with click handlers for detailed analysis
+    - ✅ **Test**: Category filtering dropdown (All Factors/Micro Only/Macro Only)
+    - ✅ **Validate**: Statistical summary panels showing Total Moments, Active Factors, Average Impact
+
+11. **AI-Generated Factor Insights** (NEW):
+    - Test the dynamic insights panel below the visualizations
+    - ✅ **Expected**: Context-aware insights based on selected filter categories
+    - ✅ **Verify**: Different insights for micro vs macro factor analysis
+    - ✅ **Check**: Pattern detection explanations for factor variance and market influences
+    - ✅ **Test**: Real-time insights updates when changing category filters
+
+12. **Dashboard Data Integration**:
+    - Verify dashboard reflects actual application data
+    - ✅ **Expected**: Knowledge Growth card shows real moment counts from store
+    - ✅ **Verify**: Trending Factors based on actual factor classification data
+    - ✅ **Check**: Recent Activity reflects real moment timeline data
 
 ### 🎯 Interactive Features Evaluation
 
