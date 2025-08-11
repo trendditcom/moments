@@ -441,7 +441,71 @@ This guide helps you systematically evaluate the completed features and capabili
     - ✅ **Check**: Pattern detection explanations for factor variance and market influences
     - ✅ **Test**: Real-time insights updates when changing category filters
 
-12. **Dashboard Data Integration**:
+12. **Dashboard Layout and UX Improvements** (NEW):
+    - Test the enhanced dashboard layout with improved component sizing
+    - ✅ **Expected**: Growth Velocity Chart occupies full container width for better data visibility
+    - ✅ **Verify**: Knowledge Base Health card displays as horizontal layout with 4-section design
+    - ✅ **Check**: Health metrics show real data including actual moment counts, analysis velocity, and quality scores
+    - ✅ **Test**: Insights sidebar starts hidden by default, providing more space for main content
+    - ✅ **Validate**: Sidebar toggle shows "Show Insights" when hidden, "Hide Insights" when visible
+
+13. **Enhanced Health Metrics Display** (NEW):
+    - Review the redesigned horizontal Knowledge Base Health card
+    - ✅ **Expected**: Four-column responsive grid layout (Overall Health, Health Metrics, Quality Scores, Industry Coverage)
+    - ✅ **Verify**: Compact circular gauge visualizations with real metric values and status colors
+    - ✅ **Check**: Quality score progress bars show actual percentages for Completeness, Accuracy, Freshness, Coverage
+    - ✅ **Test**: Industry coverage grid displays 6 key sectors with color-coded status indicators
+    - ✅ **Validate**: Overall health percentage reflects actual system status based on real metrics
+
+14. **Entity Relationship Network Visualization** (NEW):
+    - Access the operational dashboard tier to view the Entity Relationship Network
+    - ✅ **Expected**: Two-panel layout with Interactive Network Graph on left and Network Analysis Insights on right
+    - ✅ **Verify**: Force-directed network visualization with companies (blue), technologies (green), and concepts (yellow) nodes
+    - ✅ **Check**: Node sizes reflect connection count and impact score with proportional scaling
+    - ✅ **Test**: Drag-and-drop node positioning with physics simulation and smooth animations
+    - ✅ **Validate**: Zoom and pan interactions with mouse wheel and drag navigation
+
+15. **Interactive Network Graph Features** (NEW):
+    - Test the comprehensive network interaction capabilities
+    - ✅ **Expected**: Real-time entity search filtering with live network updates
+    - ✅ **Verify**: Entity type dropdown filtering (All/Companies/Technologies/Concepts)
+    - ✅ **Check**: Click-to-select nodes revealing detailed entity information panels
+    - ✅ **Test**: Hover tooltips showing entity names, types, connections, and impact scores
+    - ✅ **Validate**: Network statistics display (total entities, relations, average links, most connected entity)
+
+16. **Relationship Edge Visualization** (NEW):
+    - Examine the relationship connections between entities
+    - ✅ **Expected**: Edge width proportional to relationship strength based on co-occurrence
+    - ✅ **Verify**: Color-coded relationship types (green=collaboration, red=competition, purple=technology use)
+    - ✅ **Check**: Smooth edge animations and connection highlighting on node selection
+    - ✅ **Test**: Relationship strength calculation based on moment co-occurrences and impact weighting
+    - ✅ **Validate**: Dynamic edge updates when filtering or searching entities
+
+17. **Relationship Strength Matrix** (NEW):
+    - Switch to matrix view to examine quantitative relationship analysis
+    - ✅ **Expected**: Interactive correlation matrix with color intensity mapping
+    - ✅ **Verify**: Entity sorting options (by name, connections, or type)
+    - ✅ **Check**: Click-to-select matrix cells revealing detailed relationship analysis
+    - ✅ **Test**: Color-coded entity badges distinguishing companies, technologies, and concepts
+    - ✅ **Validate**: Relationship strength visualization with intensity scaling and legends
+
+18. **Network Analysis Insights** (NEW):
+    - Review the AI-powered network analysis in the insights panel
+    - ✅ **Expected**: Cluster detection identifying distinct entity groupings around core AI technologies
+    - ✅ **Verify**: Key relationships analysis showing technology adoption patterns
+    - ✅ **Check**: Emerging patterns detection revealing enterprise-AI startup connections
+    - ✅ **Test**: Most connected entities ranking with connection counts and impact metrics
+    - ✅ **Validate**: Export functionality framework ready for network data extraction
+
+19. **Entity Data Processing and Performance** (NEW):
+    - Validate the underlying data processing and performance characteristics
+    - ✅ **Expected**: Real-time data integration from moments and catalog stores
+    - ✅ **Verify**: Concepts dynamically generated from keywords, people, and location entities
+    - ✅ **Check**: Efficient force simulation with collision detection and optimization
+    - ✅ **Test**: Responsive design adapting to different screen sizes and device types
+    - ✅ **Validate**: TypeScript safety with comprehensive type definitions and error handling
+
+20. **Dashboard Data Integration**:
     - Verify dashboard reflects actual application data
     - ✅ **Expected**: Knowledge Growth card shows real moment counts from store
     - ✅ **Verify**: Trending Factors based on actual factor classification data

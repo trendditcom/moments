@@ -342,7 +342,7 @@ export function DashboardLayout({
   onTimeframeChange = () => {},
   systemHealth = { dataHealth: 'healthy', processing: 0, performance: 95 }
 }: DashboardLayoutProps) {
-  const [sidebarVisible, setSidebarVisible] = useState(true) // Always open by default
+  const [sidebarVisible, setSidebarVisible] = useState(false) // Start hidden by default
 
   return (
     <div className="flex flex-col h-full">

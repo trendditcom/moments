@@ -218,7 +218,7 @@ export function GrowthVelocityChart() {
   }, [timeSeriesData, timeWindow])
   
   return (
-    <Card className="flex-1 min-w-[500px]">
+    <Card className="w-full">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
           <CardTitle className="text-sm font-medium">Growth Velocity</CardTitle>
@@ -395,7 +395,7 @@ function HealthGauge({ metric }: { metric: HealthMetric }) {
   )
 }
 
-// Knowledge Base Health Indicators Component
+// Knowledge Base Health Indicators Component (Horizontal Layout)
 export function KnowledgeBaseHealthIndicators() {
   const { moments } = useMomentsStore()
   const { companies, technologies } = useCatalogStore()
@@ -413,101 +413,134 @@ export function KnowledgeBaseHealthIndicators() {
   const overallHealth = healthMetrics.filter(m => m.status === 'healthy').length / healthMetrics.length * 100
   
   return (
-    <Card className="flex-1 min-w-[320px] max-w-[400px]">
+    <Card className="w-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium">Knowledge Base Health</CardTitle>
         <CardDescription className="text-xs">Quality metrics and system status</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Overall Health Score */}
-          <div className="text-center p-4 bg-muted rounded-lg">
+          <div className="flex flex-col items-center justify-center p-4 bg-muted rounded-lg">
             <div className="text-3xl font-bold" style={{ 
               color: overallHealth >= 70 ? '#10b981' : overallHealth >= 40 ? '#f59e0b' : '#ef4444' 
             }}>
               {Math.round(overallHealth)}%
             </div>
-            <div className="text-sm text-muted-foreground mt-1">Overall Health</div>
+            <div className="text-xs text-muted-foreground mt-1">Overall Health</div>
           </div>
           
-          {/* Health Gauges */}
-          <div className="grid grid-cols-2 gap-4">
-            {healthMetrics.map((metric, index) => (
-              <HealthGauge key={index} metric={metric} />
-            ))}
-          </div>
-          
-          {/* Quality Scores */}
-          <div className="space-y-2">
-            <div className="text-sm font-medium">Quality Scores</div>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-muted-foreground">Completeness</span>
-                <div className="flex items-center space-x-2">
-                  <div className="w-24 bg-muted rounded-full h-2">
-                    <div 
-                      className="bg-blue-500 h-2 rounded-full transition-all"
-                      style={{ width: `${qualityScores.completeness}%` }}
-                    />
+          {/* Health Metrics Grid */}
+          <div className="lg:col-span-2">
+            <div className="grid grid-cols-2 gap-3">
+              {healthMetrics.map((metric, index) => (
+                <div key={index} className="flex flex-col items-center text-center">
+                  <div className="relative w-16 h-16">
+                    <svg className="transform -rotate-90 w-16 h-16">
+                      <circle
+                        cx="32"
+                        cy="32"
+                        r="24"
+                        stroke="#e5e7eb"
+                        strokeWidth="6"
+                        fill="none"
+                      />
+                      <circle
+                        cx="32"
+                        cy="32"
+                        r="24"
+                        stroke={metric.status === 'healthy' ? '#10b981' : metric.status === 'warning' ? '#f59e0b' : '#ef4444'}
+                        strokeWidth="6"
+                        fill="none"
+                        strokeDasharray={`${(metric.value / metric.max) * 150} 150`}
+                        className="transition-all duration-500"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-xs font-bold">{metric.value}{metric.unit}</div>
+                    </div>
                   </div>
-                  <span className="text-xs font-medium w-10 text-right">{qualityScores.completeness}%</span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-muted-foreground">Accuracy</span>
-                <div className="flex items-center space-x-2">
-                  <div className="w-24 bg-muted rounded-full h-2">
-                    <div 
-                      className="bg-green-500 h-2 rounded-full transition-all"
-                      style={{ width: `${qualityScores.accuracy}%` }}
-                    />
+                  <div className="text-xs font-medium mt-1">{metric.label}</div>
+                  <div className={`text-xs mt-0.5 ${
+                    metric.status === 'healthy' ? 'text-green-600' : 
+                    metric.status === 'warning' ? 'text-yellow-600' : 'text-red-600'
+                  }`}>
+                    {metric.status}
                   </div>
-                  <span className="text-xs font-medium w-10 text-right">{qualityScores.accuracy}%</span>
                 </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-muted-foreground">Freshness</span>
-                <div className="flex items-center space-x-2">
-                  <div className="w-24 bg-muted rounded-full h-2">
-                    <div 
-                      className="bg-yellow-500 h-2 rounded-full transition-all"
-                      style={{ width: `${qualityScores.freshness}%` }}
-                    />
-                  </div>
-                  <span className="text-xs font-medium w-10 text-right">{qualityScores.freshness}%</span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-muted-foreground">Coverage</span>
-                <div className="flex items-center space-x-2">
-                  <div className="w-24 bg-muted rounded-full h-2">
-                    <div 
-                      className="bg-purple-500 h-2 rounded-full transition-all"
-                      style={{ width: `${qualityScores.coverage}%` }}
-                    />
-                  </div>
-                  <span className="text-xs font-medium w-10 text-right">{qualityScores.coverage}%</span>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
           
-          {/* Coverage Map Preview */}
-          <div className="p-3 bg-muted rounded-lg">
-            <div className="text-xs font-medium mb-2">Industry Coverage</div>
-            <div className="grid grid-cols-3 gap-1">
-              {['AI/ML', 'Enterprise', 'Security', 'Cloud', 'Data', 'DevOps', 'Mobile', 'IoT', 'Blockchain'].map((sector, i) => (
-                <div 
-                  key={sector}
-                  className={`text-xs p-1 rounded text-center ${
-                    i < 4 ? 'bg-green-100 text-green-800' : 
-                    i < 7 ? 'bg-yellow-100 text-yellow-800' : 
-                    'bg-gray-100 text-gray-600'
-                  }`}
-                >
-                  {sector}
+          {/* Quality Scores & Industry Coverage */}
+          <div className="space-y-4">
+            {/* Quality Scores */}
+            <div>
+              <div className="text-xs font-medium mb-2">Quality Scores</div>
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Completeness</span>
+                  <span className="text-xs font-medium">{qualityScores.completeness}%</span>
                 </div>
-              ))}
+                <div className="w-full bg-muted rounded-full h-1.5">
+                  <div 
+                    className="bg-blue-500 h-1.5 rounded-full transition-all"
+                    style={{ width: `${qualityScores.completeness}%` }}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Accuracy</span>
+                  <span className="text-xs font-medium">{qualityScores.accuracy}%</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-1.5">
+                  <div 
+                    className="bg-green-500 h-1.5 rounded-full transition-all"
+                    style={{ width: `${qualityScores.accuracy}%` }}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Freshness</span>
+                  <span className="text-xs font-medium">{qualityScores.freshness}%</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-1.5">
+                  <div 
+                    className="bg-yellow-500 h-1.5 rounded-full transition-all"
+                    style={{ width: `${qualityScores.freshness}%` }}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Coverage</span>
+                  <span className="text-xs font-medium">{qualityScores.coverage}%</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-1.5">
+                  <div 
+                    className="bg-purple-500 h-1.5 rounded-full transition-all"
+                    style={{ width: `${qualityScores.coverage}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* Industry Coverage */}
+            <div>
+              <div className="text-xs font-medium mb-2">Industry Coverage</div>
+              <div className="grid grid-cols-2 gap-1">
+                {['AI/ML', 'Enterprise', 'Security', 'Cloud', 'Data', 'DevOps'].map((sector, i) => (
+                  <div 
+                    key={sector}
+                    className={`text-xs px-1.5 py-0.5 rounded text-center ${
+                      i < 2 ? 'bg-green-100 text-green-800' : 
+                      i < 4 ? 'bg-yellow-100 text-yellow-800' : 
+                      'bg-gray-100 text-gray-600'
+                    }`}
+                  >
+                    {sector}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -519,7 +552,7 @@ export function KnowledgeBaseHealthIndicators() {
 // Main Knowledge Growth Metrics Component
 export function KnowledgeGrowthMetrics() {
   return (
-    <div className="flex flex-wrap gap-4 w-full">
+    <div className="flex flex-col gap-4 w-full">
       <GrowthVelocityChart />
       <KnowledgeBaseHealthIndicators />
     </div>

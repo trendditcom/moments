@@ -13,6 +13,7 @@ import {
 } from '@/components/dashboard-components'
 import { KnowledgeGrowthMetrics } from '@/components/dashboard-growth-metrics'
 import { FactorDistributionAnalytics } from '@/components/dashboard-factor-analytics'
+import { EntityRelationshipNetwork } from '@/components/dashboard-entity-network'
 import { Company, Technology } from '@/types/catalog'
 import { PivotalMoment } from '@/types/moments'
 import { 
@@ -148,14 +149,9 @@ export function DashboardView({ companies, technologies, moments, isLoading = fa
         <>
           <FactorDistributionAnalytics />
           
+          <EntityRelationshipNetwork />
+          
           <div className="flex flex-wrap gap-4">
-            <div className="flex-1 min-w-[300px]">
-              <DashboardPlaceholder
-                title="Entity Network Graph"
-                description="Interactive network visualization of company and technology relationships"
-                icon={MapIcon}
-              />
-            </div>
             <div className="flex-1 min-w-[300px]">
               <DashboardPlaceholder
                 title="Temporal Analysis"
