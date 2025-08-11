@@ -6,6 +6,7 @@ import { CatalogDetail } from '@/components/catalog-detail'
 import { MomentDetail } from '@/components/moment-detail'
 import { MomentsView } from '@/components/moments-view'
 import { DashboardView } from '@/components/dashboard-view'
+import { GraphView } from '@/components/graph-view'
 import { StorageManager } from '@/components/storage-manager'
 import { SettingsContent } from '@/components/settings-content'
 import { CatalogStatus } from '@/components/catalog-status'
@@ -32,7 +33,7 @@ import {
 import { Zap } from 'lucide-react'
 
 type ViewState = 
-  | { type: 'catalog', tab: 'companies' | 'technologies' | 'moments' | 'dashboard' }
+  | { type: 'catalog', tab: 'companies' | 'technologies' | 'moments' | 'dashboard' | 'graph' }
   | { type: 'detail', item: Company | Technology, itemType: 'company' | 'technology' }
   | { type: 'moment-detail', moment: PivotalMoment }
 
@@ -101,7 +102,7 @@ export default function HomePage() {
     }
   }
   
-  const handleTabChange = (tab: 'companies' | 'technologies' | 'moments' | 'dashboard') => {
+  const handleTabChange = (tab: 'companies' | 'technologies' | 'moments' | 'dashboard' | 'graph') => {
     setViewState({ type: 'catalog', tab })
   }
   
@@ -449,6 +450,16 @@ export default function HomePage() {
                       >
                         Dashboard
                       </button>
+                      <button
+                        onClick={() => handleTabChange('graph')}
+                        className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                          activeTab === 'graph'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Graph
+                      </button>
                     </nav>
                   </div>
                 )}
@@ -496,6 +507,13 @@ export default function HomePage() {
                     </div>
                   ) : viewState.tab === 'dashboard' ? (
                     <DashboardView
+                      companies={companies}
+                      technologies={technologies}
+                      moments={moments}
+                      isLoading={isAnalyzing || isLoading}
+                    />
+                  ) : viewState.tab === 'graph' ? (
+                    <GraphView
                       companies={companies}
                       technologies={technologies}
                       moments={moments}

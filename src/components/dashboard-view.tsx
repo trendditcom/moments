@@ -13,7 +13,6 @@ import {
 } from '@/components/dashboard-components'
 import { KnowledgeGrowthMetrics } from '@/components/dashboard-growth-metrics'
 import { FactorDistributionAnalytics } from '@/components/dashboard-factor-analytics'
-import { EntityRelationshipNetwork } from '@/components/dashboard-entity-network'
 import { Company, Technology } from '@/types/catalog'
 import { PivotalMoment } from '@/types/moments'
 import { 
@@ -117,19 +116,24 @@ export function DashboardView({ companies, technologies, moments, isLoading = fa
       onTimeframeChange={setSelectedTimeframe}
       systemHealth={systemHealth}
     >
-      {/* Strategic Tier - Always visible */}
-      <KnowledgeGrowthMetrics />
-      
-      <div className="flex flex-wrap gap-4">
-        <div className="flex-1 min-w-[300px]">
-          <TrendingFactorsCard factors={dashboardMetrics.trendingFactors} />
-        </div>
-        <div className="flex-1 min-w-[300px]">
-          <EntityNetworkCard entityCount={dashboardMetrics.entityCount} />
-        </div>
-      </div>
+      {/* Operational Tier - Visible only at operational level - TOP PRIORITY */}
+      {analysisDepth === 'operational' && (
+        <>
+          <FactorDistributionAnalytics />
+          
+          <div className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-[300px]">
+              <DashboardPlaceholder
+                title="Temporal Analysis"
+                description="Time-series analysis with trend detection and forecasting"
+                icon={CalendarIcon}
+              />
+            </div>
+          </div>
+        </>
+      )}
 
-      {/* Tactical Tier - Visible at tactical and operational levels */}
+      {/* Tactical Tier - Visible at tactical and operational levels - SECOND PRIORITY */}
       {(analysisDepth === 'tactical' || analysisDepth === 'operational') && (
         <div className="flex flex-wrap gap-4">
           <div className="flex-1 min-w-[280px]">
@@ -144,24 +148,17 @@ export function DashboardView({ companies, technologies, moments, isLoading = fa
         </div>
       )}
 
-      {/* Operational Tier - Visible only at operational level */}
-      {analysisDepth === 'operational' && (
-        <>
-          <FactorDistributionAnalytics />
-          
-          <EntityRelationshipNetwork />
-          
-          <div className="flex flex-wrap gap-4">
-            <div className="flex-1 min-w-[300px]">
-              <DashboardPlaceholder
-                title="Temporal Analysis"
-                description="Time-series analysis with trend detection and forecasting"
-                icon={CalendarIcon}
-              />
-            </div>
-          </div>
-        </>
-      )}
+      {/* Strategic Tier - Always visible - BASE FOUNDATION */}
+      <KnowledgeGrowthMetrics />
+      
+      <div className="flex flex-wrap gap-4">
+        <div className="flex-1 min-w-[300px]">
+          <TrendingFactorsCard factors={dashboardMetrics.trendingFactors} />
+        </div>
+        <div className="flex-1 min-w-[300px]">
+          <EntityNetworkCard entityCount={dashboardMetrics.entityCount} />
+        </div>
+      </div>
     </DashboardLayout>
   )
 }
