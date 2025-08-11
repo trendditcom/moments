@@ -294,7 +294,7 @@ function FullHeightNetworkGraph({
     svg.call(zoom as any)
     
     // Create edges
-    const edges = g.selectAll('.edge')
+    const edgeSelection = g.selectAll('.edge')
       .data(filteredEdges)
       .enter().append('line')
       .attr('class', 'edge')
@@ -361,7 +361,7 @@ function FullHeightNetworkGraph({
     
     // Update positions on simulation tick
     simulation.on('tick', function() {
-      edges
+      edgeSelection
         .attr('x1', d => (d.source as NetworkNode).x || 0)
         .attr('y1', d => (d.source as NetworkNode).y || 0)
         .attr('x2', d => (d.target as NetworkNode).x || 0)
