@@ -213,13 +213,15 @@ function FullHeightNetworkGraph({
   edges, 
   searchQuery, 
   selectedNodeType,
-  containerHeight = 600
+  containerHeight = 600,
+  onNodeSelect
 }: {
   nodes: NetworkNode[]
   edges: NetworkEdge[]
   searchQuery: string
   selectedNodeType: string
   containerHeight?: number
+  onNodeSelect?: (node: NetworkNode | null) => void
 }) {
   const svgRef = useRef<SVGSVGElement>(null)
   const [selectedNode, setSelectedNode] = useState<NetworkNode | null>(null)
@@ -327,6 +329,7 @@ function FullHeightNetworkGraph({
       })
       .on('click', function(event, d) {
         setSelectedNode(d)
+        onNodeSelect?.(d)
         event.stopPropagation()
       })
       .call(d3.drag<SVGCircleElement, NetworkNode>()
@@ -371,6 +374,7 @@ function FullHeightNetworkGraph({
     // Click to deselect
     svg.on('click', function() {
       setSelectedNode(null)
+      onNodeSelect?.(null)
     })
     
     return () => {
@@ -414,9 +418,10 @@ function FullHeightNetworkGraph({
 }
 
 // Network Analysis Insights Sidebar Component
-function NetworkAnalysisInsightsSidebar({ networkData, stats }: {
+function NetworkAnalysisInsightsSidebar({ networkData, stats, selectedNode }: {
   networkData: { nodes: NetworkNode[], edges: NetworkEdge[] }
   stats: { totalNodes: number, totalEdges: number, avgConnections: number, mostConnected: NetworkNode }
+  selectedNode: NetworkNode | null
 }) {
   return (
     <div className="w-80 bg-card border-l border-border flex flex-col h-full">
@@ -441,6 +446,41 @@ function NetworkAnalysisInsightsSidebar({ networkData, stats }: {
       
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* Selected Node Information */}
+        {selectedNode && (
+          <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+            <div className="flex items-start space-x-2">
+              <div className={`w-3 h-3 rounded-full mt-1 flex-shrink-0 ${
+                selectedNode.type === 'company' ? 'bg-blue-500' :
+                selectedNode.type === 'technology' ? 'bg-green-500' : 'bg-yellow-500'
+              }`}></div>
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-sm text-purple-900 mb-1 truncate" title={selectedNode.name}>
+                  {selectedNode.name}
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs text-purple-800">
+                  <div>
+                    <div className="text-purple-600">Type</div>
+                    <div className="font-medium capitalize">{selectedNode.type}</div>
+                  </div>
+                  <div>
+                    <div className="text-purple-600">Connections</div>
+                    <div className="font-medium">{selectedNode.connections}</div>
+                  </div>
+                  <div>
+                    <div className="text-purple-600">Impact Score</div>
+                    <div className="font-medium">{Math.round(selectedNode.impact)}</div>
+                  </div>
+                  <div>
+                    <div className="text-purple-600">Network Size</div>
+                    <div className="font-medium">{selectedNode.size}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Clustering Analysis */}
         <div className="p-3 bg-blue-50 rounded-lg">
           <div className="flex items-start space-x-2">
@@ -598,6 +638,7 @@ export function GraphView({ companies, technologies, moments, isLoading = false 
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedNodeType, setSelectedNodeType] = useState<'all' | 'company' | 'technology' | 'concept'>('all')
   const [containerHeight, setContainerHeight] = useState(600)
+  const [selectedNode, setSelectedNode] = useState<NetworkNode | null>(null)
   
   const networkData = useMemo(() => 
     extractEntitiesFromMoments(moments, companies, technologies),
@@ -733,6 +774,7 @@ export function GraphView({ companies, technologies, moments, isLoading = false 
               searchQuery={searchQuery}
               selectedNodeType={selectedNodeType}
               containerHeight={containerHeight}
+              onNodeSelect={setSelectedNode}
             />
           ) : (
             <div className="flex items-center justify-center h-full">
@@ -745,7 +787,7 @@ export function GraphView({ companies, technologies, moments, isLoading = false 
       </div>
       
       {/* Right Sidebar */}
-      <NetworkAnalysisInsightsSidebar networkData={networkData} stats={stats} />
+      <NetworkAnalysisInsightsSidebar networkData={networkData} stats={stats} selectedNode={selectedNode} />
     </div>
   )
 }
