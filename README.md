@@ -1,7 +1,5 @@
-# Moments
-
 <div align="center">
-  <img src="blog/images/moments.png" alt="Moments Dashboard" width="100%" style="border-radius: 8px; margin-bottom: 20px;">
+  <h1>⚡ Moments</h1>
   
   **AI-Powered Business Intelligence for the AI Industry**
   
@@ -13,31 +11,51 @@
   [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 </div>
 
+![Moments Dashboard](blog/images/dashboard.png)
+
 ## 🚀 What is Moments?
 
 **Moments** is a local-first, agent-driven application that discovers and analyzes pivotal moments in the AI business landscape. Built as an intelligent wrapper around the [Claude Code SDK](https://docs.anthropic.com/en/docs/claude-code/sdk), Moments transforms raw business content into classified intelligence through specialized AI agents.
 
-### Key Features
+### ✨ Key Features
 
-- **🤖 Multi-Agent AI Analysis** - Specialized sub-agents for content analysis, classification, and correlation discovery
-- **📊 Business Intelligence Dashboard** - Real-time analysis of AI startups, enterprises, and market dynamics  
-- **🔒 Local-First Architecture** - Your data stays on your systems with optional AI enhancement
-- **⚡ Smart Update System** - Incremental analysis processes only changed content for 10x faster updates
-- **🎯 Factor Classification** - Automatic categorization by micro/macro business factors
-- **🔗 Correlation Discovery** - AI-powered relationship mapping between market events
-- **🗂️ File-System Integration** - Two-way sync with human-readable markdown files
-- **📱 Apple Settings-Style Interface** - Professional, intuitive design with advanced storage management
+🤖 **Multi-Agent AI Analysis** - Specialized sub-agents for content analysis, classification, and correlation discovery
 
-<div align="center">
-  <img src="blog/images/companies.png" alt="Company Analysis" width="48%" style="border-radius: 8px; margin: 10px;">
-  <img src="blog/images/filters.png" alt="Smart Filtering" width="48%" style="border-radius: 8px; margin: 10px;">
-</div>
+📊 **Business Intelligence Dashboard** - Three-tier analytics (Strategic/Tactical/Operational) with real-time visualizations
 
-## 🏗️ Architecture & Technology
+🔒 **Local-First Architecture** - Your data stays on your systems with optional AI enhancement
 
-Moments showcases modern AI-first application architecture with production-ready patterns:
+⚡ **Smart Update System** - Incremental analysis processes only changed content for 10x faster updates
 
-### Multi-Agent System
+🎯 **Factor Classification** - Automatic categorization by micro/macro business factors
+
+🔗 **Entity Relationship Network** - Interactive force-directed graphs with 237+ entities and 1800+ relationships
+
+📈 **Advanced Visualizations** - Sunburst charts, correlation matrices, growth velocity tracking
+
+🗂️ **File-System Integration** - Two-way sync with human-readable markdown files
+
+📱 **Apple Settings-Style Interface** - Professional, intuitive design with advanced storage management
+
+⚡ **Parallel Processing** - Multi-source concurrent analysis with real-time progress tracking
+
+## 🎯 Use Cases
+
+### For Business Leaders
+- **Investment Intelligence**: Track startup trajectories and acquisition targets
+- **Competitive Analysis**: Monitor competitor moves 3-6 months before market impact  
+- **Strategic Planning**: Understand regulatory impacts on product roadmaps
+
+### For Development Teams
+- **Agent Orchestration**: Learn multi-agent AI application patterns
+- **Claude Code SDK**: Explore production-ready AI integration techniques
+- **TypeScript AI Apps**: Study type-safe AI development workflows
+
+## 🏗️ Architecture
+
+![Dashboard Architecture](blog/images/dashboard-factors.png)
+
+### Multi-Agent System Architecture
 ```typescript
 // Specialized AI agents for different analysis tasks
 const subAgents = {
@@ -45,35 +63,23 @@ const subAgents = {
     model: "claude-sonnet-4-20250514",
     temperature: 0.3
   },
-  classificationAgent: { // Categorize by business factors
-    model: "claude-sonnet-4-20250514", 
+  classificationAgent: { // Categorize by business factors  
+    model: "claude-sonnet-4-20250514",
     temperature: 0.2
   },
   correlationEngine: {   // Discover relationships
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-20250514", 
     temperature: 0.4
   }
 }
 ```
 
 ### Technology Stack
-- **Frontend**: Next.js 14+, React 18+, TypeScript 5+, Tailwind CSS, shadcn/ui
+- **Frontend**: Next.js 14+, React 18+, TypeScript 5+, Tailwind CSS, shadcn/ui, D3.js
 - **AI Integration**: Claude Code SDK, Anthropic API, multi-agent orchestration
+- **Visualization**: Recharts, D3.js force simulations, interactive network graphs
 - **State Management**: Zustand with file-system persistence
-- **Development**: ESLint, TypeScript, modern React patterns
 - **Architecture**: 4-layer design (Presentation, Agent Orchestration, Data Processing, Storage)
-
-## 🎯 Use Cases
-
-### For Business Leaders
-- **Investment Intelligence**: Track startup trajectories and acquisition targets
-- **Competitive Analysis**: Monitor competitor moves 3-6 months before market impact
-- **Strategic Planning**: Understand regulatory impacts on product roadmaps
-
-### For Development Teams
-- **Agent Orchestration**: Learn multi-agent AI application patterns
-- **Claude Code SDK**: Explore production-ready AI integration techniques
-- **TypeScript AI Apps**: Study type-safe AI development workflows
 
 ## 🚀 Quick Start
 
@@ -102,9 +108,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to see the application.
 
-### Configuration
-
-Create your `.env.local` file:
+### Environment Configuration
 
 ```env
 # Required: Anthropic API key for AI analysis
@@ -115,36 +119,50 @@ ANTHROPIC_API_KEY=your_api_key_here
 CONFIG_PATH=./config.yml
 ```
 
-## 📖 Getting Started Guide
+## 📊 Dashboard Features
 
-### 1. Zero-Configuration Setup
+![Entity Network Graph](blog/images/graph.png)
 
-<img src="blog/images/companies.png" alt="Auto-Loading Content" width="400" align="right" style="border-radius: 8px; margin: 0 0 20px 20px;">
+### Three-Tier Information Architecture
 
-- **Automatic Loading**: Catalogs load automatically from `companies/` and `technologies/` folders
-- **Immediate Start**: App begins loading content on first visit
-- **Real-Time Progress**: Watch analysis progress with live moment counting
-- **File-System Integration**: Content persists as human-readable markdown files
-- **Manual Refresh**: Use refresh buttons for manual content updates
+**Strategic Tier (Executive Dashboard)**
+- High-level KPIs and trend alerts for leadership
+- Knowledge base growth metrics and velocity tracking
+- Real-time system health indicators
 
-### 2. Smart Analysis System
+**Tactical Tier (Analysis Dashboard)**  
+- Factor distribution with interactive sunburst charts
+- Entity relationship networks with 237 entities
+- Correlation insights and pattern discovery
 
-Switch to the **Moments** tab for AI-powered analysis:
-- **Smart Update**: Process only new or changed content (90% faster)
-- **Full Analysis**: Complete re-analysis of all content
-- **Real-Time Progress**: Track moment discovery as it happens
-- **Parallel Processing**: Multiple agents working simultaneously
+**Operational Tier (Detail Dashboard)**
+- Individual moment analysis and classification
+- Relationship strength matrices with quantitative coefficients
+- Source analysis and temporal correlation patterns
 
-### 3. Explore Intelligence
+### Advanced Visualizations
 
-<img src="blog/images/moment-details.png" alt="Moment Details" width="300" align="right" style="border-radius: 8px; margin: 0 0 20px 20px;">
+**Knowledge Base Growth Metrics**
+- Multi-series velocity charts with time-series data
+- Health indicators with circular gauge visualizations  
+- Quality score progress bars and industry coverage maps
 
-Navigate the comprehensive interface:
-- **Filter by Factors**: Company, competition, regulation, technology
-- **Sort by Impact**: High-impact moments surface first
-- **Interactive Keywords**: Click keywords to filter instantly  
-- **Deep Dive Details**: Click any moment for comprehensive analysis
-- **Entity Navigation**: Click companies/technologies to explore connections
+**Factor Distribution Analytics**
+- Three-ring sunburst charts (micro/macro, categories, specific types)
+- Impact distribution heatmaps with color intensity mapping
+- Interactive filtering and AI-generated pattern insights
+
+**Entity Relationship Network**
+- Force-directed network visualization with drag-and-drop
+- Proportional node sizing based on connection count
+- Color-coded relationship types and strength-based edge width
+
+![Relationship Matrix](blog/images/matrix.png)
+
+**Relationship Strength Matrix**  
+- Correlation coefficients with hierarchical clustering
+- Interactive matrix cells with detailed relationship analysis
+- Quantitative relationship strengths and statistical significance
 
 ## 🧠 AI Analysis Features
 
@@ -154,8 +172,8 @@ Moments categorizes business developments into:
 
 **Micro Factors** (Company-Specific):
 - 🏢 **Company**: Leadership, funding, product launches
-- 🥊 **Competition**: Competitor moves, market positioning  
-- 🤝 **Partners**: Strategic alliances, integrations
+- 🥊 **Competition**: Competitor moves, market positioning
+- 🤝 **Partners**: Strategic alliances, integrations  
 - 👥 **Customers**: Customer wins, market adoption
 
 **Macro Factors** (Industry-Wide):
@@ -166,126 +184,140 @@ Moments categorizes business developments into:
 - 🌱 **Environment**: Sustainability, ESG considerations
 - ⛓️ **Supply Chain**: Infrastructure, resource availability
 
-### Real-Time Processing
+### Real-Time Processing Intelligence
 
-<img src="blog/images/settings-storage-management.png" alt="Apple Settings Interface" width="300" align="right" style="border-radius: 8px; margin: 0 0 20px 20px;">
-
-Monitor AI agent activities in real-time:
+Monitor AI agent activities with live progress tracking:
 - **Content Analyzer**: Extracting moments from documents
 - **Classification Agent**: Categorizing by business factors
-- **Correlation Engine**: Discovering relationships
-- **Progress Intelligence**: Step-by-step analysis visibility with live counts
+- **Correlation Engine**: Discovering entity relationships
+- **Progress Intelligence**: Step-by-step analysis visibility with live moment counting
 
-### Advanced Storage Management
+### Parallel Processing Performance
 
-Professional storage system with Apple Settings-style interface:
-- **Health Monitoring**: Real-time storage capacity and performance metrics
-- **File Integration**: Two-way sync between app and filesystem
-- **Backup & Restore**: Complete data export/import capabilities
-- **Auto-Recovery**: Automatic data restoration on app restart
-
-## 🧪 Performance Features
-
-### Intelligent Processing
 - **Smart Updates**: 90% faster processing by analyzing only changed content
-- **Parallel Agents**: Multiple AI agents working simultaneously
-- **Incremental Cache**: Tracks content changes using MD5 hashing
-- **Temporal Windows**: Correlation analysis within configurable time periods (14 days)
+- **Parallel Agents**: Multiple AI agents working simultaneously  
+- **Incremental Cache**: MD5 content hashing for change detection
+- **Temporal Windows**: Correlation analysis within configurable time periods
 
-### File-System First Architecture
-- **Human-Readable**: All data stored as markdown files with YAML frontmatter
-- **Version Control**: Compatible with git for team collaboration
-- **Local-First**: No vendor lock-in, your data stays with you
-- **Performance**: Intelligent caching for immediate UI response
+## 🗂️ File-System Integration
 
-## 🔧 Configuration
+### Two-Way Persistence
 
-### Custom Content Sources
+**Human-Readable Storage**
+- All data stored as markdown files with YAML frontmatter
+- Moments automatically saved to `moments/` folder hierarchy
+- Companies and technologies loaded from `companies/` and `technologies/` folders
 
-Modify `config.yml` to analyze your own content:
+**Example Moment File Format**
+```yaml
+---
+title: "Tesla develops 10x parameter FSD model with end-to-end architecture"
+type: "company"
+impact_score: 85
+confidence: 92
+classification:
+  micro_factors: ["company"]
+  macro_factors: ["technology"]
+entities:
+  companies: ["Tesla"]
+  technologies: ["autonomous driving", "neural networks"]
+timeline:
+  extracted_date: "2025-08-10"
+---
+
+# Analysis Summary
+
+Tesla's development of a 10x parameter Full Self-Driving model represents...
+```
+
+### Configuration Management
+
+Customize content sources in `config.yml`:
 
 ```yaml
 catalogs:
   companies:
     name: "Companies"
-    description: "AI Companies and Startups"
+    description: "AI Companies and Startups" 
     source_folder: "./companies"
     file_patterns: ["**/*.md", "**/*.txt"]
   
   technologies:
-    name: "Technologies" 
+    name: "Technologies"
     description: "AI Technologies and Frameworks"
     source_folder: "./technologies"
     file_patterns: ["**/*.md", "**/*.txt"]
-```
 
-### Agent Configuration
-
-Customize AI agent behavior:
-
-```yaml
 agents:
   content_analyzer:
     enabled: true
     model: "claude-sonnet-4-20250514"
     temperature: 0.3
-    
-  classification_agent:
-    model: "claude-sonnet-4-20250514"
-    temperature: 0.2
-```
 
-### Performance Settings
-
-```yaml
 app:
   processing:
     parallel_processing:
       enabled: true
       max_concurrent_sources: 4
       max_concurrent_content_per_source: 3
-      enable_sub_agent_parallelization: true
 ```
+
+## 🎨 User Interface
+
+### Apple Settings-Style Design
+
+Professional interface with:
+- **Edge-to-edge layout** with dedicated Settings sidebar
+- **Three-section storage management** (Health, Current Data, Management)
+- **Smooth animations** and hover states throughout
+- **Responsive design** optimized for all screen sizes
+
+### Interactive Navigation
+
+- **Entity Navigation**: Click companies/technologies in moment cards to view details
+- **Keyword Filtering**: Click keyword badges for instant filtering
+- **Detail Views**: Comprehensive 4-tab detail pages (Overview, Related, Source, Timeline)
+- **Real-Time Search**: Live filtering with updated statistics
 
 ## 📊 Sample Data
 
-The repository includes curated content for exploration:
+The repository includes curated content for immediate exploration:
 
-### Companies
-- **Glean**: Agent platform and enterprise search
-- **Sierra AI**: Conversational agent operating system
-- **Walmart**: Enterprise AI strategy and implementation
+**Companies**
+- **Glean**: Agent platform and enterprise search ($7.2B valuation)
+- **Sierra AI**: Conversational agent operating system ($4.5B valuation)  
+- **Tesla**: Autonomous driving and AI infrastructure
+- **Walmart**: Enterprise AI strategy and agentic systems
 
-### Technologies
-- **Claude Code**: AI development tools and SDK
+**Technologies**
+- **Claude Code**: AI development tools and SDK patterns
 - **LLM Agents**: Multi-agent system architectures
-- **LLM Prompting**: Advanced prompting techniques
+- **Model Context Protocol**: Standardized agent tool integration
 
-## 🏗️ Development
+## 🔧 Development
 
 ### Project Structure
 
 ```
 src/
-├── app/                    # Next.js App Router
-├── components/            # React components
-│   ├── ui/               # shadcn/ui components
-│   ├── moment-card.tsx   # AI moment display
-│   └── moments-view.tsx  # Analysis dashboard
-├── lib/                  # Core logic
-│   ├── moment-extractor.ts  # AI content analysis
-│   ├── sub-agents.ts        # Agent orchestration
-│   └── factor-classifier.ts # Business factor logic
-├── store/                # State management
-└── types/                # TypeScript definitions
+├── app/                      # Next.js App Router
+│   ├── api/                 # REST API endpoints
+│   │   ├── moments/         # Moment CRUD operations
+│   │   ├── companies/       # Company data loading
+│   │   └── technologies/    # Technology data loading
+├── components/              # React components
+│   ├── ui/                 # shadcn/ui components
+│   ├── dashboard-*.tsx     # Dashboard visualizations
+│   ├── moment-*.tsx        # Moment display and details
+│   └── graph-view.tsx      # Entity network visualization
+├── lib/                    # Core logic
+│   ├── moment-extractor.ts   # Claude SDK integration
+│   ├── sub-agents.ts         # Agent orchestration
+│   ├── factor-classifier.ts  # Business factor logic
+│   └── incremental-moment-manager.ts # Smart updates
+├── store/                  # Zustand state management
+└── types/                  # TypeScript definitions
 ```
-
-### Key Components
-
-- **MomentExtractor**: Claude Code SDK integration for content analysis
-- **SubAgentManager**: Multi-agent orchestration and workflow
-- **IncrementalMomentManager**: Smart change detection and processing
-- **MomentsStore**: Zustand state management with file persistence
 
 ### Development Commands
 
@@ -296,392 +328,84 @@ npm run type-check   # TypeScript validation
 npm run lint         # Code linting
 ```
 
+## ⚡ Performance Features
+
+### Intelligent Processing
+- **90% faster updates** through incremental processing
+- **Parallel agent execution** with configurable concurrency
+- **Real-time progress tracking** with live moment counting
+- **Smart caching** with MD5 content change detection
+
+### Scalability
+- **File-system first** architecture for unlimited data growth
+- **Efficient network visualization** handling 200+ entities
+- **Responsive dashboard** adapting to analysis depth (Strategic/Tactical/Operational)
+- **Memory optimization** with lazy loading and virtualization
+
 ## 🔐 Security & Privacy
 
 ### Local-First Design
 - All sensitive processing happens locally
-- No cloud dependencies for core functionality
+- No cloud dependencies for core functionality  
 - Optional AI enhancement with your API keys
+- Data export/backup for complete control
 
-### Development vs Production
+### Production Considerations
 - **Development**: Client-side API keys for rapid iteration
-- **Production**: Server-side API routes recommended
+- **Production**: Server-side API routes recommended (patterns included)
 - **Migration Path**: Built-in patterns for secure deployment
 
-## 📚 Learning Resources
+## 📚 Documentation
 
-### Documentation
+### Comprehensive Specifications
 - **[Architecture Specification](specs/stack.md)**: Complete technical architecture
-- **[Design System](specs/design.md)**: UI/UX design principles
+- **[Design System](specs/design.md)**: UI/UX design principles  
+- **[Dashboard Specification](specs/dashboard.md)**: Visualization design patterns
 - **[Development Guide](CLAUDE.md)**: Comprehensive development instructions
 
-### Blog Posts
-- **[AI Business Intelligence](blog/end-user-persona-ai-business-intelligence.md)**: End-user perspective
-- **[Claude Code SDK Architecture](blog/developer-persona-claude-code-sdk-architecture.md)**: Technical deep dive
-- **[File-System AI Integration](blog/file-system-persistence-real-time-ai.md)**: Local-first architecture
+### Blog Posts & Guides
+- **[Business Intelligence Dashboard](blog/business-intelligence-dashboard-three-tier-analytics.md)**: Executive overview
+- **[Factor Distribution Analytics](blog/factor-distribution-analytics-sunburst-heatmap.md)**: Advanced visualization guide
+- **[Entity Relationship Networks](blog/entity-relationship-network-graph-ai-intelligence.md)**: Network analysis features
 - **[Parallel AI Processing](blog/parallel-ai-processing-performance.md)**: Performance optimization
-
-## ✅ User Evaluation Guide
-
-This guide helps you systematically evaluate the completed features and capabilities of the Moments application.
-
-### 🚀 Initial Setup Evaluation
-
-**Test Auto-Hydration System**
-1. **Fresh Install Test**: 
-   - Start the app for the first time
-   - ✅ **Expected**: Automatic loading of companies and technologies from folders
-   - ✅ **Verify**: Progress indicators show catalog loading status
-   - ✅ **Check**: Companies and Technologies tabs show actual content counts
-
-2. **Configuration Validation**:
-   - Review `config.yml` file settings
-   - ✅ **Expected**: Configurable folder paths and file patterns
-   - ✅ **Verify**: App respects configuration settings for source folders
-
-### 🧠 AI Analysis Features Evaluation
-
-**Test Multi-Agent Analysis System**
-1. **Smart Update Analysis**:
-   - Navigate to Moments tab
-   - Click "Smart Update" button
-   - ✅ **Expected**: Real-time progress with moment count updates
-   - ✅ **Verify**: Live agent activity tracking shows specialized sub-agents working
-   - ✅ **Check**: Progress shows incrementing moment counts during processing
-
-2. **Full Analysis Capability**:
-   - Click "Analyze All" button
-   - ✅ **Expected**: Complete analysis of all content with progress tracking
-   - ✅ **Verify**: Parallel processing of multiple sources simultaneously
-   - ✅ **Check**: Final moment cards appear automatically after completion
-
-3. **Factor Classification Validation**:
-   - Review generated moment cards
-   - ✅ **Expected**: Color-coded factor badges (micro: company, competition, partners, customers)
-   - ✅ **Verify**: Macro factor classification (economic, geo-political, regulation, technology, etc.)
-   - ✅ **Check**: Impact scoring (High/Medium/Low) with confidence indicators
-
-### 📊 Dashboard Features Evaluation
-
-**Test Foundation Dashboard System**
-1. **Dashboard Navigation**:
-   - Click the "Dashboard" tab in main navigation
-   - ✅ **Expected**: Professional dashboard interface with three-tier information architecture
-   - ✅ **Verify**: Header with timeframe selector (24h/7d/30d/90d/1y) and alert indicators
-   - ✅ **Check**: Responsive grid layout adapting to screen size
-
-2. **Header-Integrated Analysis Depth Controls**:
-   - Test Analysis Depth buttons in dashboard header (right-aligned before calendar)
-   - ✅ **Expected**: Three depth levels with appropriate icons (Eye/Strategic, Chart/Tactical, Cog/Operational)
-   - ✅ **Verify**: Segmented button group with muted background container and smooth active states
-   - ✅ **Check**: Grid layout changes complexity based on selected depth (1-3, 2-4, 3-5 columns)
-   - ✅ **Validate**: Tooltips appear on hover with descriptive help text for each depth level
-
-3. **Core Dashboard Components**:
-   - Review Knowledge Base Growth card with real metrics
-   - ✅ **Expected**: Live data showing total moments, growth percentage, trend indicators
-   - ✅ **Verify**: Trending Factors card displays top factor categories with counts
-   - ✅ **Check**: Entity Network card shows companies, technologies, concepts counts
-
-4. **Knowledge Base Growth Metrics Visualization** (NEW):
-   - Review the enhanced Growth Velocity Chart in dashboard
-   - ✅ **Expected**: Multi-series area chart with gradient fills showing moments, companies, technologies, and high-impact trends
-   - ✅ **Verify**: Time window selector (24H/7D/30D/90D/1Y) filters data display in real-time
-   - ✅ **Check**: Interactive tooltips on hover showing exact values for each data point
-   - ✅ **Validate**: Growth statistics panel shows Total Growth %, Avg Daily rate, Peak Day, and Projections
-   
-5. **Knowledge Base Health Indicators** (NEW):
-   - Examine the health metrics dashboard component
-   - ✅ **Expected**: Overall Health Score displayed prominently with color-coded percentage
-   - ✅ **Verify**: Four circular gauge visualizations for Total Moments, Analysis Velocity, Data Quality, Industry Coverage
-   - ✅ **Check**: Color-coded status indicators (green=healthy, amber=warning, red=critical) for each metric
-   - ✅ **Validate**: Quality Score progress bars for Completeness, Accuracy, Freshness, Coverage with percentages
-   - ✅ **Test**: Industry Coverage Map preview grid showing sector coverage (AI/ML, Enterprise, Security, Cloud, etc.)
-
-6. **Persistent Insights Sidebar**:
-   - Verify insights sidebar is always visible by default on dashboard load
-   - ✅ **Expected**: Persistent insights panel with three sections (Smart Filters, AI Insights, Saved Views)
-   - ✅ **Verify**: Sidebar top aligns with dashboard header level for visual consistency
-   - ✅ **Check**: Toggle functionality available for hiding/showing when needed
-   - ✅ **Validate**: Professional hover states and smooth transitions throughout interface
-
-7. **System Health Footer**:
-   - Monitor footer metrics during dashboard use
-   - ✅ **Expected**: Real-time data health status (healthy/warning/error)
-   - ✅ **Verify**: Processing queue count updates during analysis
-   - ✅ **Check**: Performance metrics with color-coded indicators
-
-8. **Enhanced Dashboard UX Integration**:
-   - Test complete workflow from header controls to grid adaptation
-   - ✅ **Expected**: Seamless switching between Strategic/Tactical/Operational views using header buttons
-   - ✅ **Verify**: Grid immediately adapts layout density (columns and spacing) based on depth selection
-   - ✅ **Check**: Sidebar remains persistent during depth changes for continuous access to insights
-   - ✅ **Validate**: Professional visual hierarchy with proper icon semantics and responsive design
-
-9. **Factor Distribution Analytics** (NEW):
-   - Switch to Operational depth level to access advanced visualizations
-   - ✅ **Expected**: Factor Classification Sunburst chart with three-ring hierarchical structure
-   - ✅ **Verify**: Inner ring shows micro (blue) vs macro (green) factor categories
-   - ✅ **Check**: Outer ring displays specific factor types with color-coded classification
-   - ✅ **Test**: Hover interactions show tooltips with factor names, counts, and classification levels
-   - ✅ **Validate**: Click-to-zoom functionality for detailed factor exploration
-
-10. **Impact Distribution Heatmap** (NEW):
-    - Review the heatmap visualization alongside the sunburst chart
-    - ✅ **Expected**: Grid-based heatmap showing factor categories vs impact levels (low/medium/high)
-    - ✅ **Verify**: Color-intensity mapping with red (low), yellow (medium), green (high) impact levels
-    - ✅ **Check**: Interactive cell selection with click handlers for detailed analysis
-    - ✅ **Test**: Category filtering dropdown (All Factors/Micro Only/Macro Only)
-    - ✅ **Validate**: Statistical summary panels showing Total Moments, Active Factors, Average Impact
-
-11. **AI-Generated Factor Insights** (NEW):
-    - Test the dynamic insights panel below the visualizations
-    - ✅ **Expected**: Context-aware insights based on selected filter categories
-    - ✅ **Verify**: Different insights for micro vs macro factor analysis
-    - ✅ **Check**: Pattern detection explanations for factor variance and market influences
-    - ✅ **Test**: Real-time insights updates when changing category filters
-
-12. **Dashboard Layout and UX Improvements** (NEW):
-    - Test the enhanced dashboard layout with improved component sizing
-    - ✅ **Expected**: Growth Velocity Chart occupies full container width for better data visibility
-    - ✅ **Verify**: Knowledge Base Health card displays as horizontal layout with 4-section design
-    - ✅ **Check**: Health metrics show real data including actual moment counts, analysis velocity, and quality scores
-    - ✅ **Test**: Insights sidebar starts hidden by default, providing more space for main content
-    - ✅ **Validate**: Sidebar toggle shows "Show Insights" when hidden, "Hide Insights" when visible
-
-13. **Enhanced Health Metrics Display** (NEW):
-    - Review the redesigned horizontal Knowledge Base Health card
-    - ✅ **Expected**: Four-column responsive grid layout (Overall Health, Health Metrics, Quality Scores, Industry Coverage)
-    - ✅ **Verify**: Compact circular gauge visualizations with real metric values and status colors
-    - ✅ **Check**: Quality score progress bars show actual percentages for Completeness, Accuracy, Freshness, Coverage
-    - ✅ **Test**: Industry coverage grid displays 6 key sectors with color-coded status indicators
-    - ✅ **Validate**: Overall health percentage reflects actual system status based on real metrics
-
-14. **Entity Relationship Network Visualization** (NEW):
-    - Access the operational dashboard tier to view the Entity Relationship Network
-    - ✅ **Expected**: Two-panel layout with Interactive Network Graph on left and Network Analysis Insights on right
-    - ✅ **Verify**: Force-directed network visualization with companies (blue), technologies (green), and concepts (yellow) nodes
-    - ✅ **Check**: Node sizes reflect connection count and impact score with proportional scaling
-    - ✅ **Test**: Drag-and-drop node positioning with physics simulation and smooth animations
-    - ✅ **Validate**: Zoom and pan interactions with mouse wheel and drag navigation
-
-15. **Interactive Network Graph Features** (NEW):
-    - Test the comprehensive network interaction capabilities
-    - ✅ **Expected**: Real-time entity search filtering with live network updates
-    - ✅ **Verify**: Entity type dropdown filtering (All/Companies/Technologies/Concepts)
-    - ✅ **Check**: Click-to-select nodes revealing detailed entity information panels
-    - ✅ **Test**: Hover tooltips showing entity names, types, connections, and impact scores
-    - ✅ **Validate**: Network statistics display (total entities, relations, average links, most connected entity)
-
-16. **Relationship Edge Visualization** (NEW):
-    - Examine the relationship connections between entities
-    - ✅ **Expected**: Edge width proportional to relationship strength based on co-occurrence
-    - ✅ **Verify**: Color-coded relationship types (green=collaboration, red=competition, purple=technology use)
-    - ✅ **Check**: Smooth edge animations and connection highlighting on node selection
-    - ✅ **Test**: Relationship strength calculation based on moment co-occurrences and impact weighting
-    - ✅ **Validate**: Dynamic edge updates when filtering or searching entities
-
-17. **Relationship Strength Matrix** (NEW):
-    - Switch to matrix view to examine quantitative relationship analysis
-    - ✅ **Expected**: Interactive correlation matrix with color intensity mapping
-    - ✅ **Verify**: Entity sorting options (by name, connections, or type)
-    - ✅ **Check**: Click-to-select matrix cells revealing detailed relationship analysis
-    - ✅ **Test**: Color-coded entity badges distinguishing companies, technologies, and concepts
-    - ✅ **Validate**: Relationship strength visualization with intensity scaling and legends
-
-18. **Network Analysis Insights** (NEW):
-    - Review the AI-powered network analysis in the insights panel
-    - ✅ **Expected**: Cluster detection identifying distinct entity groupings around core AI technologies
-    - ✅ **Verify**: Key relationships analysis showing technology adoption patterns
-    - ✅ **Check**: Emerging patterns detection revealing enterprise-AI startup connections
-    - ✅ **Test**: Most connected entities ranking with connection counts and impact metrics
-    - ✅ **Validate**: Export functionality framework ready for network data extraction
-
-19. **Entity Data Processing and Performance** (NEW):
-    - Validate the underlying data processing and performance characteristics
-    - ✅ **Expected**: Real-time data integration from moments and catalog stores
-    - ✅ **Verify**: Concepts dynamically generated from keywords, people, and location entities
-    - ✅ **Check**: Efficient force simulation with collision detection and optimization
-    - ✅ **Test**: Responsive design adapting to different screen sizes and device types
-    - ✅ **Validate**: TypeScript safety with comprehensive type definitions and error handling
-
-20. **Dashboard Data Integration**:
-    - Verify dashboard reflects actual application data
-    - ✅ **Expected**: Knowledge Growth card shows real moment counts from store
-    - ✅ **Verify**: Trending Factors based on actual factor classification data
-    - ✅ **Check**: Recent Activity reflects real moment timeline data
-
-### 🎯 Interactive Features Evaluation
-
-**Test Navigation and Interactivity**
-1. **Entity Navigation**:
-   - Click company/technology names in moment cards
-   - ✅ **Expected**: Navigation to detailed catalog entries
-   - ✅ **Verify**: Fallback to catalog tab when no match found
-   - ✅ **Check**: Detail views show Overview, Content, and Moments tabs
-
-2. **Keyword Filtering**:
-   - Click keyword badges in moment cards
-   - ✅ **Expected**: Instant filtering by selected keywords
-   - ✅ **Verify**: Filter count updates in header (e.g., "16 of 80 moments (filtered)")
-   - ✅ **Check**: All statistics badges reflect filtered results
-
-3. **Moment Detail Views**:
-   - Click on moment card titles or content areas
-   - ✅ **Expected**: Comprehensive detail view with 4 tabs (Overview, Related, Source, Timeline)
-   - ✅ **Verify**: Related moments show correlation scores and reasoning
-   - ✅ **Check**: Source tab displays original content and metadata
-
-### 📊 Storage and Persistence Evaluation
-
-**Test File-System Integration**
-1. **Two-Way File Persistence**:
-   - Run analysis to generate moments
-   - ✅ **Expected**: Moment files appear in `moments/` folder as markdown
-   - ✅ **Verify**: Human-readable format with YAML frontmatter metadata
-   - ✅ **Check**: App can reload moments from files on restart
-
-2. **Storage Management Interface**:
-   - Open Settings sidebar (gear icon in header)
-   - Navigate through Storage Health, Current Data, Storage Management sections
-   - ✅ **Expected**: Apple Settings-style interface with clear section organization
-   - ✅ **Verify**: Real-time storage metrics and file system status
-   - ✅ **Check**: Backup/restore functionality with file validation
-
-3. **Auto-Recovery System**:
-   - Restart the application
-   - ✅ **Expected**: Automatic data recovery from file system
-   - ✅ **Verify**: No need to manually reload catalogs or moments
-   - ✅ **Check**: Status indicators confirm successful recovery
-
-### ⚡ Performance Features Evaluation
-
-**Test Intelligent Processing**
-1. **Incremental Analysis Efficiency**:
-   - Make small content changes to a company file
-   - Run "Smart Update"
-   - ✅ **Expected**: Significantly faster processing (90% time reduction)
-   - ✅ **Verify**: Only changed content gets reprocessed
-   - ✅ **Check**: Existing moments remain unchanged unless affected
-
-2. **Parallel Processing Validation**:
-   - Monitor agent activity during full analysis
-   - ✅ **Expected**: Multiple agents working simultaneously
-   - ✅ **Verify**: Progress shows concurrent processing of companies and technologies
-   - ✅ **Check**: System utilizes configured parallelization settings from config.yml
-
-3. **Real-Time Progress Intelligence**:
-   - Watch progress during long analyses
-   - ✅ **Expected**: Live moment counting instead of "0 moments found" until completion
-   - ✅ **Verify**: Step-by-step progress with descriptive status messages
-   - ✅ **Check**: Agent activity shows current processing stages
-
-### 🎨 UI/UX Features Evaluation
-
-**Test Interface Design and Usability**
-1. **Professional Interface**:
-   - Navigate through all main tabs (Companies, Technologies, Moments)
-   - ✅ **Expected**: Consistent Apple Settings-style design
-   - ✅ **Verify**: Smooth animations and hover states
-   - ✅ **Check**: Responsive layout on different screen sizes
-
-2. **Search and Filtering**:
-   - Use search functionality in moments view
-   - ✅ **Expected**: Real-time filtering with live count updates
-   - ✅ **Verify**: Filter statistics reflect only filtered results
-   - ✅ **Check**: Multiple filter types work together (keywords, factors, impact)
-
-3. **Scrolling and Navigation**:
-   - Scroll through long lists of cards
-   - ✅ **Expected**: Smooth scrolling without UI freezing
-   - ✅ **Verify**: All content accessible even when below the fold
-   - ✅ **Check**: Navigation breadcrumbs work correctly in detail views
-
-### 🔄 Data Refresh and Consistency
-
-**Test Real-Time Data Management**
-1. **Refresh Functionality Validation**:
-   - Test all refresh buttons (header catalog refresh, moments reload)
-   - ✅ **Expected**: Clear labeling distinguishes reload vs analysis operations
-   - ✅ **Verify**: Tooltips explain what each refresh button does
-   - ✅ **Check**: Auto-refresh after analysis ensures immediate visibility
-
-2. **Data Consistency Checks**:
-   - Compare moment cards with generated markdown files
-   - ✅ **Expected**: Perfect consistency between UI and file system
-   - ✅ **Verify**: All metadata and classifications match
-   - ✅ **Check**: File timestamps reflect actual processing times
-
-### 🎯 End-to-End Workflow Validation
-
-**Complete User Journey Test**
-1. **New User Experience**:
-   - Simulate first-time user workflow
-   - ✅ **Expected**: Zero configuration required, automatic content discovery
-   - ✅ **Verify**: Intuitive progression from catalog loading to analysis
-   - ✅ **Check**: Help text and status indicators guide user journey
-
-2. **Power User Features**:
-   - Test advanced features like correlation discovery and entity navigation
-   - ✅ **Expected**: Rich interactivity reveals deep insights
-   - ✅ **Verify**: Professional-grade business intelligence capabilities
-   - ✅ **Check**: Export and backup features work for data preservation
-
-### 📈 Success Criteria
-
-**Overall Application Health**
-- ✅ **Performance**: Analysis completes in reasonable time with progress feedback
-- ✅ **Reliability**: Consistent results across multiple analysis runs
-- ✅ **Usability**: Intuitive interface requires minimal learning curve
-- ✅ **Intelligence**: AI-generated insights provide genuine business value
-- ✅ **Integration**: Seamless file system integration with human-readable output
-- ✅ **Scalability**: Handles large content collections without performance degradation
-
-Use this evaluation guide to systematically verify that all major features work as intended and provide value for AI business intelligence use cases.
 
 ## 🤝 Contributing
 
-We welcome contributions! Areas of interest:
+We welcome contributions! Priority areas:
 
 ### High Priority
 - **Server-side API migration** for production security
-- **Additional data sources** (RSS, APIs, databases)
+- **Additional data sources** (RSS feeds, APIs, databases)
 - **Advanced correlation algorithms** for business intelligence
-- **Export capabilities** (PDF reports, CSV data)
+- **Export capabilities** (PDF reports, CSV data, dashboard snapshots)
 
 ### Development Setup
 
 1. Fork the repository
 2. Create feature branch: `git checkout -b feature/amazing-feature`
-3. Make changes following existing patterns
-4. Add tests for new functionality
+3. Follow existing patterns: TypeScript-first, feature-slice approach
+4. Add tests and documentation
 5. Submit pull request with detailed description
-
-### Code Style
-- TypeScript-first development
-- Feature-slice approach (no mocks/prototypes)
-- AI-native patterns with Claude Code SDK
-- Modern React and Next.js conventions
 
 ## 🚀 Roadmap
 
 ### Immediate (Next Release)
-- [ ] Server-side API routes for production security
-- [ ] Enhanced correlation discovery algorithms
-- [ ] Export functionality (reports, data)
-- [ ] Additional content source integrations
+- [ ] **Dashboard Components**: Temporal analysis, trend detection, anomaly identification
+- [ ] **Advanced Analytics**: Predictive insights, seasonality patterns, forecasting
+- [ ] **Server-side Security**: Production API routes, authentication, authorization
+- [ ] **Export Features**: PDF reports, data export, dashboard snapshots
 
-### Short Term
-- [ ] Advanced filtering and search capabilities
-- [ ] Custom agent configuration UI
-- [ ] Real-time content monitoring
-- [ ] Team collaboration features
+### Short Term  
+- [ ] **Advanced Visualizations**: AI landscape maps, technology evolution trees
+- [ ] **Natural Language Queries**: Conversational analytics interface
+- [ ] **Real-time Updates**: WebSocket integration, live dashboard updates
+- [ ] **Collaboration Features**: Shared views, annotations, team workspaces
 
 ### Long Term
-- [ ] Enterprise deployment options
-- [ ] Advanced analytics and reporting
-- [ ] Integration with business intelligence platforms
-- [ ] Multi-language content analysis
+- [ ] **Enterprise Deployment**: Scalability, multi-tenancy, enterprise security
+- [ ] **BI Platform Integration**: Tableau, PowerBI, Looker connectors
+- [ ] **Mobile Application**: Touch-optimized interface, offline capabilities
+- [ ] **Advanced AI**: Custom models, domain-specific agents, automated insights
 
 ## 📄 License
 
@@ -690,7 +414,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - **[Anthropic](https://anthropic.com)** for Claude Code SDK and AI capabilities
-- **[Vercel](https://vercel.com)** for Next.js framework and development tools
+- **[Vercel](https://vercel.com)** for Next.js framework and development tools  
 - **[shadcn/ui](https://ui.shadcn.com)** for beautiful, accessible components
 - **AI research community** for multi-agent system patterns and techniques
 

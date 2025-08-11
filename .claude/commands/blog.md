@@ -1,0 +1,1 @@
+Think harder to review blog/ folder. Note newly added images which are not covered in the posts. Review backlog/ contents for new features added since last posts were written. Now add new posts using the new images and features added since.
