@@ -321,6 +321,174 @@ npm run lint         # Code linting
 - **[File-System AI Integration](blog/file-system-persistence-real-time-ai.md)**: Local-first architecture
 - **[Parallel AI Processing](blog/parallel-ai-processing-performance.md)**: Performance optimization
 
+## ✅ User Evaluation Guide
+
+This guide helps you systematically evaluate the completed features and capabilities of the Moments application.
+
+### 🚀 Initial Setup Evaluation
+
+**Test Auto-Hydration System**
+1. **Fresh Install Test**: 
+   - Start the app for the first time
+   - ✅ **Expected**: Automatic loading of companies and technologies from folders
+   - ✅ **Verify**: Progress indicators show catalog loading status
+   - ✅ **Check**: Companies and Technologies tabs show actual content counts
+
+2. **Configuration Validation**:
+   - Review `config.yml` file settings
+   - ✅ **Expected**: Configurable folder paths and file patterns
+   - ✅ **Verify**: App respects configuration settings for source folders
+
+### 🧠 AI Analysis Features Evaluation
+
+**Test Multi-Agent Analysis System**
+1. **Smart Update Analysis**:
+   - Navigate to Moments tab
+   - Click "Smart Update" button
+   - ✅ **Expected**: Real-time progress with moment count updates
+   - ✅ **Verify**: Live agent activity tracking shows specialized sub-agents working
+   - ✅ **Check**: Progress shows incrementing moment counts during processing
+
+2. **Full Analysis Capability**:
+   - Click "Analyze All" button
+   - ✅ **Expected**: Complete analysis of all content with progress tracking
+   - ✅ **Verify**: Parallel processing of multiple sources simultaneously
+   - ✅ **Check**: Final moment cards appear automatically after completion
+
+3. **Factor Classification Validation**:
+   - Review generated moment cards
+   - ✅ **Expected**: Color-coded factor badges (micro: company, competition, partners, customers)
+   - ✅ **Verify**: Macro factor classification (economic, geo-political, regulation, technology, etc.)
+   - ✅ **Check**: Impact scoring (High/Medium/Low) with confidence indicators
+
+### 🎯 Interactive Features Evaluation
+
+**Test Navigation and Interactivity**
+1. **Entity Navigation**:
+   - Click company/technology names in moment cards
+   - ✅ **Expected**: Navigation to detailed catalog entries
+   - ✅ **Verify**: Fallback to catalog tab when no match found
+   - ✅ **Check**: Detail views show Overview, Content, and Moments tabs
+
+2. **Keyword Filtering**:
+   - Click keyword badges in moment cards
+   - ✅ **Expected**: Instant filtering by selected keywords
+   - ✅ **Verify**: Filter count updates in header (e.g., "16 of 80 moments (filtered)")
+   - ✅ **Check**: All statistics badges reflect filtered results
+
+3. **Moment Detail Views**:
+   - Click on moment card titles or content areas
+   - ✅ **Expected**: Comprehensive detail view with 4 tabs (Overview, Related, Source, Timeline)
+   - ✅ **Verify**: Related moments show correlation scores and reasoning
+   - ✅ **Check**: Source tab displays original content and metadata
+
+### 📊 Storage and Persistence Evaluation
+
+**Test File-System Integration**
+1. **Two-Way File Persistence**:
+   - Run analysis to generate moments
+   - ✅ **Expected**: Moment files appear in `moments/` folder as markdown
+   - ✅ **Verify**: Human-readable format with YAML frontmatter metadata
+   - ✅ **Check**: App can reload moments from files on restart
+
+2. **Storage Management Interface**:
+   - Open Settings sidebar (gear icon in header)
+   - Navigate through Storage Health, Current Data, Storage Management sections
+   - ✅ **Expected**: Apple Settings-style interface with clear section organization
+   - ✅ **Verify**: Real-time storage metrics and file system status
+   - ✅ **Check**: Backup/restore functionality with file validation
+
+3. **Auto-Recovery System**:
+   - Restart the application
+   - ✅ **Expected**: Automatic data recovery from file system
+   - ✅ **Verify**: No need to manually reload catalogs or moments
+   - ✅ **Check**: Status indicators confirm successful recovery
+
+### ⚡ Performance Features Evaluation
+
+**Test Intelligent Processing**
+1. **Incremental Analysis Efficiency**:
+   - Make small content changes to a company file
+   - Run "Smart Update"
+   - ✅ **Expected**: Significantly faster processing (90% time reduction)
+   - ✅ **Verify**: Only changed content gets reprocessed
+   - ✅ **Check**: Existing moments remain unchanged unless affected
+
+2. **Parallel Processing Validation**:
+   - Monitor agent activity during full analysis
+   - ✅ **Expected**: Multiple agents working simultaneously
+   - ✅ **Verify**: Progress shows concurrent processing of companies and technologies
+   - ✅ **Check**: System utilizes configured parallelization settings from config.yml
+
+3. **Real-Time Progress Intelligence**:
+   - Watch progress during long analyses
+   - ✅ **Expected**: Live moment counting instead of "0 moments found" until completion
+   - ✅ **Verify**: Step-by-step progress with descriptive status messages
+   - ✅ **Check**: Agent activity shows current processing stages
+
+### 🎨 UI/UX Features Evaluation
+
+**Test Interface Design and Usability**
+1. **Professional Interface**:
+   - Navigate through all main tabs (Companies, Technologies, Moments)
+   - ✅ **Expected**: Consistent Apple Settings-style design
+   - ✅ **Verify**: Smooth animations and hover states
+   - ✅ **Check**: Responsive layout on different screen sizes
+
+2. **Search and Filtering**:
+   - Use search functionality in moments view
+   - ✅ **Expected**: Real-time filtering with live count updates
+   - ✅ **Verify**: Filter statistics reflect only filtered results
+   - ✅ **Check**: Multiple filter types work together (keywords, factors, impact)
+
+3. **Scrolling and Navigation**:
+   - Scroll through long lists of cards
+   - ✅ **Expected**: Smooth scrolling without UI freezing
+   - ✅ **Verify**: All content accessible even when below the fold
+   - ✅ **Check**: Navigation breadcrumbs work correctly in detail views
+
+### 🔄 Data Refresh and Consistency
+
+**Test Real-Time Data Management**
+1. **Refresh Functionality Validation**:
+   - Test all refresh buttons (header catalog refresh, moments reload)
+   - ✅ **Expected**: Clear labeling distinguishes reload vs analysis operations
+   - ✅ **Verify**: Tooltips explain what each refresh button does
+   - ✅ **Check**: Auto-refresh after analysis ensures immediate visibility
+
+2. **Data Consistency Checks**:
+   - Compare moment cards with generated markdown files
+   - ✅ **Expected**: Perfect consistency between UI and file system
+   - ✅ **Verify**: All metadata and classifications match
+   - ✅ **Check**: File timestamps reflect actual processing times
+
+### 🎯 End-to-End Workflow Validation
+
+**Complete User Journey Test**
+1. **New User Experience**:
+   - Simulate first-time user workflow
+   - ✅ **Expected**: Zero configuration required, automatic content discovery
+   - ✅ **Verify**: Intuitive progression from catalog loading to analysis
+   - ✅ **Check**: Help text and status indicators guide user journey
+
+2. **Power User Features**:
+   - Test advanced features like correlation discovery and entity navigation
+   - ✅ **Expected**: Rich interactivity reveals deep insights
+   - ✅ **Verify**: Professional-grade business intelligence capabilities
+   - ✅ **Check**: Export and backup features work for data preservation
+
+### 📈 Success Criteria
+
+**Overall Application Health**
+- ✅ **Performance**: Analysis completes in reasonable time with progress feedback
+- ✅ **Reliability**: Consistent results across multiple analysis runs
+- ✅ **Usability**: Intuitive interface requires minimal learning curve
+- ✅ **Intelligence**: AI-generated insights provide genuine business value
+- ✅ **Integration**: Seamless file system integration with human-readable output
+- ✅ **Scalability**: Handles large content collections without performance degradation
+
+Use this evaluation guide to systematically verify that all major features work as intended and provide value for AI business intelligence use cases.
+
 ## 🤝 Contributing
 
 We welcome contributions! Areas of interest:

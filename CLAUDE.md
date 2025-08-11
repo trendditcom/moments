@@ -22,6 +22,8 @@ Moments creates signal from noise by classifying and correlating these pivotal m
 
 **IMPORTANT**: Refer to `specs/tagging-correlation.md` when implementing content classification and moment correlation features. This specification provides the operational framework for detecting, classifying, correlating, and ranking pivotal moments through preprocessing, entity extraction, rule-based and ML classification, and correlation algorithms.
 
+**IMPORTANT**: Refer to `specs/dashboard.md` when implementing the Moments visual analytics dashboard. This specification provides comprehensive dashboard design patterns, interactive visualizations, data representation techniques, and business intelligence components for transforming complex AI insights into intuitive visual narratives that reveal emerging trends, entity relationships, and correlation insights from the growing knowledge base.
+
 ## Backlog Management
 
 Project features and requirements are defined in the `backlog/` folder. Development should follow the backlog items in sequence to ensure systematic progress toward the project goals.
