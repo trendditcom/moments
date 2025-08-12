@@ -214,6 +214,7 @@ function FullHeightNetworkGraph({
   searchQuery, 
   selectedNodeType,
   containerHeight = 600,
+  viewMode = 'network',
   onNodeSelect
 }: {
   nodes: NetworkNode[]
@@ -221,9 +222,11 @@ function FullHeightNetworkGraph({
   searchQuery: string
   selectedNodeType: string
   containerHeight?: number
+  viewMode?: string
   onNodeSelect?: (node: NetworkNode | null) => void
 }) {
   const svgRef = useRef<SVGSVGElement>(null)
+  const simulationRef = useRef<d3.Simulation<NetworkNode, NetworkEdge> | null>(null)
   const [selectedNode, setSelectedNode] = useState<NetworkNode | null>(null)
   const [hoveredNode, setHoveredNode] = useState<NetworkNode | null>(null)
   
@@ -245,13 +248,15 @@ function FullHeightNetworkGraph({
   
   const filteredEdges = useMemo(() => {
     const nodeIds = new Set(filteredNodes.map(n => n.id))
-    return edges.filter(edge => 
-      nodeIds.has(edge.source as string) && nodeIds.has(edge.target as string)
-    )
+    return edges.filter(edge => {
+      const sourceId = typeof edge.source === 'string' ? edge.source : edge.source.id
+      const targetId = typeof edge.target === 'string' ? edge.target : edge.target.id
+      return nodeIds.has(sourceId) && nodeIds.has(targetId)
+    })
   }, [edges, filteredNodes])
   
   useEffect(() => {
-    if (!svgRef.current) return
+    if (!svgRef.current || viewMode !== 'network') return
     
     const svg = d3.select(svgRef.current)
     svg.selectAll("*").remove()
@@ -270,9 +275,30 @@ function FullHeightNetworkGraph({
       .domain(['collaboration', 'competition', 'technology_use', 'concept_relation', 'market_relation'])
       .range(['#22c55e', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316'])
     
+    // Stop any existing simulation
+    if (simulationRef.current) {
+      simulationRef.current.stop()
+      simulationRef.current = null
+    }
+    
+    // Reset node positions to ensure proper clustering when switching back from matrix view
+    filteredNodes.forEach(node => {
+      node.x = undefined
+      node.y = undefined
+      node.fx = null
+      node.fy = null
+    })
+    
+    // Create deep copies of edges to prevent D3 mutation issues
+    const edgeCopies = filteredEdges.map(edge => ({
+      ...edge,
+      source: typeof edge.source === 'string' ? edge.source : edge.source.id,
+      target: typeof edge.target === 'string' ? edge.target : edge.target.id
+    }))
+    
     // Create force simulation with proper typing
     const simulation = d3.forceSimulation<NetworkNode>(filteredNodes)
-      .force('link', d3.forceLink<NetworkNode, NetworkEdge>(filteredEdges)
+      .force('link', d3.forceLink<NetworkNode, NetworkEdge>(edgeCopies)
         .id((d: NetworkNode) => d.id)
         .distance(d => 50 + (d.strength * 10))
         .strength(d => Math.min(1, d.strength * 0.1))
@@ -280,6 +306,8 @@ function FullHeightNetworkGraph({
       .force('charge', d3.forceManyBody().strength(-200))
       .force('center', d3.forceCenter(centerX, centerY))
       .force('collision', d3.forceCollide<NetworkNode>().radius(d => d.size + 5))
+    
+    simulationRef.current = simulation
     
     // Create container
     const g = svg.append("g")
@@ -293,19 +321,27 @@ function FullHeightNetworkGraph({
     
     svg.call(zoom as any)
     
-    // Create edges
+    // Create edges with proper data binding
     const edgeSelection = g.selectAll('.edge')
-      .data(filteredEdges)
-      .enter().append('line')
+      .data(edgeCopies)
+    
+    edgeSelection.exit().remove()
+    
+    const edgeEnter = edgeSelection.enter().append('line')
       .attr('class', 'edge')
       .attr('stroke', d => edgeColorScale(d.type) as string)
       .attr('stroke-width', d => Math.max(1, d.strength * 2))
       .attr('stroke-opacity', 0.6)
     
-    // Create nodes
-    const nodeGroups = g.selectAll('.node')
+    const edgeMerge = edgeEnter.merge(edgeSelection as any)
+    
+    // Create nodes with proper data binding
+    const nodeSelection = g.selectAll('.node')
       .data(filteredNodes)
-      .enter().append('g')
+    
+    nodeSelection.exit().remove()
+    
+    const nodeGroups = nodeSelection.enter().append('g')
       .attr('class', 'node')
       .style('cursor', 'pointer')
     
@@ -361,11 +397,11 @@ function FullHeightNetworkGraph({
     
     // Update positions on simulation tick
     simulation.on('tick', function() {
-      edgeSelection
-        .attr('x1', d => (d.source as NetworkNode).x || 0)
-        .attr('y1', d => (d.source as NetworkNode).y || 0)
-        .attr('x2', d => (d.target as NetworkNode).x || 0)
-        .attr('y2', d => (d.target as NetworkNode).y || 0)
+      edgeMerge
+        .attr('x1', d => (d.source as any).x || 0)
+        .attr('y1', d => (d.source as any).y || 0)
+        .attr('x2', d => (d.target as any).x || 0)
+        .attr('y2', d => (d.target as any).y || 0)
       
       nodeGroups
         .attr('transform', d => `translate(${d.x || 0}, ${d.y || 0})`)
@@ -378,10 +414,23 @@ function FullHeightNetworkGraph({
     })
     
     return () => {
-      simulation.stop()
+      if (simulationRef.current) {
+        simulationRef.current.stop()
+        simulationRef.current = null
+      }
     }
     
-  }, [filteredNodes, filteredEdges, containerHeight])
+  }, [filteredNodes, filteredEdges, containerHeight, viewMode])
+  
+  // Cleanup effect for component unmount
+  useEffect(() => {
+    return () => {
+      if (simulationRef.current) {
+        simulationRef.current.stop()
+        simulationRef.current = null
+      }
+    }
+  }, [])
   
   return (
     <div className="space-y-4">
@@ -908,15 +957,17 @@ export function GraphView({ companies, technologies, moments, isLoading = false 
         <div className="flex-1 p-4">
           {viewMode === 'network' ? (
             <FullHeightNetworkGraph
+              key={`network-${viewMode}`}
               nodes={networkData.nodes}
               edges={networkData.edges}
               searchQuery={searchQuery}
               selectedNodeType={selectedNodeType}
               containerHeight={containerHeight}
+              viewMode={viewMode}
               onNodeSelect={setSelectedNode}
             />
           ) : (
-            <RelationshipStrengthMatrix matrix={networkData.matrix} />
+            <RelationshipStrengthMatrix key={`matrix-${viewMode}`} matrix={networkData.matrix} />
           )}
         </div>
       </div>
