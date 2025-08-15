@@ -10,7 +10,6 @@ import {
   InvokeModelCommandInput,
   InvokeModelWithResponseStreamCommandInput
 } from '@aws-sdk/client-bedrock-runtime'
-import { fromIni, fromEnv } from '@aws-sdk/credential-providers'
 import {
   ModelProvider,
   ModelProviderConfig,
@@ -22,9 +21,11 @@ import {
   ModelProviderAuthError,
   ModelProviderRateLimitError
 } from './provider-interface'
+import { BedrockAuth, BedrockAuthConfig } from '../auth/bedrock-auth'
 
 export class BedrockProvider extends ModelProvider {
   private client!: BedrockRuntimeClient
+  private bedrockAuth!: BedrockAuth
   private isInitialized: boolean = false
 
   constructor(config: ModelProviderConfig, modelMapping?: any) {
@@ -36,34 +37,28 @@ export class BedrockProvider extends ModelProvider {
     try {
       const region = this.config.region || process.env.AWS_REGION || 'us-east-1'
       
-      // Configure credentials based on settings
-      let credentials
-      
-      if (this.config.useBedrockApiKey) {
-        // Use Bedrock API keys (new authentication method)
-        const apiKey = this.config.apiKey || 
-          (this.config.apiKeyEnv ? process.env[this.config.apiKeyEnv] : undefined) ||
-          process.env.BEDROCK_API_KEY
-
-        if (!apiKey) {
-          throw new ModelProviderAuthError(
-            'Bedrock API key not found. Please set BEDROCK_API_KEY or provide it in config.',
-            'bedrock'
-          )
-        }
-
-        // Bedrock API keys are handled differently
-        credentials = {
-          accessKeyId: apiKey,
-          secretAccessKey: apiKey // Bedrock uses same key for both
-        }
-      } else if (this.config.profile) {
-        // Use AWS profile from ~/.aws/credentials
-        credentials = fromIni({ profile: this.config.profile })
-      } else {
-        // Use environment variables or default chain
-        credentials = fromEnv()
+      // Create BedrockAuth configuration from ModelProviderConfig
+      const authConfig: BedrockAuthConfig = {
+        method: 'auto',
+        region,
+        profile: this.config.profile,
+        bedrockApiKey: this.config.apiKey,
+        bedrockApiKeyEnv: this.config.apiKeyEnv,
+        roleArn: this.config.inferenceProfile, // Use inference profile as role ARN if needed
       }
+
+      // Override method based on configuration
+      if (this.config.useBedrockApiKey) {
+        authConfig.method = 'api_key'
+      } else if (this.config.profile) {
+        authConfig.method = 'cli'
+      } else if (process.env.BEDROCK_AUTH_METHOD) {
+        authConfig.method = process.env.BEDROCK_AUTH_METHOD as any
+      }
+
+      // Initialize authentication
+      this.bedrockAuth = new BedrockAuth(authConfig)
+      const credentials = await this.bedrockAuth.getCredentials()
 
       // Initialize Bedrock client
       this.client = new BedrockRuntimeClient({
@@ -252,22 +247,33 @@ export class BedrockProvider extends ModelProvider {
 
   async validateAuth(): Promise<boolean> {
     try {
-      // Try a minimal API call to validate auth
-      const testRequest: ModelRequest = {
-        messages: [{ role: 'user', content: 'test' }],
-        model: 'haiku',
-        maxTokens: 1
+      if (!this.isInitialized) {
+        await this.initializeClient()
       }
 
-      await this.sendRequest(testRequest)
-      return true
+      // Use the comprehensive BedrockAuth validation
+      const authResult = await this.bedrockAuth.validateBedrockPermissions()
+      return authResult.isValid && 
+             (authResult.permissions?.canInvokeModel || false)
     } catch (error: any) {
-      if (error.name === 'AccessDeniedException' || 
-          error.name === 'UnrecognizedClientException') {
-        return false
+      // Fallback to simple API test if BedrockAuth validation fails
+      try {
+        const testRequest: ModelRequest = {
+          messages: [{ role: 'user', content: 'test' }],
+          model: 'haiku',
+          maxTokens: 1
+        }
+
+        await this.sendRequest(testRequest)
+        return true
+      } catch (testError: any) {
+        if (testError.name === 'AccessDeniedException' || 
+            testError.name === 'UnrecognizedClientException') {
+          return false
+        }
+        // Other errors don't necessarily mean auth is invalid
+        return true
       }
-      // Other errors don't necessarily mean auth is invalid
-      return true
     }
   }
 
@@ -406,6 +412,58 @@ export class BedrockProvider extends ModelProvider {
       }
       // Other errors don't mean the model is unavailable
       return true
+    }
+  }
+
+  /**
+   * Get detailed authentication status and permissions
+   */
+  async getAuthenticationStatus(): Promise<{
+    isValid: boolean
+    provider: string
+    identity?: {
+      arn?: string
+      userId?: string
+      account?: string
+    }
+    permissions?: {
+      canInvokeModel: boolean
+      canStreamModel: boolean
+      checkedPermissions: string[]
+    }
+    error?: string
+  }> {
+    try {
+      if (!this.isInitialized) {
+        await this.initializeClient()
+      }
+
+      return await this.bedrockAuth.validateBedrockPermissions()
+    } catch (error: any) {
+      return {
+        isValid: false,
+        provider: 'bedrock',
+        error: `Authentication status check failed: ${error.message}`
+      }
+    }
+  }
+
+  /**
+   * Get available authentication methods
+   */
+  static getAuthenticationMethods(): Array<{ method: string; description: string; requirements: string[] }> {
+    return BedrockAuth.getAvailableMethods()
+  }
+
+  /**
+   * Update authentication configuration
+   */
+  async updateAuthConfig(config: Partial<BedrockAuthConfig>): Promise<void> {
+    if (this.bedrockAuth) {
+      this.bedrockAuth.updateConfig(config)
+      // Force re-initialization with new config
+      this.isInitialized = false
+      await this.initializeClient()
     }
   }
 }

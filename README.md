@@ -330,6 +330,180 @@ npm run lint         # Code linting
 
 ## 🧪 Feature Evaluation Guide
 
+### AWS Bedrock Authentication (Latest Feature)
+
+The Moments application now includes **comprehensive AWS Bedrock authentication** supporting multiple authentication methods, detailed permission validation, and enterprise-grade AWS integration for AI model providers.
+
+#### Testing AWS Bedrock Authentication
+
+**1. Authentication Methods Testing**
+```bash
+# Method 1: AWS CLI Configuration
+aws configure set profile development
+export AWS_PROFILE=development
+export BEDROCK_AUTH_METHOD=cli
+
+# Method 2: Environment Variables
+export AWS_ACCESS_KEY_ID=your-access-key
+export AWS_SECRET_ACCESS_KEY=your-secret-key
+export AWS_REGION=us-east-1
+export BEDROCK_AUTH_METHOD=env
+
+# Method 3: AWS SSO
+export AWS_SSO_START_URL=https://your-org.awsapps.com/start
+export AWS_SSO_ACCOUNT_ID=123456789012
+export AWS_SSO_ROLE_NAME=BedrockUserRole
+export BEDROCK_AUTH_METHOD=sso
+
+# Method 4: Bedrock API Keys
+export BEDROCK_API_KEY=your-bedrock-api-key
+export BEDROCK_AUTH_METHOD=api_key
+
+# Method 5: IAM Role Assumption
+export AWS_ROLE_ARN=arn:aws:iam::123456789012:role/BedrockRole
+export BEDROCK_AUTH_METHOD=role
+```
+
+**2. Permission Validation Testing**
+```typescript
+// Test comprehensive permission validation
+import { BedrockAuth } from '@/lib/auth/bedrock-auth'
+
+const auth = new BedrockAuth({
+  method: 'auto',
+  region: 'us-east-1'
+})
+
+// Validate authentication and permissions
+const validation = await auth.validateBedrockPermissions()
+console.log('Authentication valid:', validation.isValid)
+console.log('Identity:', validation.identity)
+console.log('Can invoke model:', validation.permissions?.canInvokeModel)
+console.log('Can stream model:', validation.permissions?.canStreamModel)
+
+// Expected output for valid authentication:
+// Authentication valid: true
+// Identity: { arn: 'arn:aws:iam::123456789012:user/developer', ... }
+// Can invoke model: true
+// Can stream model: true
+```
+
+**3. Multi-Provider Authentication Validator**
+```typescript
+// Test universal authentication validator
+import { AuthValidator } from '@/lib/auth/auth-validator'
+
+const validator = new AuthValidator()
+
+// Test both providers simultaneously
+const anthropicResult = await validator.validateAnthropicAuth()
+const bedrockResult = await validator.validateBedrockAuth()
+
+console.log('Anthropic auth:', anthropicResult.isValid)
+console.log('Bedrock auth:', bedrockResult.isValid)
+console.log('Recommendations:', bedrockResult.suggestions)
+
+// Get comprehensive authentication status
+const status = await validator.getAuthStatus([
+  { type: 'anthropic' },
+  { type: 'bedrock' }
+])
+
+console.log('Valid providers:', status.validProviders)
+console.log('Has valid provider:', status.hasValidProvider)
+```
+
+**4. BedrockProvider Integration Testing**
+```typescript
+// Test enhanced Bedrock provider with new authentication
+import { BedrockProvider } from '@/lib/model-providers/bedrock-provider'
+
+const provider = new BedrockProvider({
+  type: 'bedrock',
+  region: 'us-east-1',
+  useBedrockApiKey: true,
+  apiKey: process.env.BEDROCK_API_KEY
+})
+
+// Test authentication status
+const authStatus = await provider.getAuthenticationStatus()
+console.log('Provider auth status:', authStatus)
+
+// Test available authentication methods
+const methods = BedrockProvider.getAuthenticationMethods()
+console.log('Available auth methods:', methods)
+
+// Test authentication validation
+const isValid = await provider.validateAuth()
+console.log('Provider authentication valid:', isValid)
+```
+
+**5. Environment Configuration Validation**
+```bash
+# Test comprehensive .env.example configuration
+cat .env.example | grep -A 50 "AWS BEDROCK CONFIGURATION"
+
+# Verify all authentication methods are documented:
+# ✅ AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY
+# ✅ BEDROCK_API_KEY 
+# ✅ AWS_PROFILE
+# ✅ AWS_SSO_* variables
+# ✅ AWS_ROLE_ARN for role assumption
+# ✅ AWS_REGION configuration
+# ✅ Security notes and best practices
+```
+
+**6. Error Handling & Troubleshooting**
+```typescript
+// Test comprehensive error scenarios
+try {
+  const auth = new BedrockAuth({ 
+    method: 'api_key',
+    bedrockApiKey: 'invalid-key'
+  })
+  await auth.validateBedrockPermissions()
+} catch (error) {
+  console.log('Error type:', error.constructor.name)
+  console.log('Error message:', error.message)
+  // Expected: ModelProviderAuthError with specific guidance
+}
+
+// Test validation with helpful suggestions
+const result = await validator.validateBedrockAuth({
+  type: 'bedrock',
+  useBedrockApiKey: true,
+  apiKey: '' // Empty key to trigger error
+})
+
+console.log('Validation suggestions:', result.suggestions)
+// Expected suggestions:
+// - Configure AWS credentials using aws configure
+// - Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
+// - Use AWS SSO authentication
+// - Configure Bedrock API keys
+// - Check IAM permissions for Bedrock access
+```
+
+**Key Benefits:**
+- ✅ **6 Authentication Methods**: CLI, Environment Variables, SSO, API Keys, Role Assumption, Auto-detection
+- ✅ **Real Permission Validation**: Tests actual bedrock:InvokeModel and bedrock:InvokeModelWithResponseStream permissions
+- ✅ **AWS STS Integration**: Identity verification with ARN, User ID, and Account details
+- ✅ **Comprehensive Error Handling**: Specific error types with actionable troubleshooting guidance
+- ✅ **Universal Validator**: Single interface for validating both Anthropic and Bedrock authentication
+- ✅ **Environment Documentation**: Complete .env.example with security best practices
+- ✅ **Enterprise Support**: SSO, role assumption, and multi-account scenarios
+- ✅ **TypeScript Safety**: Full type definitions for all authentication configurations
+- ✅ **Dynamic Configuration**: Runtime authentication method switching and validation
+- ✅ **Production Ready**: Security-first design with comprehensive AWS integration patterns
+
+**Technical Implementation:**
+- **BedrockAuth Class**: Comprehensive authentication with 6 methods and permission validation
+- **AuthValidator Class**: Universal authentication validator for multi-provider scenarios  
+- **Enhanced BedrockProvider**: Integrated with new authentication system for seamless provider switching
+- **AWS SDK Integration**: Uses @aws-sdk/credential-providers and @aws-sdk/client-sts for robust AWS integration
+- **Permission Testing**: Real API calls to validate bedrock:InvokeModel and bedrock:InvokeModelWithResponseStream access
+- **Error Classification**: Specific error types (AccessDenied, UnrecognizedClient, ThrottlingException) with targeted guidance
+
 ### Configuration Schema for Provider Selection (Latest Feature)
 
 The Moments application now includes **enhanced configuration management** supporting multiple AI model providers through a comprehensive configuration schema, enabling seamless switching between Anthropic and Amazon Bedrock providers with zero code changes.
