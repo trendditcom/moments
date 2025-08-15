@@ -328,6 +328,79 @@ npm run type-check   # TypeScript validation
 npm run lint         # Code linting
 ```
 
+## 🧪 Feature Evaluation Guide
+
+### Model Provider Abstraction Layer (New Feature)
+
+The Moments application now supports **multiple AI model providers** through a unified abstraction layer, enabling seamless switching between Anthropic's direct API and Amazon Bedrock.
+
+#### Testing the Provider Abstraction
+
+**1. Provider Interface Testing**
+```typescript
+// Example: Using the provider factory
+import { ModelProviderFactory } from '@/lib/model-providers/provider-factory'
+
+// Initialize with Anthropic (default for development)
+ModelProviderFactory.initialize({
+  type: 'anthropic',
+  anthropic: {
+    apiKeyEnv: 'ANTHROPIC_API_KEY'
+  }
+})
+
+// Or initialize with Bedrock (for production)
+ModelProviderFactory.initialize({
+  type: 'bedrock',
+  bedrock: {
+    region: 'us-east-1',
+    useBedrockApiKey: true
+  }
+})
+
+// Get provider and make requests
+const provider = ModelProviderFactory.getPrimaryProvider()
+const response = await provider.sendRequest({
+  messages: [{ role: 'user', content: 'Analyze this moment' }],
+  model: 'sonnet', // Logical name, auto-mapped to provider-specific ID
+  maxTokens: 4000
+})
+```
+
+**2. Testing Provider Switching**
+- Set `ANTHROPIC_API_KEY` in `.env.local` for Anthropic provider
+- Or configure AWS credentials for Bedrock provider
+- The system automatically detects available credentials
+
+**3. Health Check & Fallback**
+```typescript
+// Test provider health
+const health = await provider.healthCheck()
+console.log('Provider healthy:', health.isHealthy)
+
+// Automatic fallback configuration
+ModelProviderFactory.initialize({
+  type: 'bedrock',
+  fallbackProvider: 'anthropic',
+  autoFallback: true
+})
+```
+
+**4. Cost Tracking**
+```typescript
+// Estimate costs for both providers
+const cost = provider.estimateCost(1000, 500, 'sonnet')
+console.log('Estimated cost:', cost)
+```
+
+**Key Benefits:**
+- ✅ **Zero code changes** required when switching providers
+- ✅ **Automatic model ID mapping** between providers
+- ✅ **Built-in error handling** and retry logic
+- ✅ **Cost estimation** for budget management
+- ✅ **Health monitoring** with automatic failover
+- ✅ **Support for streaming** responses
+
 ## ⚡ Performance Features
 
 ### Intelligent Processing

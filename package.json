@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.59.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.864.0",
+    "@aws-sdk/credential-providers": "^3.864.0",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^3.9.0",
     "@instantlyeasy/claude-code-sdk-ts": "^0.3.3",
