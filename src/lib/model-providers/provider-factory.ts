@@ -90,7 +90,7 @@ export class ModelProviderFactory {
 
     // Store instances
     this.instances.set(config.type, this.primaryProvider)
-    if (this.fallbackProvider) {
+    if (this.fallbackProvider && config.fallbackProvider) {
       this.instances.set(config.fallbackProvider, this.fallbackProvider)
     }
   }
@@ -242,7 +242,7 @@ export class ModelProviderFactory {
   static async healthCheckAll(): Promise<Map<string, any>> {
     const results = new Map()
     
-    for (const [type, provider] of this.instances) {
+    for (const [type, provider] of Array.from(this.instances.entries())) {
       try {
         const health = await provider.healthCheck()
         results.set(type, health)

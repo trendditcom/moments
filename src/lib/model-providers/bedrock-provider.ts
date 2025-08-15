@@ -24,7 +24,7 @@ import {
 } from './provider-interface'
 
 export class BedrockProvider extends ModelProvider {
-  private client: BedrockRuntimeClient
+  private client!: BedrockRuntimeClient
   private isInitialized: boolean = false
 
   constructor(config: ModelProviderConfig, modelMapping?: any) {

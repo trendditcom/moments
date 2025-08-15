@@ -14,6 +14,7 @@ import {
 import { KnowledgeGrowthMetrics } from '@/components/dashboard-growth-metrics'
 import { FactorDistributionAnalytics } from '@/components/dashboard-factor-analytics'
 import { RelationshipMatrix } from '@/components/dashboard-relationship-matrix'
+import { TemporalAnalysis } from '@/components/dashboard-temporal-analysis'
 import { Company, Technology } from '@/types/catalog'
 import { PivotalMoment } from '@/types/moments'
 import { 
@@ -124,15 +125,7 @@ export function DashboardView({ companies, technologies, moments, isLoading = fa
           
           <RelationshipMatrix />
           
-          <div className="flex flex-wrap gap-4">
-            <div className="flex-1 min-w-[300px]">
-              <DashboardPlaceholder
-                title="Temporal Analysis"
-                description="Time-series analysis with trend detection and forecasting"
-                icon={CalendarIcon}
-              />
-            </div>
-          </div>
+          <TemporalAnalysis />
         </>
       )}
 

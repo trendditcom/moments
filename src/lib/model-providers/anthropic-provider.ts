@@ -17,7 +17,7 @@ import {
 } from './provider-interface'
 
 export class AnthropicProvider extends ModelProvider {
-  private client: Anthropic
+  private client!: Anthropic
   private isInitialized: boolean = false
 
   constructor(config: ModelProviderConfig, modelMapping?: any) {

@@ -401,6 +401,131 @@ console.log('Estimated cost:', cost)
 - ✅ **Health monitoring** with automatic failover
 - ✅ **Support for streaming** responses
 
+### Temporal Analysis Dashboard (Latest Feature)
+
+The Moments application now includes a **comprehensive Temporal Analysis Dashboard** that transforms static moment data into dynamic temporal intelligence, providing deep insights into AI industry activity patterns, trend analysis, and predictive analytics.
+
+#### Testing the Temporal Analysis Dashboard
+
+**1. Accessing Temporal Analysis**
+- Navigate to **Dashboard** tab in the main navigation
+- Switch analysis depth to **"Operational"** using the top-right controls
+- The Temporal Analysis component appears as the third visualization panel
+
+**2. View Mode Testing**
+```typescript
+// Available visualization modes:
+const viewModes = [
+  'timeline',    // Area chart with multi-layer visualization
+  'density',     // Bar chart showing event concentration
+  'calendar',    // Calendar heatmap (placeholder - coming soon)
+  'streamgraph'  // Streamgraph visualization (placeholder - coming soon)
+]
+```
+
+**3. Interactive Controls Evaluation**
+
+**Time Granularity Controls:**
+- **Day**: Aggregate moments by daily intervals
+- **Week**: Weekly aggregation with start-of-week alignment
+- **Month**: Monthly patterns and seasonal analysis
+
+**Time Range Selection:**
+- **7d**: Recent activity analysis
+- **30d**: Monthly trends and patterns
+- **90d**: Quarterly business cycles
+- **1y**: Annual seasonality detection
+- **All**: Complete historical analysis
+
+**Layer Toggle Testing:**
+- **Events Layer**: Toggle moment count visualization on/off
+- **Impact Layer**: Show/hide high/medium/low impact distributions
+- **Trends Layer**: Display average impact trend line overlay
+- **Annotations Layer**: Significant event markers and reference lines
+
+**4. Advanced Features Evaluation**
+
+**Event Density Mapping:**
+```javascript
+// Density calculation: moments per day within intervals
+const density = momentCount / intervalDays
+// Visualization: Interactive bar charts with hover details
+```
+
+**Intelligent Event Annotations:**
+- **High Activity Detection**: Days with 5+ moments automatically annotated
+- **Anomaly Detection**: Unusual density patterns (>2 moments/day) flagged
+- **Impact Clusters**: 3+ high-impact moments grouped and highlighted
+- **Color-coded Indicators**: Red (high impact), Yellow (medium), Green (low)
+
+**Forecasting & Trend Analysis:**
+```typescript
+// Basic trend detection
+const momentum = currentCount - previousCount
+const trend = momentum > 1 ? 'up' : momentum < -1 ? 'down' : 'stable'
+
+// Simple linear regression for forecasting
+const forecast = currentValue + averageGrowthRate
+const confidence = Math.min(90, Math.max(10, 70 - Math.abs(momentum) * 5))
+```
+
+**5. Data Processing Intelligence**
+
+**Temporal Data Pipeline:**
+- Filters moments by selected time range using `isWithinInterval`
+- Generates time intervals based on granularity (`eachDayOfInterval`, `eachWeekOfInterval`, etc.)
+- Aggregates metrics: count, average impact, density, factor distributions
+- Calculates derived statistics: high/medium/low impact breakdowns
+
+**Real-time Statistics Dashboard:**
+- **Total Events**: Sum of all moments in selected timeframe
+- **Average Impact**: Mean impact score across all moments
+- **Average Density**: Events per day average
+- **Key Events**: Count of significant annotations
+
+**6. Professional UI/UX Features**
+
+**Custom Tooltips:**
+```javascript
+// Rich hover information
+const tooltipData = {
+  date: "Jan 15",
+  momentCount: 8,
+  averageImpact: 72,
+  density: 2.3,
+  highImpactCount: 3
+}
+```
+
+**Zoom & Animation Controls:**
+- **Zoom In/Out**: Scale visualization detail level (50% - 300%)
+- **Reset**: Return to 100% zoom level
+- **Play/Pause**: Animation controls for temporal progression
+- **Refresh**: Manual data reload capabilities
+
+**Significant Events List:**
+- **Impact-coded Indicators**: Color-coded event importance
+- **Expandable Details**: Event descriptions and affected moments
+- **Date Badges**: Clear temporal reference points
+- **Scrollable Interface**: Handle large numbers of annotations
+
+**Key Benefits:**
+- ✅ **Temporal Intelligence**: Transform static data into time-series insights
+- ✅ **Multi-View Analysis**: Timeline, density, calendar, and streamgraph options
+- ✅ **Intelligent Annotations**: Automated detection of significant events and anomalies
+- ✅ **Configurable Granularity**: Day/week/month analysis with proper interval handling
+- ✅ **Interactive Layers**: Toggle events, impact, trends, and annotations independently
+- ✅ **Forecasting Capabilities**: Basic trend detection with confidence scoring
+- ✅ **Professional UI**: Zoom, animation, and comprehensive control systems
+- ✅ **Real-time Processing**: Live data integration with memoized calculations
+- ✅ **Responsive Design**: Optimized for all screen sizes and analysis depths
+
+**Technical Implementation:**
+- **Data Processing**: Uses `date-fns` library for robust date manipulation
+- **Visualization**: Recharts-based with custom components and responsive containers
+- **Performance**: Memoized calculations and efficient time series aggregation
+- **Integration**: Seamless integration with Zustand store and existing dashboard architecture
+
 ## ⚡ Performance Features
 
 ### Intelligent Processing
