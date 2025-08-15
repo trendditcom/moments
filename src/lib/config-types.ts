@@ -77,6 +77,40 @@ export interface PersistenceConfig {
   }
 }
 
+export interface AnthropicProviderConfig {
+  api_key_env: string
+  base_url: string
+}
+
+export interface BedrockProviderConfig {
+  aws_region: string
+  aws_profile?: string
+  use_bedrock_api_key: boolean
+  inference_profile?: string | null
+}
+
+export interface ModelMapping {
+  sonnet: {
+    anthropic: string
+    bedrock: string
+  }
+  haiku: {
+    anthropic: string
+    bedrock: string
+  }
+  opus: {
+    anthropic: string
+    bedrock: string
+  }
+}
+
+export interface ModelProviderConfig {
+  type: 'anthropic' | 'bedrock'
+  anthropic: AnthropicProviderConfig
+  bedrock: BedrockProviderConfig
+  model_mapping: ModelMapping
+}
+
 export interface Config {
   catalogs: {
     companies: CatalogConfig
@@ -84,6 +118,7 @@ export interface Config {
     moments?: MomentsCatalogConfig
   }
   persistence?: PersistenceConfig
+  model_provider?: ModelProviderConfig
   app: AppConfig
   factors: FactorsConfig
   agents: {

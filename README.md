@@ -330,6 +330,122 @@ npm run lint         # Code linting
 
 ## 🧪 Feature Evaluation Guide
 
+### Configuration Schema for Provider Selection (Latest Feature)
+
+The Moments application now includes **enhanced configuration management** supporting multiple AI model providers through a comprehensive configuration schema, enabling seamless switching between Anthropic and Amazon Bedrock providers with zero code changes.
+
+#### Testing the Configuration Schema
+
+**1. Configuration Structure Verification**
+```yaml
+# config.yml - Model provider configuration
+model_provider:
+  type: "anthropic" # or "bedrock"
+  
+  # Anthropic API configuration
+  anthropic:
+    api_key_env: "ANTHROPIC_API_KEY"
+    base_url: "https://api.anthropic.com"
+    
+  # Amazon Bedrock configuration  
+  bedrock:
+    aws_region: "us-east-1"
+    aws_profile: "default"
+    use_bedrock_api_key: false
+    inference_profile: null
+    
+  # Model mapping between logical names and provider-specific IDs
+  model_mapping:
+    sonnet:
+      anthropic: "claude-3-5-sonnet-20241022"
+      bedrock: "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
+    haiku:
+      anthropic: "claude-3-5-haiku-20241022"
+      bedrock: "us.anthropic.claude-3-5-haiku-20241022-v1:0"
+    opus:
+      anthropic: "claude-3-opus-20240229"
+      bedrock: "anthropic.claude-3-opus-20240229-v1:0"
+```
+
+**2. TypeScript Configuration Testing**
+```typescript
+// Access provider configuration with full type safety
+import { loadConfigClient, getModelProviderConfig } from '@/lib/config-loader.client'
+
+const config = await loadConfigClient()
+const providerConfig = getModelProviderConfig(config)
+
+// Type-safe access to provider settings
+const providerType: 'anthropic' | 'bedrock' = providerConfig?.type || 'anthropic'
+const awsRegion: string = providerConfig?.bedrock.aws_region || 'us-east-1'
+const apiKeyEnv: string = providerConfig?.anthropic.api_key_env || 'ANTHROPIC_API_KEY'
+
+// Model mapping with automatic provider selection
+const sonnetModel = providerConfig?.model_mapping.sonnet[providerType]
+console.log('Sonnet model ID:', sonnetModel)
+```
+
+**3. Configuration Loading Validation**
+```bash
+# Test YAML configuration loading
+node -e "
+const fs = require('fs');
+const yaml = require('js-yaml');
+const config = yaml.load(fs.readFileSync('./config.yml', 'utf8'));
+console.log('Provider type:', config.model_provider?.type);
+console.log('AWS region:', config.model_provider?.bedrock?.aws_region);
+console.log('Model mapping available:', !!config.model_provider?.model_mapping);
+"
+
+# Expected output:
+# Provider type: anthropic
+# AWS region: us-east-1  
+# Model mapping available: true
+```
+
+**4. API Configuration Access**
+```typescript
+// Test configuration API endpoint
+fetch('/api/config')
+  .then(res => res.json())
+  .then(config => {
+    console.log('Model provider loaded:', config.model_provider?.type)
+    console.log('Bedrock config:', config.model_provider?.bedrock)
+    console.log('Model mapping:', config.model_provider?.model_mapping)
+  })
+```
+
+**5. Local Override Testing**
+```yaml
+# config.local.yml - Override for local development
+model_provider:
+  type: "bedrock"
+  bedrock:
+    aws_region: "us-west-2"
+    aws_profile: "development"
+    use_bedrock_api_key: true
+    inference_profile: "us.anthropic.claude-3-5-sonnet-20241022-v1:0"
+```
+
+**Key Benefits:**
+- ✅ **Unified Configuration**: Single source of truth for all provider settings
+- ✅ **Type Safety**: Complete TypeScript interfaces with compile-time validation
+- ✅ **Zero Code Changes**: Switch providers through configuration only
+- ✅ **Backward Compatibility**: Existing configurations continue to work
+- ✅ **Local Overrides**: config.local.yml for environment-specific settings
+- ✅ **Model Mapping**: Logical model names automatically resolve to provider-specific IDs
+- ✅ **Environment Variables**: Support for various authentication methods
+- ✅ **Deep Merge**: Configuration sections intelligently combined
+- ✅ **Build Integration**: Automatic configuration validation during build process
+- ✅ **API Exposure**: Configuration accessible via /api/config endpoint
+
+**Technical Implementation:**
+- **YAML Parsing**: Uses js-yaml library for robust configuration loading
+- **TypeScript Safety**: Complete interfaces for all configuration sections
+- **Default Fallbacks**: Comprehensive default configuration for missing files
+- **Client/Server Support**: Both client-side and server-side configuration access
+- **Helper Functions**: getModelProviderConfig() for easy provider access
+
 ### Model Provider Abstraction Layer (New Feature)
 
 The Moments application now supports **multiple AI model providers** through a unified abstraction layer, enabling seamless switching between Anthropic's direct API and Amazon Bedrock.

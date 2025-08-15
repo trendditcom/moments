@@ -90,6 +90,33 @@ export function getDefaultConfig(): Config {
         sync_mode: 'bidirectional' as const
       }
     },
+    model_provider: {
+      type: 'anthropic',
+      anthropic: {
+        api_key_env: 'ANTHROPIC_API_KEY',
+        base_url: 'https://api.anthropic.com'
+      },
+      bedrock: {
+        aws_region: 'us-east-1',
+        aws_profile: 'default',
+        use_bedrock_api_key: false,
+        inference_profile: null
+      },
+      model_mapping: {
+        sonnet: {
+          anthropic: 'claude-3-5-sonnet-20241022',
+          bedrock: 'us.anthropic.claude-3-7-sonnet-20250219-v1:0'
+        },
+        haiku: {
+          anthropic: 'claude-3-5-haiku-20241022',
+          bedrock: 'us.anthropic.claude-3-5-haiku-20241022-v1:0'
+        },
+        opus: {
+          anthropic: 'claude-3-opus-20240229',
+          bedrock: 'anthropic.claude-3-opus-20240229-v1:0'
+        }
+      }
+    },
     app: {
       name: 'Moments',
       description: 'AI Business Intelligence Dashboard',

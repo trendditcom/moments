@@ -34,7 +34,7 @@ Successfully created a comprehensive model provider abstraction layer that enabl
 - **Health Monitoring**: Provider health check capabilities for automatic failover scenarios
 - Installed required AWS SDK dependencies (@aws-sdk/client-bedrock-runtime, @aws-sdk/credential-providers)
 
-### 2. [ ] Extend Configuration Schema for Provider Selection
+### 2. [x] Extend Configuration Schema for Provider Selection
 Update the configuration system to support model provider selection and provider-specific settings.
 
 **Requirements:**
@@ -77,6 +77,9 @@ model_provider:
 - Update `src/lib/config-types.ts` with ModelProviderConfig interface
 - Update `src/lib/config-loader.server.ts` to load provider configuration
 - Update `config.yml` with default provider configuration
+
+**Completion Summary:**
+Successfully extended configuration schema for provider selection including: 1) **config.yml Enhancement** - Added comprehensive model_provider section with type selection (anthropic/bedrock), complete Anthropic API configuration (api_key_env, base_url), full Bedrock configuration (aws_region, aws_profile, use_bedrock_api_key, inference_profile), and detailed model mapping for logical model names (sonnet, haiku, opus) to provider-specific model IDs, 2) **TypeScript Interface Implementation** - Created ModelProviderConfig interface with AnthropicProviderConfig, BedrockProviderConfig, and ModelMapping interfaces, updated main Config interface to include optional model_provider field, ensured type safety with proper optional fields and null handling for inference_profile, 3) **Configuration Loader Updates** - Updated both server-side (config-loader.server.ts) and client-side (config-loader.client.ts) configuration loaders to include model_provider in default configuration, added getModelProviderConfig() helper function for easy access to provider settings, maintained backward compatibility with existing configuration loading, 4) **Validation and Testing** - Successfully validated YAML configuration loading with both Anthropic and Bedrock provider types, confirmed TypeScript compilation success with npm run type-check, tested configuration structure with different provider settings (aws_region: us-west-2, use_bedrock_api_key: true), verified model mapping access and type safety throughout the system, 5) **Build Integration** - Ensured npm run build completes successfully with new configuration schema, confirmed API endpoint (/api/config) automatically serves enhanced configuration including model_provider section, maintained all existing functionality while adding provider selection capabilities. The implementation provides complete foundation for seamless switching between Anthropic and Amazon Bedrock providers with comprehensive configuration support, type safety, and backward compatibility.
 
 ### 3. [ ] Implement AWS Bedrock Authentication
 Add support for multiple AWS authentication methods for Bedrock integration.
