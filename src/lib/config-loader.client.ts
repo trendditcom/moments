@@ -70,22 +70,22 @@ export function getDefaultConfig(): Config {
     agents: {
       content_analyzer: {
         enabled: true,
-        model: 'claude-3-sonnet',
+        model: 'sonnet',
         temperature: 0.3
       },
       classification_agent: {
         enabled: true,
-        model: 'claude-3-sonnet',
+        model: 'sonnet',
         temperature: 0.2
       },
       correlation_engine: {
         enabled: true,
-        model: 'claude-3-sonnet',
+        model: 'sonnet',
         temperature: 0.4
       },
       report_generator: {
         enabled: true,
-        model: 'claude-3-sonnet',
+        model: 'sonnet',
         temperature: 0.5
       }
     }

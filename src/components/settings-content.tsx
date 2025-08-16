@@ -355,6 +355,7 @@ export function SettingsContent({ section }: SettingsContentProps) {
     }
   }
 
+
   const getStorageStatus = () => {
     if (!storageHealth) return { variant: 'default' as const, text: 'Unknown' }
     if (!storageHealth.available) return { variant: 'destructive' as const, text: 'Unavailable' }
@@ -499,6 +500,7 @@ export function SettingsContent({ section }: SettingsContentProps) {
             description="Moments are automatically saved to filesystem as markdown files"
           />
         </div>
+
       </div>
     )
   }

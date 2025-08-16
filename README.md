@@ -2390,7 +2390,160 @@ npm run lint         # Code linting
 
 ## 🧪 Feature Evaluation Guide
 
-### Provider-Aware Sub-Agent Manager (Latest Feature)
+### AI Insights Integration (Latest Feature)
+
+The Moments application now includes a **comprehensive AI Insights Integration** that transforms raw moment data into actionable business intelligence through intelligent alerts, strategic recommendations, executive summaries, and comprehensive reports. This AI-powered system provides automated trend detection, risk assessment, and opportunity identification essential for strategic decision-making.
+
+#### Testing the AI Insights Integration
+
+**1. Accessing AI Insights**
+```typescript
+// Navigate to Dashboard tab in the main navigation
+// Switch analysis depth to "Operational" to see full AI Insights Integration
+// Or view enhanced AI Insights Card in "Tactical" tier
+```
+
+**2. Intelligent Alerts System Evaluation**
+- **Navigate**: Dashboard → Analysis Depth: Operational → AI Insights Integration → Alerts tab
+- **Test Features**:
+  - Emerging trend detection with factor frequency analysis
+  - Unusual activity monitoring with statistical threshold detection
+  - Risk indicator identification through sentiment clustering
+  - Opportunity recognition through breakthrough moment detection
+- **Validation**:
+  - Check alert severity classification (Critical/High/Medium/Low)
+  - Verify confidence scoring (0-100%) for each alert
+  - Review AI-generated insights and action items
+  - Test alert expansion for detailed analysis
+
+**3. AI Recommendation Engine Evaluation**
+- **Navigate**: Dashboard → AI Insights Integration → Recommendations tab
+- **Test Features**:
+  - Analysis target recommendations for underanalyzed entities
+  - Data gap identification for missing company/technology coverage
+  - Correlation opportunity detection through co-occurrence analysis
+  - Content priority recommendations based on recent high-impact moments
+- **Validation**:
+  - Check priority classification (Urgent/High/Medium/Low)
+  - Verify estimated impact scores and effort assessments
+  - Review reasoning and suggested actions
+  - Test recommendation expansion for detailed guidance
+
+**4. Executive Summary Generation**
+- **Navigate**: Dashboard → AI Insights Integration → Executive Summary tab
+- **Test Features**:
+  - Configurable timeframe selection (24h/7d/30d/90d)
+  - Key metrics visualization (moments, companies, technologies, correlations)
+  - Trend analysis with trending/declining/emerging factors
+  - Risk assessment with mitigation strategies
+  - Opportunity identification (immediate/strategic/competitive)
+- **Validation**:
+  - Verify real-time metric calculations
+  - Check trend analysis accuracy
+  - Review risk level assessment and factors
+  - Test timeframe switching and data updates
+
+**5. Comprehensive Weekly Reports**
+- **Navigate**: Dashboard → AI Insights Integration → Reports tab
+- **Test Features**:
+  - Weekly summary with narrative generation
+  - Highlights categorization (achievements/challenges/surprises)
+  - Entity spotlight with top companies/technologies/people
+  - Data health assessment (coverage/quality/freshness)
+  - Looking ahead predictions and watch lists
+- **Validation**:
+  - Check weekly date range accuracy
+  - Verify entity ranking by activity
+  - Review data health percentage calculations
+  - Test prediction and recommendation quality
+
+**6. Enhanced Tactical Tier Integration**
+- **Navigate**: Dashboard → Analysis Depth: Tactical → AI Insights Card
+- **Test Features**:
+  - Real-time alert and recommendation counts
+  - Latest alert preview with severity indicators
+  - "View All Insights" modal integration
+  - Enhanced card layout with action items
+- **Validation**:
+  - Verify alert/recommendation count accuracy
+  - Check severity color coding and icons
+  - Test modal launch and data consistency
+  - Review preview content truncation
+
+**7. Advanced Analytics Testing**
+```typescript
+// Test AI Insights Engine directly
+import { AIInsightsEngine } from '@/lib/ai-insights-engine'
+
+const engine = AIInsightsEngine.getInstance()
+
+// Generate alerts with real data
+const alerts = engine.generateAlerts(moments, companies, technologies)
+console.log('Generated alerts:', alerts.length)
+console.log('Critical alerts:', alerts.filter(a => a.severity === 'critical').length)
+
+// Generate recommendations
+const recommendations = engine.generateRecommendations(moments, companies, technologies)
+console.log('Generated recommendations:', recommendations.length)
+console.log('High priority:', recommendations.filter(r => r.priority === 'high').length)
+
+// Generate executive summary
+const summary = engine.generateExecutiveSummary(moments, companies, technologies, '7d')
+console.log('Key insights:', summary.keyInsights.length)
+console.log('Risk level:', summary.riskAssessment.level)
+
+// Generate weekly report
+const report = engine.generateWeeklyReport(moments, companies, technologies)
+console.log('Weekly highlights:', report.highlights)
+console.log('Data health:', report.dataHealth)
+```
+
+**8. Performance and Integration Testing**
+- **Memory Usage**: Monitor browser performance during large dataset analysis
+- **Real-time Updates**: Verify insights update when new moments are added
+- **Data Accuracy**: Cross-reference generated insights with actual moment data
+- **UI Responsiveness**: Test across different screen sizes and devices
+- **Export Functionality**: Verify export buttons and future integration points
+
+**9. AI Quality Assessment**
+- **Alert Accuracy**: Verify that emerging trends reflect actual data patterns
+- **Recommendation Relevance**: Check that suggestions are actionable and valuable
+- **Risk Assessment**: Ensure risk indicators align with business intelligence expectations
+- **Opportunity Detection**: Validate that opportunities represent genuine business value
+- **Insight Quality**: Review AI-generated content for coherence and usefulness
+
+**10. Integration with Existing Features**
+- **Dashboard Compatibility**: Seamless integration with three-tier architecture
+- **Data Store Connectivity**: Real-time updates from moments and catalog stores
+- **Navigation Consistency**: Proper integration with main application navigation
+- **State Management**: Correct handling of loading states and error conditions
+- **Theme Consistency**: UI matches Apple Settings design system throughout
+
+#### Key Features Validation Checklist
+
+- ✅ **Intelligent Alerts**: Automated detection of trends, risks, and opportunities
+- ✅ **Smart Recommendations**: AI-powered analysis targets and priority suggestions  
+- ✅ **Executive Summaries**: Configurable timeframe insights with key metrics
+- ✅ **Weekly Reports**: Comprehensive business intelligence with entity spotlights
+- ✅ **Advanced Analytics**: Statistical significance testing and confidence scoring
+- ✅ **Dashboard Integration**: Seamless operational and tactical tier integration
+- ✅ **Real-time Processing**: Live insights generation from current moment data
+- ✅ **Professional UI**: Apple Settings-style interface with responsive design
+- ✅ **TypeScript Safety**: Comprehensive type definitions and error handling
+- ✅ **Performance Optimization**: Efficient algorithms and memoized calculations
+
+#### Architecture Components
+
+- **AIInsightsEngine**: Singleton engine with comprehensive analysis algorithms
+- **Intelligent Alerts**: Factor analysis, activity monitoring, sentiment detection
+- **Recommendation System**: Gap analysis, correlation detection, priority scoring  
+- **Executive Reporting**: Summary generation, trend analysis, risk assessment
+- **React Integration**: Full-featured component with tabbed interface and details
+- **Dashboard Enhancement**: Tactical tier cards and operational tier full interface
+
+The AI Insights Integration transforms Moments from a data collection platform into a sophisticated AI-powered business intelligence system, providing automated insights, strategic recommendations, and comprehensive reporting essential for AI industry analysis and decision-making.
+
+### Provider-Aware Sub-Agent Manager (Previous Feature)
 
 The Moments application now includes a **Provider-Aware Sub-Agent Manager** that provides seamless multi-provider support, automatic failover, enhanced error handling, and comprehensive usage tracking for AI sub-agents across both Anthropic and Amazon Bedrock providers.
 

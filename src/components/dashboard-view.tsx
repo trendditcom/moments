@@ -15,6 +15,8 @@ import { KnowledgeGrowthMetrics } from '@/components/dashboard-growth-metrics'
 import { FactorDistributionAnalytics } from '@/components/dashboard-factor-analytics'
 import { RelationshipMatrix } from '@/components/dashboard-relationship-matrix'
 import { TemporalAnalysis } from '@/components/dashboard-temporal-analysis'
+import { AIInsightsIntegration } from '@/components/ai-insights-integration'
+import { AIInsightsEngine } from '@/lib/ai-insights-engine'
 import { Company, Technology } from '@/types/catalog'
 import { PivotalMoment } from '@/types/moments'
 import { 
@@ -34,6 +36,18 @@ interface DashboardViewProps {
 export function DashboardView({ companies, technologies, moments, isLoading = false }: DashboardViewProps) {
   const [selectedTimeframe, setSelectedTimeframe] = useState('7d')
   const [analysisDepth, setAnalysisDepth] = useState<'strategic' | 'tactical' | 'operational'>('strategic')
+  const [showAIInsightsModal, setShowAIInsightsModal] = useState(false)
+
+  // Generate AI insights
+  const aiInsights = useMemo(() => {
+    if (moments.length === 0) return null
+    
+    const engine = AIInsightsEngine.getInstance()
+    return {
+      alerts: engine.generateAlerts(moments, companies, technologies),
+      recommendations: engine.generateRecommendations(moments, companies, technologies)
+    }
+  }, [moments, companies, technologies])
 
   // Calculate dashboard metrics from actual data
   const dashboardMetrics = useMemo(() => {
@@ -81,7 +95,7 @@ export function DashboardView({ companies, technologies, moments, isLoading = fa
       },
       recentMoments,
       correlationCount,
-      insightCount: Math.floor(totalMoments * 0.15) || 1 // 15% of moments generate insights
+      insightCount: (aiInsights?.alerts.length || 0) + (aiInsights?.recommendations.length || 0)
     }
   }, [companies, technologies, moments])
 
@@ -126,6 +140,13 @@ export function DashboardView({ companies, technologies, moments, isLoading = fa
           <RelationshipMatrix />
           
           <TemporalAnalysis />
+          
+          <AIInsightsIntegration
+            moments={moments}
+            companies={companies}
+            technologies={technologies}
+            isLoading={isLoading}
+          />
         </>
       )}
 
@@ -139,7 +160,12 @@ export function DashboardView({ companies, technologies, moments, isLoading = fa
             <CorrelationInsightsCard correlationCount={dashboardMetrics.correlationCount} />
           </div>
           <div className="flex-1 min-w-[280px]">
-            <AIInsightsCard insightCount={dashboardMetrics.insightCount} />
+            <AIInsightsCard 
+              insightCount={dashboardMetrics.insightCount}
+              alerts={aiInsights?.alerts || []}
+              recommendations={aiInsights?.recommendations || []}
+              onViewDetails={() => setShowAIInsightsModal(true)}
+            />
           </div>
         </div>
       )}

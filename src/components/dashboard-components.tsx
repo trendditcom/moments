@@ -12,7 +12,8 @@ import {
   ClockIcon,
   LinkIcon,
   LightBulbIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  BellIcon
 } from '@heroicons/react/24/outline'
 
 // Types for dashboard metrics
@@ -230,8 +231,23 @@ export function CorrelationInsightsCard({ correlationCount }: { correlationCount
   )
 }
 
-// 6. AI Insights Alert Component
-export function AIInsightsCard({ insightCount }: { insightCount: number }) {
+// 6. AI Insights Alert Component - Enhanced version
+// Note: This is now replaced by the full AIInsightsIntegration component
+// but kept as a simpler card version for tactical tier display
+export function AIInsightsCard({ 
+  insightCount, 
+  alerts = [], 
+  recommendations = [], 
+  onViewDetails 
+}: { 
+  insightCount: number
+  alerts?: any[]
+  recommendations?: any[]
+  onViewDetails?: () => void 
+}) {
+  const criticalAlerts = alerts.filter(a => a.severity === 'critical').length
+  const highPriorityRecommendations = recommendations.filter(r => r.priority === 'urgent' || r.priority === 'high').length
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -246,22 +262,52 @@ export function AIInsightsCard({ insightCount }: { insightCount: number }) {
           </p>
           
           <div className="space-y-2">
-            <div className="p-2 bg-blue-50 rounded-lg">
-              <div className="flex items-start space-x-2">
-                <ExclamationTriangleIcon className="w-4 h-4 text-blue-600 mt-0.5" />
-                <div>
-                  <p className="text-xs font-medium text-blue-900">
-                    Emerging Trend Detected
-                  </p>
-                  <p className="text-xs text-blue-700">
-                    AI regulation moments increased 40% this week
-                  </p>
+            {/* Alert Summary */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <ExclamationTriangleIcon className="w-4 h-4 text-orange-500" />
+                <span className="text-sm">Active Alerts</span>
+              </div>
+              <Badge variant={criticalAlerts > 0 ? "destructive" : "secondary"}>
+                {alerts.length}
+              </Badge>
+            </div>
+
+            {/* Recommendation Summary */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <LightBulbIcon className="w-4 h-4 text-blue-500" />
+                <span className="text-sm">Recommendations</span>
+              </div>
+              <Badge variant={highPriorityRecommendations > 0 ? "default" : "secondary"}>
+                {recommendations.length}
+              </Badge>
+            </div>
+            
+            {/* Latest Alert Preview */}
+            {alerts.length > 0 && (
+              <div className="p-2 bg-orange-50 rounded-lg">
+                <div className="flex items-start space-x-2">
+                  <ExclamationTriangleIcon className="w-4 h-4 text-orange-600 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-medium text-orange-900">
+                      {alerts[0].title}
+                    </p>
+                    <p className="text-xs text-orange-700">
+                      {alerts[0].description.slice(0, 80)}...
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
           
-          <Button variant="outline" size="sm" className="w-full mt-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full mt-2" 
+            onClick={onViewDetails}
+          >
             View All Insights
           </Button>
         </div>

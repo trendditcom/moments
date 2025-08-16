@@ -53,6 +53,7 @@ export class ProviderAwareSubAgentManager {
   private modelProviderConfig?: ModelProviderConfig
   private healthStatus?: ProviderHealthStatus
   private autoFallback: boolean = false
+  private initializationPromise: Promise<void>
   
   /**
    * Creates a new ProviderAwareSubAgentManager instance
@@ -72,7 +73,7 @@ export class ProviderAwareSubAgentManager {
     autoFallback: boolean = true
   ) {
     this.autoFallback = autoFallback
-    this.initializeAsync(configs, modelProviderConfig)
+    this.initializationPromise = this.initializeAsync(configs, modelProviderConfig)
   }
 
   /**
@@ -153,14 +154,22 @@ export class ProviderAwareSubAgentManager {
   ): Promise<ProviderAwareSubAgentManager> {
     const manager = new ProviderAwareSubAgentManager(configs, modelProviderConfig, autoFallback)
     // Wait for async initialization to complete
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await manager.initializationPromise
     return manager
+  }
+
+  /**
+   * Ensure initialization is complete before proceeding
+   */
+  private async ensureInitialized(): Promise<void> {
+    await this.initializationPromise
   }
 
   /**
    * Check health of providers and update status
    */
   async checkProviderHealth(): Promise<ProviderHealthStatus> {
+    await this.ensureInitialized()
     const startTime = Date.now()
     
     try {
@@ -441,6 +450,8 @@ export class ProviderAwareSubAgentManager {
       }>
     }>
   }>> {
+    await this.ensureInitialized()
+    
     if (!this.configs.content_analyzer.enabled) {
       return { success: false, error: 'Content analyzer is disabled', processingTime: 0 }
     }
@@ -495,6 +506,8 @@ export class ProviderAwareSubAgentManager {
       }
     }>
   }>> {
+    await this.ensureInitialized()
+    
     if (!this.configs.classification_agent.enabled) {
       return { success: false, error: 'Classification agent is disabled', processingTime: 0 }
     }
@@ -582,6 +595,8 @@ export class ProviderAwareSubAgentManager {
       confidence: number
     }>
   }>> {
+    await this.ensureInitialized()
+    
     if (!this.configs.correlation_engine.enabled) {
       return { success: false, error: 'Correlation engine is disabled', processingTime: 0 }
     }
@@ -689,6 +704,8 @@ export class ProviderAwareSubAgentManager {
       opportunities: string[]
     }
   }>> {
+    await this.ensureInitialized()
+    
     if (!this.configs.report_generator.enabled) {
       return { success: false, error: 'Report generator is disabled', processingTime: 0 }
     }
@@ -726,6 +743,8 @@ export class ProviderAwareSubAgentManager {
    * Switch to a different provider
    */
   async switchProvider(providerType: 'anthropic' | 'bedrock'): Promise<boolean> {
+    await this.ensureInitialized()
+    
     try {
       const newProvider = ModelProviderFactory.getProvider(providerType)
       const health = await newProvider.healthCheck()
