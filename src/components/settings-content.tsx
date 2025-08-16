@@ -14,6 +14,9 @@ import {
 } from '@/lib/persistence'
 import { useCatalogStore } from '@/store/catalog-store'
 import { useMomentsStore } from '@/store/moments-store'
+import { ProviderConfig } from '@/components/settings/provider-config'
+import { ProviderTest } from '@/components/settings/provider-test'
+import type { ModelProviderConfig } from '@/lib/config-types'
 import { 
   ArrowDownTrayIcon, 
   ArrowUpTrayIcon, 
@@ -23,7 +26,8 @@ import {
   ExclamationTriangleIcon,
   CheckCircleIcon,
   InformationCircleIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  CpuChipIcon
 } from '@heroicons/react/24/outline'
 
 interface ActionButtonProps {
@@ -86,7 +90,7 @@ function StorageMetric({ label, value, description, variant = 'default' }: Stora
 }
 
 interface SettingsContentProps {
-  section: 'health' | 'data' | 'management'
+  section: 'health' | 'data' | 'management' | 'provider'
 }
 
 export function SettingsContent({ section }: SettingsContentProps) {
@@ -95,12 +99,14 @@ export function SettingsContent({ section }: SettingsContentProps) {
   const [inspectionResults, setInspectionResults] = useState<string | null>(null)
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null)
   const [isRunningHealthCheck, setIsRunningHealthCheck] = useState(false)
+  const [providerConfig, setProviderConfig] = useState<ModelProviderConfig | undefined>(undefined)
 
   const { companies, technologies } = useCatalogStore()
   const { moments, lastAnalysisAt } = useMomentsStore()
 
   useEffect(() => {
     checkHealth()
+    loadProviderConfig()
   }, [])
 
   const checkHealth = async () => {
@@ -114,6 +120,72 @@ export function SettingsContent({ section }: SettingsContentProps) {
       setMessage({ type: 'error', text: 'Failed to check storage health' })
     } finally {
       setIsRunningHealthCheck(false)
+    }
+  }
+
+  const loadProviderConfig = async () => {
+    try {
+      const response = await fetch('/api/config')
+      if (response.ok) {
+        const config = await response.json()
+        setProviderConfig(config.model_provider)
+      }
+    } catch (error) {
+      console.error('Failed to load provider configuration:', error)
+    }
+  }
+
+  const handleSaveProviderConfig = async (config: ModelProviderConfig) => {
+    try {
+      const response = await fetch('/api/provider/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config),
+      })
+      
+      if (response.ok) {
+        setProviderConfig(config)
+        setMessage({ type: 'success', text: 'Provider configuration saved successfully' })
+      } else {
+        throw new Error('Failed to save configuration')
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to save provider configuration' })
+      throw error
+    }
+  }
+
+  const handleTestProviderConfig = async (config: ModelProviderConfig) => {
+    try {
+      const response = await fetch('/api/provider/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          config,
+          model: 'haiku',
+          prompt: 'Test connection',
+        }),
+      })
+      
+      const result = await response.json()
+      
+      if (response.ok) {
+        return {
+          success: true,
+          message: 'Provider connection successful',
+          details: result,
+        }
+      } else {
+        return {
+          success: false,
+          message: result.error || 'Connection test failed',
+        }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Unknown error',
+      }
     }
   }
 
@@ -605,6 +677,53 @@ export function SettingsContent({ section }: SettingsContentProps) {
                     </ul>
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  if (section === 'provider') {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-lg font-semibold mb-2 flex items-center gap-2">
+            <CpuChipIcon className="w-5 h-5" />
+            Model Provider Configuration
+          </h2>
+          <p className="text-sm text-muted-foreground mb-6">
+            Configure AI model providers for the Moments application. Choose between Anthropic API for simple setup or Amazon Bedrock for enterprise features.
+          </p>
+        </div>
+
+        <ProviderConfig
+          config={providerConfig}
+          onSave={handleSaveProviderConfig}
+          onTest={handleTestProviderConfig}
+        />
+
+        <div className="border-t pt-6">
+          <h3 className="text-base font-semibold mb-4">Provider Testing</h3>
+          <ProviderTest config={providerConfig} />
+        </div>
+
+        {message && (
+          <div className={`p-3 rounded-md border ${
+            message.type === 'error' ? 'bg-red-50 border-red-200' : 
+            message.type === 'success' ? 'bg-green-50 border-green-200' : 
+            'bg-blue-50 border-blue-200'
+          }`}>
+            <div className="flex items-start gap-3">
+              {message.type === 'error' && <ExclamationTriangleIcon className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />}
+              {message.type === 'success' && <CheckCircleIcon className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />}
+              {message.type === 'info' && <InformationCircleIcon className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />}
+              <div className="flex-1">
+                <p className="text-sm font-medium">
+                  {message.type === 'error' ? 'Error' : message.type === 'success' ? 'Success' : 'Information'}
+                </p>
+                <p className="text-sm mt-1">{message.text}</p>
               </div>
             </div>
           </div>

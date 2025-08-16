@@ -294,6 +294,105 @@ The repository includes curated content for immediate exploration:
 - **LLM Agents**: Multi-agent system architectures
 - **Model Context Protocol**: Standardized agent tool integration
 
+## 🧪 Feature Evaluation Guide
+
+### Provider Configuration (New Feature)
+
+The Moments application now supports configurable AI model providers, allowing seamless switching between Anthropic API and Amazon Bedrock for enterprise deployments.
+
+#### Accessing Provider Configuration
+
+1. **Navigate to Settings**
+   - Click the Settings icon in the application
+   - Select the "Provider" section in the sidebar
+
+2. **Configure Your Provider**
+   
+   **For Anthropic API (Recommended for Development):**
+   - Select "Anthropic API" from the provider dropdown
+   - Ensure your `ANTHROPIC_API_KEY` environment variable is set
+   - Verify the base URL is `https://api.anthropic.com`
+   
+   **For Amazon Bedrock (Enterprise Deployment):**
+   - Select "Amazon Bedrock" from the provider dropdown
+   - Choose your AWS region (e.g., us-east-1, us-west-2)
+   - Configure authentication method:
+     - AWS CLI profile (default)
+     - Bedrock API keys (toggle "Use Bedrock API Keys")
+     - Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+   - Optional: Set inference profile for cross-region optimization
+
+3. **Test Your Configuration**
+   - Click "Test Connection" to validate authentication
+   - View detailed test results including:
+     - Connection status (success/failure)
+     - Latency measurements
+     - Token usage statistics
+     - Estimated costs per request
+   
+4. **Compare Provider Performance**
+   - Use "Compare Both Providers" to test both simultaneously
+   - Review comparison metrics:
+     - Response latency (ms)
+     - Cost per request ($)
+     - Success rate
+     - Model availability
+
+5. **Customize Model Mappings**
+   - Configure model IDs for each provider:
+     - Sonnet: Balanced performance
+     - Haiku: Fast and economical
+     - Opus: Most capable
+   - Map logical names to provider-specific model IDs
+   - Example: `claude-3-5-sonnet` → `us.anthropic.claude-3-7-sonnet`
+
+#### Testing Provider Functionality
+
+**Basic Connection Test:**
+```yaml
+1. Set provider type to "anthropic" or "bedrock"
+2. Configure authentication credentials
+3. Click "Test Connection"
+4. Verify green success badge appears
+```
+
+**Performance Comparison:**
+```yaml
+1. Configure both providers with valid credentials
+2. Enter test prompt: "What is 2+2?"
+3. Click "Compare Both Providers"
+4. Review latency and cost differences
+```
+
+**Production Configuration:**
+```yaml
+# config.yml
+model_provider:
+  type: "bedrock"  # Use Bedrock for production
+  bedrock:
+    aws_region: "us-east-1"
+    use_bedrock_api_key: true
+  fallback_provider: "anthropic"  # Automatic fallback
+  auto_fallback: true
+```
+
+#### Troubleshooting
+
+**Authentication Issues:**
+- Verify API keys are correctly set in `.env.local`
+- Check AWS credentials with `aws sts get-caller-identity`
+- Ensure IAM role has `bedrock:InvokeModel` permission
+
+**Model Availability:**
+- Confirm model is available in selected AWS region
+- Check Bedrock console for enabled models
+- Use inference profiles for cross-region access
+
+**Configuration Persistence:**
+- Settings are saved to `config.yml` automatically
+- Changes take effect immediately
+- Restart not required after configuration updates
+
 ## 🔧 Development
 
 ### Project Structure
