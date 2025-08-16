@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { AgentConfig, SubAgentConfigs } from '@/types/moments'
 import { PivotalMoment, MomentCorrelation } from '@/types/moments'
 import { ContentItem } from '@/types/catalog'
+import { ProviderAwareSubAgentManager, createProviderAwareSubAgentManager } from './sub-agents-provider-aware'
 
 interface AgentResponse<T = any> {
   success: boolean
@@ -10,6 +11,26 @@ interface AgentResponse<T = any> {
   processingTime: number
 }
 
+/**
+ * @deprecated This class is deprecated. Use ProviderAwareSubAgentManager instead.
+ * 
+ * SubAgentManager - Legacy implementation using direct Anthropic SDK
+ * 
+ * This class provides backward compatibility but lacks provider abstraction features.
+ * For new implementations, use ProviderAwareSubAgentManager which supports:
+ * - Multiple AI providers (Anthropic and Amazon Bedrock)
+ * - Automatic provider failover
+ * - Enhanced error handling and retry logic
+ * - Usage tracking and cost estimation
+ * - Provider health monitoring
+ * 
+ * @example
+ * // Recommended new approach:
+ * const manager = await createProviderAwareSubAgentManager()
+ * 
+ * // Legacy approach (still works):
+ * const legacyManager = new SubAgentManager()
+ */
 export class SubAgentManager {
   private anthropic: Anthropic
   private configs: SubAgentConfigs
@@ -22,6 +43,11 @@ export class SubAgentManager {
    * 
    * @warning SECURITY ISSUE: This class currently runs Anthropic API calls in the browser
    * with dangerouslyAllowBrowser: true, which exposes the API key to the client.
+   * 
+   * @warning DEPRECATION: This class is deprecated. Use ProviderAwareSubAgentManager for:
+   * - Multi-provider support (Anthropic + Bedrock)
+   * - Better error handling and failover
+   * - Enhanced monitoring and cost tracking
    * 
    * @todo PRODUCTION FIX: Move API calls to server-side API routes:
    * - Create /api/sub-agents/* endpoints
@@ -661,7 +687,32 @@ Return JSON object:
   }
 }
 
-// Factory function
+// Factory function (Legacy)
+/**
+ * @deprecated Use createProviderAwareSubAgentManager() instead for multi-provider support
+ * 
+ * Creates a legacy SubAgentManager instance
+ * This function is maintained for backward compatibility only.
+ * 
+ * @param apiKey - Optional API key override
+ * @param configs - Sub-agent configurations
+ * @returns SubAgentManager instance
+ * 
+ * @example
+ * // Recommended approach:
+ * const manager = await createProviderAwareSubAgentManager()
+ * 
+ * // Legacy approach (still supported):
+ * const legacyManager = createSubAgentManager()
+ */
 export function createSubAgentManager(apiKey?: string, configs?: SubAgentConfigs): SubAgentManager {
+  console.warn('createSubAgentManager() is deprecated. Consider using createProviderAwareSubAgentManager() for multi-provider support.')
   return new SubAgentManager(apiKey, configs)
 }
+
+// Re-export new provider-aware functions for easy migration
+export { 
+  ProviderAwareSubAgentManager,
+  createProviderAwareSubAgentManager,
+  createSubAgentManagerWithProvider
+} from './sub-agents-provider-aware'

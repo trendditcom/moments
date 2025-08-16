@@ -330,7 +330,281 @@ npm run lint         # Code linting
 
 ## 🧪 Feature Evaluation Guide
 
-### AWS Bedrock Authentication (Latest Feature)
+### Provider-Aware Sub-Agent Manager (Latest Feature)
+
+The Moments application now includes a **Provider-Aware Sub-Agent Manager** that provides seamless multi-provider support, automatic failover, enhanced error handling, and comprehensive usage tracking for AI sub-agents across both Anthropic and Amazon Bedrock providers.
+
+#### Testing Provider-Aware Sub-Agent Manager
+
+**1. Basic Migration Testing**
+```typescript
+// Legacy approach (still works but deprecated)
+import { createSubAgentManager } from '@/lib/sub-agents'
+const legacyManager = createSubAgentManager()
+
+// Modern approach with provider abstraction
+import { createProviderAwareSubAgentManager } from '@/lib/sub-agents'
+const modernManager = await createProviderAwareSubAgentManager()
+
+// Check provider status
+const status = modernManager.getProviderStatus()
+console.log('Primary provider:', status.primary.type)
+console.log('Has fallback:', !!status.fallback)
+console.log('Auto fallback enabled:', status.autoFallback)
+```
+
+**2. Explicit Provider Selection**
+```typescript
+import { createSubAgentManagerWithProvider } from '@/lib/sub-agents'
+
+// Force Anthropic provider
+const anthropicManager = await createSubAgentManagerWithProvider('anthropic')
+
+// Force Bedrock provider
+const bedrockManager = await createSubAgentManagerWithProvider('bedrock')
+
+// Test provider switching
+const canSwitch = await modernManager.switchProvider('bedrock')
+console.log('Provider switch successful:', canSwitch)
+```
+
+**3. Health Monitoring and Failover Testing**
+```typescript
+// Check provider health
+const healthStatus = await modernManager.checkProviderHealth()
+console.log('Primary health:', healthStatus.primary)
+console.log('Fallback health:', healthStatus.fallback)
+
+// Test automatic failover (simulate primary failure)
+const manager = await createProviderAwareSubAgentManager(
+  undefined, // Default configs
+  undefined, // Auto-load provider config
+  true       // Enable auto-failover
+)
+
+// Monitor health and failover behavior
+const status = await manager.checkProviderHealth()
+if (!status.primary.isHealthy && status.fallback?.isHealthy) {
+  console.log('Will automatically use fallback provider')
+}
+```
+
+**4. Enhanced Error Handling and Retry Logic**
+```typescript
+// Test enhanced error handling with sample content
+const testContent = [{
+  id: 'test-1',
+  name: 'Test Content',
+  type: 'markdown' as const,
+  content: 'AI startup raises $50M Series A funding',
+  path: '/test/content.md',
+  lastModified: new Date(),
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  size: 1024
+}]
+
+try {
+  const result = await manager.analyzeContent(testContent)
+  
+  if (result.success) {
+    console.log('Analysis successful:', {
+      provider: result.provider,
+      model: result.model,
+      processingTime: result.processingTime,
+      usage: result.usage
+    })
+  } else {
+    console.log('Analysis failed with enhanced error handling:', result.error)
+  }
+} catch (error) {
+  console.log('Caught error with retry logic:', error)
+}
+```
+
+**5. Parallel Processing with Usage Tracking**
+```typescript
+// Test parallel processing with usage tracking
+const sampleMoments = [
+  {
+    id: 'moment-1',
+    title: 'AI Funding Surge',
+    description: 'Major funding round in AI sector',
+    content: 'Company X raises $100M in Series B funding for AI infrastructure',
+    classification: {
+      microFactors: ['company'],
+      macroFactors: ['economic'],
+      confidence: 'high',
+      reasoning: 'Significant funding event',
+      keywords: ['funding', 'AI', 'Series B']
+    },
+    impact: { score: 85, reasoning: 'Large funding round indicates market confidence' },
+    timeline: { timeframe: '2024', isHistorical: false },
+    source: { 
+      type: 'company', 
+      id: 'company-x', 
+      name: 'Company X',
+      contentId: 'content-1',
+      filePath: '/companies/company-x.md'
+    },
+    entities: { companies: ['Company X'], technologies: ['AI'], people: [], locations: [] },
+    extractedAt: new Date(),
+    metadata: { extractedAt: new Date(), version: '1.0' }
+  }
+]
+
+// Test classification with parallel processing
+const classificationResult = await manager.classifyMoments(
+  sampleMoments, 
+  10,  // Batch size
+  true // Enable parallel batches
+)
+
+if (classificationResult.success) {
+  console.log('Parallel classification results:', {
+    provider: classificationResult.provider,
+    processingTime: classificationResult.processingTime,
+    usage: classificationResult.usage,
+    classifications: classificationResult.data?.classifications?.length
+  })
+}
+
+// Test correlation analysis
+const correlationResult = await manager.findCorrelations(
+  sampleMoments,
+  15, // Batch size
+  true // Enable parallel batches
+)
+
+if (correlationResult.success) {
+  console.log('Correlation analysis results:', {
+    provider: correlationResult.provider,
+    correlations: correlationResult.data?.correlations?.length,
+    insights: correlationResult.data?.insights?.length,
+    usage: correlationResult.usage
+  })
+}
+```
+
+**6. Configuration-Driven Operation**
+```typescript
+// Test configuration-driven operation
+const configuredManager = await createProviderAwareSubAgentManager({
+  content_analyzer: {
+    enabled: true,
+    model: 'sonnet',           // Logical model name
+    temperature: 0.3,
+    parallel_batch_size: 15,
+    enable_parallel_batches: true
+  },
+  classification_agent: {
+    enabled: true,
+    model: 'sonnet',
+    temperature: 0.2,
+    parallel_batch_size: 10,
+    enable_parallel_batches: true
+  },
+  correlation_engine: {
+    enabled: true,
+    model: 'haiku',            // Use cheaper model for correlation
+    temperature: 0.4,
+    parallel_batch_size: 20,
+    enable_parallel_batches: true
+  },
+  report_generator: {
+    enabled: true,
+    model: 'haiku',            // Use cheaper model for reports
+    temperature: 0.5,
+    parallel_batch_size: 5,
+    enable_parallel_batches: false
+  }
+})
+
+// Test report generation
+const reportResult = await configuredManager.generateReport(
+  sampleMoments,
+  [], // No correlations for this test
+  {
+    type: 'executive_summary',
+    timeframe: '2024',
+    focusAreas: ['funding', 'AI']
+  }
+)
+
+if (reportResult.success) {
+  console.log('Report generation results:', {
+    provider: reportResult.provider,
+    title: reportResult.data?.report.title,
+    sections: reportResult.data?.report.sections.length,
+    recommendations: reportResult.data?.report.recommendations.length,
+    usage: reportResult.usage
+  })
+}
+```
+
+**7. Migration Validation and Examples**
+```typescript
+// Test migration validation
+import { MigrationUtilities } from '@/lib/migration-examples'
+
+const migrationReport = await MigrationUtilities.createMigrationReport()
+console.log('Migration capabilities comparison:', migrationReport)
+
+const readinessCheck = await MigrationUtilities.validateMigrationReadiness()
+console.log('Migration readiness:', readinessCheck.isReady)
+console.log('Checklist:', readinessCheck.checklist)
+
+// Test if current manager is legacy or provider-aware
+const isLegacy = MigrationUtilities.isLegacyManager(manager)
+console.log('Is legacy manager:', isLegacy)
+```
+
+**8. Environment-Specific Configuration Testing**
+```bash
+# Test different environment configurations
+
+# Development with Anthropic
+export ANTHROPIC_API_KEY=sk-ant-...
+export NODE_ENV=development
+# Manager will use Anthropic with cheaper models
+
+# Production with Bedrock
+export AWS_REGION=us-east-1
+export AWS_ACCESS_KEY_ID=AKIA...
+export AWS_SECRET_ACCESS_KEY=...
+export NODE_ENV=production
+# Manager will use Bedrock with production optimizations
+
+# Hybrid environment with fallback
+export ANTHROPIC_API_KEY=sk-ant-...
+export AWS_REGION=us-east-1
+export AWS_ACCESS_KEY_ID=AKIA...
+export AWS_SECRET_ACCESS_KEY=...
+# Manager will auto-detect primary and set up fallback
+```
+
+**Key Benefits:**
+- ✅ **Multi-Provider Support**: Seamless switching between Anthropic and Amazon Bedrock
+- ✅ **Automatic Failover**: Health monitoring with automatic provider switching
+- ✅ **Enhanced Error Handling**: Exponential backoff retry logic with detailed error classification
+- ✅ **Usage Tracking**: Comprehensive token usage and cost monitoring
+- ✅ **Parallel Processing**: Configurable batch processing for improved performance
+- ✅ **Backward Compatibility**: Legacy SubAgentManager still works with deprecation warnings
+- ✅ **Configuration Driven**: Logical model names with provider-specific mapping
+- ✅ **Production Ready**: Health checks, monitoring, and enterprise authentication support
+- ✅ **Migration Support**: Comprehensive examples and validation utilities
+
+**Technical Implementation:**
+- **ProviderAwareSubAgentManager Class**: New manager with provider abstraction layer
+- **Automatic Provider Detection**: Environment-based provider selection and configuration
+- **Health Monitoring**: Real-time provider health checks with status reporting
+- **Enhanced Retry Logic**: Exponential backoff with provider fallback on failures
+- **Usage Statistics**: Detailed token usage and cost tracking per provider
+- **Configuration Integration**: Seamless integration with existing config.yml settings
+- **Migration Path**: Clear upgrade path with comprehensive examples and utilities
+- **Type Safety**: Complete TypeScript interfaces with extended AgentConfig support
+
+### AWS Bedrock Authentication (Previous Feature)
 
 The Moments application now includes **comprehensive AWS Bedrock authentication** supporting multiple authentication methods, detailed permission validation, and enterprise-grade AWS integration for AI model providers.
 

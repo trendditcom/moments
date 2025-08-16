@@ -53,6 +53,11 @@ export interface PivotalMoment {
     timeframe?: string
     isHistorical: boolean
   }
+  metadata: {
+    extractedAt: Date
+    version: string
+    [key: string]: any
+  }
 }
 
 export interface MomentCorrelation {
@@ -155,6 +160,8 @@ export interface AgentConfig {
   enabled: boolean
   model: string
   temperature: number
+  parallel_batch_size?: number
+  enable_parallel_batches?: boolean
 }
 
 export interface SubAgentConfigs {

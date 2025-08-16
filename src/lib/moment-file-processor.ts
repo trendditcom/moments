@@ -179,6 +179,11 @@ ${moment.content}
           estimatedDate: data.timeline?.estimatedDate ? new Date(data.timeline.estimatedDate) : undefined,
           timeframe: data.timeline?.timeframe,
           isHistorical: data.timeline?.isHistorical || false
+        },
+        metadata: {
+          extractedAt: new Date(data.extractedAt || data.metadata?.extractedAt || new Date()),
+          version: data.metadata?.version || '1.0',
+          ...(data.metadata || {})
         }
       }
 

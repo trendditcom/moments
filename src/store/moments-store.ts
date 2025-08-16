@@ -14,7 +14,12 @@ import {
 } from '@/types/moments'
 import { Company, Technology, ContentItem } from '@/types/catalog'
 import { MomentExtractor, createMomentExtractor } from '@/lib/moment-extractor'
-import { SubAgentManager, createSubAgentManager } from '@/lib/sub-agents'
+import { 
+  SubAgentManager, 
+  createSubAgentManager,
+  ProviderAwareSubAgentManager,
+  createProviderAwareSubAgentManager
+} from '@/lib/sub-agents'
 import { createPersistStorage, createFileFirstStorage } from '@/lib/persistence'
 import { momentFileProcessor } from '@/lib/moment-file-processor'
 import { loadConfigClient } from '@/lib/config-loader.client'
@@ -804,7 +809,8 @@ export async function analyzeMomentsFromCatalog(
     onPrompt: progressCallbacks?.onPrompt
   })
   
-  const subAgents = createSubAgentManager()
+  // Use provider-aware sub-agent manager for enhanced multi-provider support
+  const subAgents = await createProviderAwareSubAgentManager()
   
   try {
     // Load configuration first (await is needed)
