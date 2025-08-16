@@ -33,6 +33,8 @@
 
 📈 **Advanced Visualizations** - Sunburst charts, correlation matrices, growth velocity tracking
 
+🧬 **Correlation Discovery Interface** - Statistical significance testing with diverging heatmaps, temporal stability analysis, and hierarchical clustering
+
 🗂️ **File-System Integration** - Two-way sync with human-readable markdown files
 
 📱 **Apple Settings-Style Interface** - Professional, intuitive design with advanced storage management
