@@ -86,12 +86,12 @@ export class CacheManager {
     this.updateResponseCacheConfig()
     
     // Initialize analytics
-    if (this.config.global.analyticsEnabled) {
+    if (this.config.global?.analyticsEnabled) {
       this.initializeAnalytics()
     }
     
     // Schedule exports if configured
-    if (this.config.global.exportSchedule && this.config.global.exportSchedule !== 'never') {
+    if (this.config.global?.exportSchedule && this.config.global.exportSchedule !== 'never') {
       this.scheduleExports()
     }
   }
@@ -133,33 +133,43 @@ export class CacheManager {
       }
     }
 
-    return {
+    const merged = {
       ...defaultConfig,
       ...userConfig,
       providers: {
-        anthropic: { ...defaultConfig.providers.anthropic, ...userConfig?.providers?.anthropic },
-        bedrock: { ...defaultConfig.providers.bedrock, ...userConfig?.providers?.bedrock }
+        anthropic: { ...defaultConfig.providers!.anthropic, ...userConfig?.providers?.anthropic },
+        bedrock: { ...defaultConfig.providers!.bedrock, ...userConfig?.providers?.bedrock }
       },
-      global: { ...defaultConfig.global, ...userConfig?.global }
+      global: { ...defaultConfig.global!, ...userConfig?.global }
     }
+
+    return merged as CacheManagerConfig
   }
 
   /**
    * Update response cache configuration based on current provider and settings
    */
   private updateResponseCacheConfig(): void {
+    const anthropicConfig = this.config.providers?.anthropic
+    const bedrockConfig = this.config.providers?.bedrock
+    const globalConfig = this.config.global
+    
+    if (!anthropicConfig || !bedrockConfig || !globalConfig) {
+      return
+    }
+
     // Combine provider configs for unified cache
     const combinedConfig: Partial<CacheConfig> = {
       enabled: this.config.enabled,
-      maxEntries: this.config.providers.anthropic.maxEntries + this.config.providers.bedrock.maxEntries,
-      defaultTtl: Math.max(this.config.providers.anthropic.defaultTtl, this.config.providers.bedrock.defaultTtl),
-      maxMemory: this.config.global.maxTotalMemory,
-      compressionEnabled: this.config.providers.anthropic.compressionEnabled,
-      persistToDisk: this.config.providers.anthropic.persistToDisk,
-      cleanupInterval: Math.min(this.config.providers.anthropic.cleanupInterval, this.config.providers.bedrock.cleanupInterval),
+      maxEntries: (anthropicConfig.maxEntries || 500) + (bedrockConfig.maxEntries || 500),
+      defaultTtl: Math.max(anthropicConfig.defaultTtl || 2 * 60 * 60 * 1000, bedrockConfig.defaultTtl || 4 * 60 * 60 * 1000),
+      maxMemory: globalConfig.maxTotalMemory || 100 * 1024 * 1024,
+      compressionEnabled: anthropicConfig.compressionEnabled,
+      persistToDisk: anthropicConfig.persistToDisk,
+      cleanupInterval: Math.min(anthropicConfig.cleanupInterval || 10 * 60 * 1000, bedrockConfig.cleanupInterval || 15 * 60 * 1000),
       providerSpecificTtl: {
-        anthropic: this.config.providers.anthropic.defaultTtl,
-        bedrock: this.config.providers.bedrock.defaultTtl
+        anthropic: anthropicConfig.defaultTtl || 2 * 60 * 60 * 1000,
+        bedrock: bedrockConfig.defaultTtl || 4 * 60 * 60 * 1000
       }
     }
 
@@ -274,29 +284,32 @@ export class CacheManager {
    */
   private checkWarningThresholds(stats: CacheStats): void {
     const now = Date.now()
-    const memoryUsagePercent = (stats.memoryUsage / this.config.global.maxTotalMemory) * 100
+    const maxMemory = this.config.global?.maxTotalMemory || 100 * 1024 * 1024
+    const memoryUsagePercent = (stats.memoryUsage / maxMemory) * 100
+    const memoryThreshold = this.config.global?.warningThresholds?.memoryUsage || 90
+    const hitRateThreshold = this.config.global?.warningThresholds?.hitRate || 30
 
     // Memory usage warning
-    if (memoryUsagePercent > this.config.global.warningThresholds.memoryUsage) {
+    if (memoryUsagePercent > memoryThreshold) {
       this.addWarning({
         type: 'memory',
         severity: memoryUsagePercent > 95 ? 'error' : 'warning',
         message: `High memory usage: ${memoryUsagePercent.toFixed(1)}%`,
         timestamp: now,
         value: memoryUsagePercent,
-        threshold: this.config.global.warningThresholds.memoryUsage
+        threshold: memoryThreshold
       })
     }
 
     // Hit rate warning
-    if (stats.hitRate < this.config.global.warningThresholds.hitRate / 100) {
+    if (stats.hitRate < hitRateThreshold / 100) {
       this.addWarning({
         type: 'hit_rate',
         severity: stats.hitRate < 0.1 ? 'error' : 'warning',
         message: `Low cache hit rate: ${(stats.hitRate * 100).toFixed(1)}%`,
         timestamp: now,
         value: stats.hitRate * 100,
-        threshold: this.config.global.warningThresholds.hitRate
+        threshold: hitRateThreshold
       })
     }
   }
@@ -326,7 +339,8 @@ export class CacheManager {
    * Schedule automatic exports
    */
   private scheduleExports(): void {
-    const interval = this.config.global.exportSchedule === 'daily' 
+    const exportSchedule = this.config.global?.exportSchedule || 'weekly'
+    const interval = exportSchedule === 'daily' 
       ? 24 * 60 * 60 * 1000  // 24 hours
       : 7 * 24 * 60 * 60 * 1000  // 7 days
 
@@ -339,14 +353,15 @@ export class CacheManager {
    * Get cached response
    */
   async get(request: ModelRequest, provider: ProviderType): Promise<ModelResponse | null> {
-    if (!this.config.enabled || !this.config.providers[provider].enabled) {
+    const providerConfig = this.config.providers?.[provider]
+    if (!this.config.enabled || !providerConfig?.enabled) {
       return null
     }
 
     const result = this.responseCache.get(request, provider)
     
     // Track analytics
-    if (this.config.global.analyticsEnabled) {
+    if (this.config.global?.analyticsEnabled) {
       if (result) {
         this.analytics.totalCacheHits = (this.analytics.totalCacheHits || 0) + 1
       } else {
@@ -361,7 +376,8 @@ export class CacheManager {
    * Store response in cache
    */
   async set(request: ModelRequest, response: ModelResponse, provider: ProviderType): Promise<void> {
-    if (!this.config.enabled || !this.config.providers[provider].enabled) {
+    const providerConfig = this.config.providers?.[provider]
+    if (!this.config.enabled || !providerConfig?.enabled) {
       return
     }
 
@@ -372,7 +388,8 @@ export class CacheManager {
    * Check if request is cached
    */
   has(request: ModelRequest, provider: ProviderType): boolean {
-    if (!this.config.enabled || !this.config.providers[provider].enabled) {
+    const providerConfig = this.config.providers?.[provider]
+    if (!this.config.enabled || !providerConfig?.enabled) {
       return false
     }
 
@@ -443,7 +460,7 @@ export class CacheManager {
         this.analyticsTimer = undefined
       }
       
-      if (this.config.global.analyticsEnabled) {
+      if (this.config.global?.analyticsEnabled) {
         this.initializeAnalytics()
       }
     }
@@ -455,7 +472,8 @@ export class CacheManager {
         this.exportTimer = undefined
       }
       
-      if (this.config.global.exportSchedule !== 'never') {
+      const exportSchedule = this.config.global?.exportSchedule
+      if (exportSchedule && exportSchedule !== 'never') {
         this.scheduleExports()
       }
     }
@@ -488,12 +506,13 @@ export class CacheManager {
     }
 
     // Memory optimization
-    if (stats.memoryUsage > this.config.global.maxTotalMemory * 0.8) {
+    const maxMemory = this.config.global?.maxTotalMemory || 100 * 1024 * 1024
+    if (stats.memoryUsage > maxMemory * 0.8) {
       recommendations.push({
         type: 'memory' as const,
         priority: 'medium' as const,
         title: 'Optimize Memory Usage',
-        description: `Memory usage is ${((stats.memoryUsage / this.config.global.maxTotalMemory) * 100).toFixed(1)}%`,
+        description: `Memory usage is ${((stats.memoryUsage / maxMemory) * 100).toFixed(1)}%`,
         implementation: 'Enable compression or reduce maxEntries',
         estimatedImpact: '30-40% reduction in memory usage'
       })

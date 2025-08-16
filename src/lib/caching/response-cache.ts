@@ -89,7 +89,7 @@ export class ResponseCache {
     }
 
     // Start cleanup timer
-    if (this.config.enabled && this.config.cleanupInterval > 0) {
+    if (this.config.enabled && this.config.cleanupInterval && this.config.cleanupInterval > 0) {
       this.startCleanupTimer()
     }
 
@@ -130,7 +130,7 @@ export class ResponseCache {
    */
   private getTtl(provider: ProviderType): number {
     const providerTtl = this.config.providerSpecificTtl?.[provider]
-    return providerTtl || this.config.defaultTtl
+    return providerTtl || this.config.defaultTtl || 60 * 60 * 1000
   }
 
   /**
@@ -171,9 +171,11 @@ export class ResponseCache {
       .sort((a, b) => a[1].lastAccessed - b[1].lastAccessed)
 
     // Remove entries until we're under memory limit or entry limit
+    const maxMemory = this.config.maxMemory || 100 * 1024 * 1024
+    const maxEntries = this.config.maxEntries || 1000
     while (
-      (this.stats.memoryUsage > this.config.maxMemory || 
-       this.cache.size > this.config.maxEntries) &&
+      (this.stats.memoryUsage > maxMemory || 
+       this.cache.size > maxEntries) &&
       sortedEntries.length > 0
     ) {
       const [key, entry] = sortedEntries.shift()!
@@ -363,8 +365,9 @@ export class ResponseCache {
     this.stats.cacheSize = this.cache.size
 
     // Trigger cleanup if needed
-    if (this.stats.memoryUsage > this.config.maxMemory || 
-        this.cache.size > this.config.maxEntries) {
+    const maxMemory = this.config.maxMemory || 100 * 1024 * 1024
+    const maxEntries = this.config.maxEntries || 1000
+    if (this.stats.memoryUsage > maxMemory || this.cache.size > maxEntries) {
       this.evictLRUEntries()
     }
   }
