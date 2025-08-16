@@ -15,10 +15,13 @@ import {
   ModelProviderAuthError,
   ModelProviderRateLimitError
 } from './provider-interface'
+import { AnthropicOptimizer, AnthropicOptimizationConfig } from '../optimizations/anthropic-optimizer'
 
 export class AnthropicProvider extends ModelProvider {
   private client!: Anthropic
   private isInitialized: boolean = false
+  private optimizer?: AnthropicOptimizer
+  private optimizationConfig?: AnthropicOptimizationConfig
 
   constructor(config: ModelProviderConfig, modelMapping?: any) {
     super(config, modelMapping)
@@ -52,7 +55,16 @@ export class AnthropicProvider extends ModelProvider {
       } : undefined
     })
 
+    // Initialize optimizer if configuration is provided
+    this.initializeOptimizations()
+
     this.isInitialized = true
+  }
+
+  private initializeOptimizations(): void {
+    if (this.optimizationConfig) {
+      this.optimizer = new AnthropicOptimizer(this, this.optimizationConfig)
+    }
   }
 
   async sendRequest(request: ModelRequest): Promise<ModelResponse> {
@@ -60,37 +72,55 @@ export class AnthropicProvider extends ModelProvider {
       throw new ModelProviderError('Anthropic provider not initialized', 'anthropic')
     }
 
-    try {
-      // Map model name if needed
-      const modelId = this.mapModelId(request.model)
+    // Apply optimizations if enabled
+    let optimizedRequest = request
+    let optimizationsApplied: string[] = []
+    let cacheHit = false
 
-      // Convert messages to Anthropic format
-      const messages = request.messages
+    if (this.optimizer) {
+      const optimizationResult = await this.optimizer.optimizeRequest(request)
+      optimizedRequest = optimizationResult.optimizedRequest
+      optimizationsApplied = optimizationResult.optimizationsApplied
+      cacheHit = optimizationResult.cacheHit
+
+      // If we got a cache hit, the optimizer has already returned the response
+      if (cacheHit) {
+        // The optimizer would have already returned a cached response
+        // We'll need to modify this logic based on optimizer implementation
+      }
+    }
+
+    try {
+      // Map model name if needed (use optimized request)
+      const modelId = this.mapModelId(optimizedRequest.model)
+
+      // Convert messages to Anthropic format (use optimized request)
+      const messages = optimizedRequest.messages
         .filter(msg => msg.role !== 'system')
         .map(msg => ({
           role: msg.role as 'user' | 'assistant',
           content: msg.content
         }))
 
-      // Extract system message if present
-      const systemMessage = request.messages.find(msg => msg.role === 'system')
-      const system = request.system || systemMessage?.content
+      // Extract system message if present (use optimized request)
+      const systemMessage = optimizedRequest.messages.find(msg => msg.role === 'system')
+      const system = optimizedRequest.system || systemMessage?.content
 
-      // Make the API call
+      // Make the API call (use optimized request parameters)
       const response = await this.client.messages.create({
         model: modelId,
         messages,
-        max_tokens: request.maxTokens || 4000,
-        temperature: request.temperature,
-        top_p: request.topP,
-        top_k: request.topK,
-        stop_sequences: request.stopSequences,
+        max_tokens: optimizedRequest.maxTokens || 4000,
+        temperature: optimizedRequest.temperature,
+        top_p: optimizedRequest.topP,
+        top_k: optimizedRequest.topK,
+        stop_sequences: optimizedRequest.stopSequences,
         system,
-        metadata: request.metadata
+        metadata: optimizedRequest.metadata
       })
 
       // Convert response to common format
-      return {
+      const modelResponse: ModelResponse = {
         content: response.content[0].type === 'text' 
           ? response.content[0].text 
           : '',
@@ -102,6 +132,13 @@ export class AnthropicProvider extends ModelProvider {
         model: response.model,
         stopReason: response.stop_reason || undefined
       }
+
+      // Post-process response with optimizer if enabled
+      if (this.optimizer) {
+        return await this.optimizer.postProcessResponse(optimizedRequest, modelResponse, optimizationsApplied)
+      }
+
+      return modelResponse
     } catch (error: any) {
       // Handle specific error types
       if (error.status === 401) {
@@ -328,5 +365,72 @@ export class AnthropicProvider extends ModelProvider {
    */
   enablePromptCaching(): void {
     this.enableBetaFeatures(['prompt-caching-2024-07-31'])
+  }
+
+  /**
+   * Configure optimization settings
+   */
+  setOptimizationConfig(config: AnthropicOptimizationConfig): void {
+    this.optimizationConfig = config
+    if (this.isInitialized) {
+      this.initializeOptimizations()
+    }
+  }
+
+  /**
+   * Enable optimizations with default configuration
+   */
+  enableOptimizations(): void {
+    const defaultConfig: AnthropicOptimizationConfig = {
+      promptCaching: { enabled: true },
+      betaFeatures: { enabled: true, features: ['prompt-caching-2024-07-31'], autoEnable: true },
+      streaming: { enabled: true, adaptiveBuffer: true },
+      requestOptimization: { enabled: true },
+      modelOptimization: { enabled: true, autoSelectModel: true, costOptimizedSelection: true }
+    }
+    this.setOptimizationConfig(defaultConfig)
+  }
+
+  /**
+   * Disable optimizations
+   */
+  disableOptimizations(): void {
+    this.optimizer = undefined
+    this.optimizationConfig = undefined
+  }
+
+  /**
+   * Get optimization metrics
+   */
+  getOptimizationMetrics() {
+    return this.optimizer?.getMetrics()
+  }
+
+  /**
+   * Get cache statistics
+   */
+  getCacheStats() {
+    return this.optimizer?.getCacheStats()
+  }
+
+  /**
+   * Clear optimization cache
+   */
+  clearOptimizationCache(): void {
+    this.optimizer?.clearCache()
+  }
+
+  /**
+   * Get optimization recommendations
+   */
+  getOptimizationRecommendations() {
+    return this.optimizer?.getOptimizationRecommendations()
+  }
+
+  /**
+   * Check if optimizations are enabled
+   */
+  isOptimizationEnabled(): boolean {
+    return !!this.optimizer
   }
 }

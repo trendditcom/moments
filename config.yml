@@ -107,11 +107,94 @@ model_provider:
   anthropic:
     api_key_env: ANTHROPIC_API_KEY
     base_url: https://api.anthropic.com
+    optimizations:
+      prompt_caching:
+        enabled: true
+        cache_key_prefix: "moments_"
+        min_prompt_length: 100
+        max_cache_size: 1000
+        ttl: 3600
+      beta_features:
+        enabled: true
+        features:
+          - "prompt-caching-2024-07-31"
+        auto_enable: true
+      streaming:
+        enabled: true
+        buffer_size: 1024
+        adaptive_buffer: true
+        preload_threshold: 0.8
+      request_optimization:
+        enabled: true
+        batch_requests: false
+        connection_pooling: true
+        keep_alive: true
+        retry_with_backoff: true
+      model_optimization:
+        enabled: true
+        auto_select_model: true
+        fallback_models:
+          claude-opus-4-1-20250805: ["claude-sonnet-4-20250514", "claude-3-5-haiku-latest"]
+          claude-sonnet-4-20250514: ["claude-3-5-haiku-latest"]
+        cost_optimized_selection: true
   bedrock:
     aws_region: us-east-1
     aws_profile: default
     use_bedrock_api_key: false
     inference_profile: null
+    optimizations:
+      cross_region_inference:
+        enabled: true
+        primary_region: us-east-1
+        fallback_regions: 
+          - us-west-2
+          - eu-west-1
+        inference_profiles:
+          us-east-1: "arn:aws:bedrock:us-east-1:123456789012:inference-profile/us-east-1"
+          us-west-2: "arn:aws:bedrock:us-west-2:123456789012:inference-profile/us-west-2"
+        auto_fallback: true
+        latency_threshold: 2000
+      batch_inference:
+        enabled: true
+        batch_size: 20
+        max_wait_time: 5000
+        cost_threshold: 0.10
+        compatible_operations:
+          - classification
+          - analysis
+          - generation
+      guardrails:
+        enabled: false
+        guardrail_id: null
+        guardrail_version: DRAFT
+        trace: false
+        block_on_violation: true
+        custom_filters: []
+      model_inference:
+        enabled: true
+        adaptive_model_selection: true
+        region_specific_models:
+          us-east-1:
+            - us.anthropic.claude-3-7-sonnet-20250219-v1:0
+            - us.anthropic.claude-3-5-haiku-20241022-v1:0
+        performance_monitoring: true
+        auto_scaling: false
+      cost_optimization:
+        enabled: true
+        prefer_cheaper_models: true
+        spot_instances_usage: false
+        reserved_capacity: false
+        cost_budget_limits:
+          daily: 100.0
+          monthly: 3000.0
+      enterprise:
+        enabled: false
+        vpc_endpoints: false
+        private_subnets: []
+        kms_key_id: null
+        iam_role_arn: null
+        logging_enabled: true
+        compliance_mode: moderate
   model_mapping:
     sonnet:
       anthropic: claude-sonnet-4-20250514

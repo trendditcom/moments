@@ -6,6 +6,8 @@
 import { ModelProvider, ModelProviderConfig, ModelMapping } from './provider-interface'
 import { AnthropicProvider } from './anthropic-provider'
 import { BedrockProvider } from './bedrock-provider'
+import { AnthropicOptimizationConfig } from '../optimizations/anthropic-optimizer'
+import { BedrockOptimizationConfig } from '../optimizations/bedrock-optimizer'
 
 export interface ProviderFactoryConfig {
   type: 'anthropic' | 'bedrock'
@@ -17,6 +19,7 @@ export interface ProviderFactoryConfig {
     baseUrl?: string
     timeout?: number
     maxRetries?: number
+    optimizations?: AnthropicOptimizationConfig
   }
   bedrock?: {
     region?: string
@@ -26,6 +29,7 @@ export interface ProviderFactoryConfig {
     inferenceProfile?: string
     timeout?: number
     maxRetries?: number
+    optimizations?: BedrockOptimizationConfig
   }
 }
 
@@ -41,21 +45,36 @@ export class ModelProviderFactory {
   static createProvider(
     type: 'anthropic' | 'bedrock',
     config?: Partial<ModelProviderConfig>,
-    modelMapping?: ModelMapping
+    modelMapping?: ModelMapping,
+    optimizations?: AnthropicOptimizationConfig | BedrockOptimizationConfig
   ): ModelProvider {
     const providerConfig: ModelProviderConfig = {
       type,
       ...config
     }
 
+    let provider: ModelProvider
+
     switch (type) {
       case 'anthropic':
-        return new AnthropicProvider(providerConfig, modelMapping)
+        provider = new AnthropicProvider(providerConfig, modelMapping)
+        // Set optimization configuration if provided
+        if (optimizations) {
+          (provider as AnthropicProvider).setOptimizationConfig(optimizations as AnthropicOptimizationConfig)
+        }
+        break
       case 'bedrock':
-        return new BedrockProvider(providerConfig, modelMapping)
+        provider = new BedrockProvider(providerConfig, modelMapping)
+        // Set optimization configuration if provided
+        if (optimizations) {
+          (provider as BedrockProvider).setOptimizationConfig(optimizations as BedrockOptimizationConfig)
+        }
+        break
       default:
         throw new Error(`Unknown provider type: ${type}`)
     }
+
+    return provider
   }
 
   /**
@@ -72,7 +91,8 @@ export class ModelProviderFactory {
     this.primaryProvider = this.createProvider(
       config.type,
       primaryConfig,
-      config.modelMapping
+      config.modelMapping,
+      config[config.type]?.optimizations
     )
 
     // Create fallback provider if configured
@@ -84,7 +104,8 @@ export class ModelProviderFactory {
       this.fallbackProvider = this.createProvider(
         config.fallbackProvider,
         fallbackConfig,
-        config.modelMapping
+        config.modelMapping,
+        config[config.fallbackProvider]?.optimizations
       )
     }
 
@@ -257,5 +278,105 @@ export class ModelProviderFactory {
     }
     
     return results
+  }
+
+  /**
+   * Enable optimizations for a specific provider
+   */
+  static enableOptimizations(
+    type: 'anthropic' | 'bedrock',
+    config?: AnthropicOptimizationConfig | BedrockOptimizationConfig
+  ): void {
+    const provider = this.instances.get(type)
+    if (provider) {
+      if (type === 'anthropic') {
+        (provider as AnthropicProvider).setOptimizationConfig(
+          config as AnthropicOptimizationConfig || {} as AnthropicOptimizationConfig
+        )
+      } else if (type === 'bedrock') {
+        (provider as BedrockProvider).setOptimizationConfig(
+          config as BedrockOptimizationConfig || {} as BedrockOptimizationConfig
+        )
+      }
+    }
+  }
+
+  /**
+   * Enable optimizations for all providers
+   */
+  static enableAllOptimizations(): void {
+    for (const [type, provider] of this.instances.entries()) {
+      if (type === 'anthropic') {
+        (provider as AnthropicProvider).enableOptimizations()
+      } else if (type === 'bedrock') {
+        (provider as BedrockProvider).enableOptimizations()
+      }
+    }
+  }
+
+  /**
+   * Disable optimizations for a specific provider
+   */
+  static disableOptimizations(type: 'anthropic' | 'bedrock'): void {
+    const provider = this.instances.get(type)
+    if (provider) {
+      if (type === 'anthropic') {
+        (provider as AnthropicProvider).disableOptimizations()
+      } else if (type === 'bedrock') {
+        (provider as BedrockProvider).disableOptimizations()
+      }
+    }
+  }
+
+  /**
+   * Get optimization metrics for all providers
+   */
+  static getOptimizationMetrics(): Map<string, any> {
+    const metrics = new Map()
+    
+    for (const [type, provider] of this.instances.entries()) {
+      try {
+        let providerMetrics: any = null
+        
+        if (type === 'anthropic') {
+          providerMetrics = (provider as AnthropicProvider).getOptimizationMetrics()
+        } else if (type === 'bedrock') {
+          providerMetrics = (provider as BedrockProvider).getOptimizationMetrics()
+        }
+        
+        if (providerMetrics) {
+          metrics.set(type, providerMetrics)
+        }
+      } catch (error: any) {
+        metrics.set(type, { error: error.message })
+      }
+    }
+    
+    return metrics
+  }
+
+  /**
+   * Get optimization recommendations for all providers
+   */
+  static getOptimizationRecommendations(): Map<string, any[]> {
+    const recommendations = new Map()
+    
+    for (const [type, provider] of this.instances.entries()) {
+      try {
+        let providerRecommendations: any[] = []
+        
+        if (type === 'anthropic') {
+          providerRecommendations = (provider as AnthropicProvider).getOptimizationRecommendations() || []
+        } else if (type === 'bedrock') {
+          providerRecommendations = (provider as BedrockProvider).getOptimizationRecommendations() || []
+        }
+        
+        recommendations.set(type, providerRecommendations)
+      } catch (error: any) {
+        recommendations.set(type, [{ error: error.message }])
+      }
+    }
+    
+    return recommendations
   }
 }

@@ -77,9 +77,93 @@ export interface PersistenceConfig {
   }
 }
 
+export interface AnthropicOptimizationConfig {
+  prompt_caching?: {
+    enabled: boolean
+    cache_key_prefix?: string
+    min_prompt_length?: number
+    max_cache_size?: number
+    ttl?: number
+  }
+  beta_features?: {
+    enabled: boolean
+    features: string[]
+    auto_enable?: boolean
+  }
+  streaming?: {
+    enabled: boolean
+    buffer_size?: number
+    adaptive_buffer?: boolean
+    preload_threshold?: number
+  }
+  request_optimization?: {
+    enabled: boolean
+    batch_requests?: boolean
+    connection_pooling?: boolean
+    keep_alive?: boolean
+    retry_with_backoff?: boolean
+  }
+  model_optimization?: {
+    enabled: boolean
+    auto_select_model?: boolean
+    fallback_models?: Record<string, string[]>
+    cost_optimized_selection?: boolean
+  }
+}
+
+export interface BedrockOptimizationConfig {
+  cross_region_inference?: {
+    enabled: boolean
+    primary_region: string
+    fallback_regions: string[]
+    inference_profiles: Record<string, string>
+    auto_fallback: boolean
+    latency_threshold: number
+  }
+  batch_inference?: {
+    enabled: boolean
+    batch_size: number
+    max_wait_time: number
+    cost_threshold: number
+    compatible_operations: string[]
+  }
+  guardrails?: {
+    enabled: boolean
+    guardrail_id?: string
+    guardrail_version?: string
+    trace: boolean
+    block_on_violation: boolean
+    custom_filters: string[]
+  }
+  model_inference?: {
+    enabled: boolean
+    adaptive_model_selection: boolean
+    region_specific_models: Record<string, string[]>
+    performance_monitoring: boolean
+    auto_scaling: boolean
+  }
+  cost_optimization?: {
+    enabled: boolean
+    prefer_cheaper_models: boolean
+    spot_instances_usage: boolean
+    reserved_capacity: boolean
+    cost_budget_limits: Record<string, number>
+  }
+  enterprise?: {
+    enabled: boolean
+    vpc_endpoints: boolean
+    private_subnets: string[]
+    kms_key_id?: string
+    iam_role_arn?: string
+    logging_enabled: boolean
+    compliance_mode: 'strict' | 'moderate' | 'relaxed'
+  }
+}
+
 export interface AnthropicProviderConfig {
   api_key_env: string
   base_url: string
+  optimizations?: AnthropicOptimizationConfig
 }
 
 export interface BedrockProviderConfig {
@@ -87,6 +171,7 @@ export interface BedrockProviderConfig {
   aws_profile?: string
   use_bedrock_api_key: boolean
   inference_profile?: string | null
+  optimizations?: BedrockOptimizationConfig
 }
 
 export interface ModelMapping {

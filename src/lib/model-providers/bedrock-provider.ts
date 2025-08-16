@@ -22,11 +22,14 @@ import {
   ModelProviderRateLimitError
 } from './provider-interface'
 import { BedrockAuth, BedrockAuthConfig } from '../auth/bedrock-auth'
+import { BedrockOptimizer, BedrockOptimizationConfig } from '../optimizations/bedrock-optimizer'
 
 export class BedrockProvider extends ModelProvider {
   private client!: BedrockRuntimeClient
   private bedrockAuth!: BedrockAuth
   private isInitialized: boolean = false
+  private optimizer?: BedrockOptimizer
+  private optimizationConfig?: BedrockOptimizationConfig
 
   constructor(config: ModelProviderConfig, modelMapping?: any) {
     super(config, modelMapping)
@@ -70,6 +73,9 @@ export class BedrockProvider extends ModelProvider {
         }
       })
 
+      // Initialize optimizer if configuration is provided
+      this.initializeOptimizations()
+
       this.isInitialized = true
     } catch (error: any) {
       throw new ModelProviderAuthError(
@@ -79,17 +85,53 @@ export class BedrockProvider extends ModelProvider {
     }
   }
 
+  private initializeOptimizations(): void {
+    if (this.optimizationConfig) {
+      this.optimizer = new BedrockOptimizer(this, this.optimizationConfig)
+    }
+  }
+
   async sendRequest(request: ModelRequest): Promise<ModelResponse> {
     if (!this.isInitialized) {
       await this.initializeClient()
     }
 
-    try {
-      // Map model name if needed
-      const modelId = this.mapModelId(request.model)
+    // Apply optimizations if enabled
+    let optimizedRequest = request
+    let optimizationsApplied: string[] = []
+    let inferenceProfile: string | undefined
+    let region: string | undefined
+    let batchId: string | undefined
 
-      // Prepare the request body in Anthropic format for Bedrock
-      const requestBody = this.prepareAnthropicRequestBody(request)
+    if (this.optimizer) {
+      const optimizationResult = await this.optimizer.optimizeRequest(request)
+      optimizedRequest = optimizationResult.optimizedRequest
+      optimizationsApplied = optimizationResult.optimizationsApplied
+      inferenceProfile = optimizationResult.inferenceProfile
+      region = optimizationResult.region
+      batchId = optimizationResult.batchId
+
+      // If request is batched, handle it separately
+      if (batchId) {
+        // Add to batch and return - actual processing will happen later
+        // For now, we'll continue with regular processing
+      }
+
+      // Update provider configuration if region or inference profile is specified
+      if (region && region !== this.config.region) {
+        await this.setRegion(region)
+      }
+      if (inferenceProfile) {
+        this.useCrossRegionInference(inferenceProfile)
+      }
+    }
+
+    try {
+      // Map model name if needed (use optimized request)
+      const modelId = this.mapModelId(optimizedRequest.model)
+
+      // Prepare the request body in Anthropic format for Bedrock (use optimized request)
+      const requestBody = this.prepareAnthropicRequestBody(optimizedRequest)
 
       // Create the command
       const command = new InvokeModelCommand({
@@ -106,7 +148,15 @@ export class BedrockProvider extends ModelProvider {
       const responseBody = JSON.parse(new TextDecoder().decode(response.body))
 
       // Convert to common format
-      return this.parseAnthropicResponse(responseBody, modelId)
+      const modelResponse = this.parseAnthropicResponse(responseBody, modelId)
+
+      // Add optimization metadata to response
+      if (this.optimizer && optimizationsApplied.length > 0) {
+        // Could add optimization metadata to response if needed
+        // For now, just track that optimizations were applied
+      }
+
+      return modelResponse
     } catch (error: any) {
       // Handle specific error types
       if (error.name === 'AccessDeniedException') {
@@ -464,6 +514,191 @@ export class BedrockProvider extends ModelProvider {
       // Force re-initialization with new config
       this.isInitialized = false
       await this.initializeClient()
+    }
+  }
+
+  /**
+   * Configure optimization settings
+   */
+  setOptimizationConfig(config: BedrockOptimizationConfig): void {
+    this.optimizationConfig = config
+    if (this.isInitialized) {
+      this.initializeOptimizations()
+    }
+  }
+
+  /**
+   * Enable optimizations with default configuration
+   */
+  enableOptimizations(): void {
+    const defaultConfig: BedrockOptimizationConfig = {
+      crossRegionInference: { 
+        enabled: true, 
+        primaryRegion: 'us-east-1',
+        fallbackRegions: ['us-west-2', 'eu-west-1'],
+        inferenceProfiles: {},
+        autoFallback: true,
+        latencyThreshold: 2000
+      },
+      batchInference: { 
+        enabled: true, 
+        batchSize: 20,
+        maxWaitTime: 5000,
+        costThreshold: 0.10,
+        compatibleOperations: ['classification', 'analysis', 'generation']
+      },
+      guardrails: { 
+        enabled: false,
+        trace: false,
+        blockOnViolation: true,
+        customFilters: []
+      },
+      modelInference: { 
+        enabled: true, 
+        adaptiveModelSelection: true,
+        regionSpecificModels: {},
+        performanceMonitoring: true,
+        autoScaling: false
+      },
+      costOptimization: { 
+        enabled: true, 
+        preferCheaperModels: true,
+        spotInstancesUsage: false,
+        reservedCapacity: false,
+        costBudgetLimits: {}
+      },
+      enterprise: { 
+        enabled: false,
+        vpcEndpoints: false,
+        privateSubnets: [],
+        loggingEnabled: true,
+        complianceMode: 'moderate'
+      }
+    }
+    this.setOptimizationConfig(defaultConfig)
+  }
+
+  /**
+   * Enable enterprise optimizations
+   */
+  enableEnterpriseOptimizations(): void {
+    const enterpriseConfig: BedrockOptimizationConfig = {
+      crossRegionInference: { 
+        enabled: true, 
+        primaryRegion: 'us-east-1',
+        fallbackRegions: ['us-west-2', 'eu-west-1'],
+        inferenceProfiles: {},
+        autoFallback: true,
+        latencyThreshold: 1500
+      },
+      batchInference: { 
+        enabled: true, 
+        batchSize: 50,
+        maxWaitTime: 3000,
+        costThreshold: 0.05,
+        compatibleOperations: ['classification', 'analysis', 'generation', 'correlation']
+      },
+      guardrails: { 
+        enabled: true, 
+        blockOnViolation: true, 
+        trace: true,
+        customFilters: []
+      },
+      modelInference: { 
+        enabled: true, 
+        adaptiveModelSelection: true, 
+        performanceMonitoring: true,
+        regionSpecificModels: {},
+        autoScaling: true
+      },
+      costOptimization: { 
+        enabled: true, 
+        reservedCapacity: true,
+        preferCheaperModels: false,
+        spotInstancesUsage: false,
+        costBudgetLimits: {}
+      },
+      enterprise: { 
+        enabled: true, 
+        vpcEndpoints: true, 
+        loggingEnabled: true, 
+        complianceMode: 'strict',
+        privateSubnets: []
+      }
+    }
+    this.setOptimizationConfig(enterpriseConfig)
+  }
+
+  /**
+   * Disable optimizations
+   */
+  disableOptimizations(): void {
+    this.optimizer = undefined
+    this.optimizationConfig = undefined
+  }
+
+  /**
+   * Get optimization metrics
+   */
+  getOptimizationMetrics() {
+    return this.optimizer?.getMetrics()
+  }
+
+  /**
+   * Get inference profile statistics
+   */
+  getInferenceProfileStats() {
+    return this.optimizer?.getInferenceProfileStats()
+  }
+
+  /**
+   * Get optimization recommendations
+   */
+  getOptimizationRecommendations() {
+    return this.optimizer?.getOptimizationRecommendations()
+  }
+
+  /**
+   * Setup cross-region inference
+   */
+  async setupCrossRegionInference(): Promise<void> {
+    if (this.optimizer) {
+      await this.optimizer.setupCrossRegionInference()
+    }
+  }
+
+  /**
+   * Configure GuardRails
+   */
+  async configureGuardRails(guardrailId: string, version?: string): Promise<void> {
+    if (this.optimizer) {
+      await this.optimizer.configureGuardRails(guardrailId, version)
+    }
+  }
+
+  /**
+   * Process batch requests
+   */
+  async processBatchRequests(batchId: string): Promise<ModelResponse[]> {
+    if (this.optimizer) {
+      return await this.optimizer.processBatchRequests(batchId)
+    }
+    throw new ModelProviderError('Optimizer not enabled', 'bedrock')
+  }
+
+  /**
+   * Check if optimizations are enabled
+   */
+  isOptimizationEnabled(): boolean {
+    return !!this.optimizer
+  }
+
+  /**
+   * Update optimization configuration
+   */
+  updateOptimizationConfig(config: Partial<BedrockOptimizationConfig>): void {
+    if (this.optimizer) {
+      this.optimizer.updateConfig(config)
     }
   }
 }
