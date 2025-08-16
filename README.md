@@ -589,6 +589,286 @@ console.log('New correlations found:', enhancedAnalysis.results.get('correlation
 - **ProviderAdapter**: Standardized provider interface with automatic failover and validation
 - **Integration Layer**: Seamless compatibility with existing Moments architecture and components
 
+### Cost Tracking and Optimization (Latest Feature)
+
+The Moments application now includes **comprehensive Cost Tracking and Optimization** capabilities that provide real-time monitoring of AI usage costs across both Anthropic and Bedrock providers, intelligent optimization recommendations, and sophisticated budget management for enterprise-grade cost control.
+
+#### Testing Cost Tracking and Optimization
+
+**1. Accessing the Usage Dashboard**
+- Navigate to **Settings** in the main application
+- Select **"Usage"** from the settings sidebar
+- The dashboard displays comprehensive cost tracking data
+
+**2. Real-Time Usage Monitoring**
+```typescript
+// Test global usage tracker access
+import { getGlobalUsageTracker, trackUsage } from '@/lib/cost-tracking/usage-tracker'
+
+const tracker = getGlobalUsageTracker()
+
+// Manual usage tracking (automatic in provider integration)
+const usageId = trackUsage(
+  'anthropic',                    // Provider type
+  'claude-3-5-sonnet-20241022',  // Model ID
+  'analysis',                     // Operation type
+  {
+    inputTokens: 1500,
+    outputTokens: 800, 
+    totalTokens: 2300
+  },
+  0.045,                         // Cost in USD
+  1250,                          // Latency in ms
+  true,                          // Success status
+  {
+    agentType: 'content_analyzer',
+    batchSize: 1,
+    contentType: 'text'
+  }
+)
+
+console.log('Usage tracked with ID:', usageId)
+```
+
+**3. Provider Cost Comparison**
+```typescript
+// Test cost calculator for provider comparison
+import { getGlobalCostCalculator } from '@/lib/cost-tracking/cost-calculator'
+
+const calculator = getGlobalCostCalculator()
+
+// Compare costs across providers for same logical model
+const comparison = calculator.compareProviderCosts(
+  'sonnet',     // Logical model name
+  1000,         // Input tokens
+  500           // Output tokens
+)
+
+console.log('Cost comparison results:')
+comparison.forEach(result => {
+  console.log(`${result.provider}: $${result.totalCost.toFixed(4)} (efficiency: ${result.costEfficiencyScore.toFixed(1)}%)`)
+})
+
+// Expected output:
+// anthropic: $0.0105 (efficiency: 100.0%)
+// bedrock: $0.0116 (efficiency: 90.5%)
+```
+
+**4. Budget Management Testing**
+```typescript
+// Set budget limits for different periods
+const tracker = getGlobalUsageTracker()
+
+// Set daily budget to $10
+tracker.setBudgetLimit('daily', 10.00)
+
+// Set weekly budget to $50
+tracker.setBudgetLimit('weekly', 50.00)
+
+// Set monthly budget to $200
+tracker.setBudgetLimit('monthly', 200.00)
+
+// Check current budget status
+const budgetStatus = tracker.getBudgetStatus()
+console.log('Current spend:', budgetStatus.currentSpend)
+console.log('Remaining budget:', budgetStatus.remainingBudget)
+console.log('Active alerts:', budgetStatus.alerts.length)
+
+// Budget alerts trigger at 80% and 100% of limits
+budgetStatus.alerts.forEach(alert => {
+  console.log(`${alert.type}: ${alert.message} (${alert.percentage.toFixed(1)}%)`)
+})
+```
+
+**5. Optimization Recommendations**
+```typescript
+// Get intelligent optimization suggestions
+const suggestions = tracker.getOptimizationSuggestions()
+
+console.log(`Found ${suggestions.length} optimization opportunities:`)
+suggestions.forEach(suggestion => {
+  console.log(`\n${suggestion.priority.toUpperCase()}: ${suggestion.title}`)
+  console.log(`Savings: $${suggestion.potentialSavings.toFixed(2)}`)
+  console.log(`Description: ${suggestion.description}`)
+  console.log(`Implementation: ${suggestion.implementation}`)
+  console.log(`Impact: ${suggestion.impact.costReduction}% cost reduction`)
+})
+
+// Example optimization suggestions:
+// HIGH: Consider using Haiku for simple tasks
+// Savings: $12.50
+// Description: You're using Claude Opus for requests with low token counts...
+// Implementation: Switch to Haiku model for tasks under 1000 tokens
+// Impact: 80% cost reduction
+```
+
+**6. Comprehensive Usage Analytics**
+```typescript
+// Provider usage analysis
+const anthropicUsage = tracker.getProviderUsage('anthropic', {
+  start: new Date('2024-01-01'),
+  end: new Date()
+})
+
+console.log('Anthropic Usage Summary:')
+console.log(`Total requests: ${anthropicUsage.stats.totalRequests}`)
+console.log(`Total cost: $${anthropicUsage.stats.totalCost.toFixed(2)}`)
+console.log(`Average latency: ${anthropicUsage.stats.averageLatency.toFixed(0)}ms`)
+console.log(`Success rate: ${(anthropicUsage.stats.successRate * 100).toFixed(1)}%`)
+
+// Model breakdown analysis
+Object.entries(anthropicUsage.modelBreakdown).forEach(([model, stats]) => {
+  console.log(`${model}: ${stats.totalRequests} requests, $${stats.totalCost.toFixed(2)}`)
+})
+
+// Operation breakdown
+Object.entries(anthropicUsage.operationBreakdown).forEach(([operation, stats]) => {
+  console.log(`${operation}: ${stats.totalRequests} requests, $${stats.totalCost.toFixed(2)}`)
+})
+```
+
+**7. Dashboard Features Evaluation**
+
+**Real-Time Dashboard Controls:**
+- **Time Range Selection**: 24h, 7d, 30d, 90d with automatic data reload
+- **Provider Filtering**: View individual provider stats or combined analysis
+- **Data Export**: JSON/CSV export with comprehensive usage analytics
+
+**Budget Alert System:**
+- **Visual Indicators**: Progress bars showing budget consumption (green/yellow/red)
+- **Alert Badges**: Color-coded alert priority (warning at 80%, danger at 100%)
+- **Actionable Recommendations**: Specific suggestions for each alert type
+
+**Optimization Insights Panel:**
+- **Potential Savings Calculator**: Real-time calculation of monthly savings opportunities
+- **Priority Ranking**: High/medium/low priority suggestions with savings estimates
+- **Implementation Guidance**: Step-by-step instructions for each optimization
+
+**Cost Trend Analysis:**
+- **Trend Indicators**: Cost, usage, and efficiency trends with percentage changes
+- **Forecasting**: Basic linear projections with confidence intervals
+- **Historical Patterns**: Time-series visualization of usage patterns
+
+**8. Advanced Cost Analysis**
+```typescript
+// Generate comprehensive optimization report
+const optimizationReport = calculator.generateOptimizationReport()
+
+console.log('Cost Optimization Report:')
+console.log(`Current costs: Daily $${optimizationReport.currentCosts.daily.toFixed(2)}, Monthly $${optimizationReport.currentCosts.monthly.toFixed(2)}`)
+console.log(`Total potential savings: $${optimizationReport.potentialSavings.totalPotential.toFixed(2)}/month`)
+
+// Breakdown of savings opportunities
+console.log('Savings breakdown:')
+console.log(`Model optimization: $${optimizationReport.potentialSavings.modelOptimization.toFixed(2)}`)
+console.log(`Provider switching: $${optimizationReport.potentialSavings.providerSwitching.toFixed(2)}`)
+console.log(`Batching improvements: $${optimizationReport.potentialSavings.batchingImprovements.toFixed(2)}`)
+console.log(`Caching improvements: $${optimizationReport.potentialSavings.cachingImprovements.toFixed(2)}`)
+
+// Usage trends and forecasting
+console.log(`Cost trend: ${optimizationReport.trends.costTrend > 0 ? '+' : ''}${optimizationReport.trends.costTrend.toFixed(1)}%`)
+console.log(`Usage trend: ${optimizationReport.trends.usageTrend > 0 ? '+' : ''}${optimizationReport.trends.usageTrend.toFixed(1)}%`)
+console.log(`Efficiency trend: ${optimizationReport.trends.efficiencyTrend > 0 ? '+' : ''}${optimizationReport.trends.efficiencyTrend.toFixed(1)}%`)
+```
+
+**9. Budget Projection and Planning**
+```typescript
+// Project budget requirements
+const budgetProjection = calculator.projectBudget(200, 'monthly') // $200 monthly budget
+
+console.log('Budget Projection:')
+console.log(`Current spending: $${budgetProjection.currentPeriod.spent.toFixed(2)}`)
+console.log(`Projected spend: $${budgetProjection.currentPeriod.projectedSpend.toFixed(2)}`)
+console.log(`On track: ${budgetProjection.currentPeriod.onTrack ? 'Yes' : 'No'}`)
+console.log(`Days remaining: ${budgetProjection.currentPeriod.daysRemaining}`)
+
+console.log('Budget recommendations:')
+console.log(`Recommended daily budget: $${budgetProjection.recommendations.dailyBudget.toFixed(2)}`)
+console.log(`Recommended weekly budget: $${budgetProjection.recommendations.weeklyBudget.toFixed(2)}`)
+console.log(`Recommended monthly budget: $${budgetProjection.recommendations.monthlyBudget.toFixed(2)}`)
+
+if (budgetProjection.recommendations.adjustmentNeeded > 0) {
+  console.log(`Budget adjustment needed: +$${budgetProjection.recommendations.adjustmentNeeded.toFixed(2)}`)
+}
+```
+
+**10. Integration with Provider System**
+```typescript
+// Test automatic cost tracking with provider-aware sub-agent manager
+import { createProviderAwareSubAgentManager } from '@/lib/sub-agents-provider-aware'
+
+const manager = await createProviderAwareSubAgentManager()
+
+// Perform analysis (cost tracking happens automatically)
+const testContent = [{
+  id: 'test-content',
+  name: 'Cost Tracking Test',
+  type: 'markdown' as const,
+  content: 'OpenAI releases GPT-5 with breakthrough capabilities',
+  path: '/test/content.md',
+  createdAt: new Date(),
+  updatedAt: new Date()
+}]
+
+const result = await manager.analyzeContent(testContent)
+
+if (result.success) {
+  console.log('Analysis completed with automatic cost tracking:')
+  console.log(`Provider used: ${result.provider}`)
+  console.log(`Processing time: ${result.processingTime}ms`)
+  console.log(`Token usage: ${result.usage?.totalTokens} tokens`)
+  
+  // Check that usage was automatically tracked
+  const recentUsage = tracker.getProviderUsage(result.provider as any)
+  console.log(`Total tracked cost: $${recentUsage.stats.totalCost.toFixed(4)}`)
+}
+```
+
+**11. Data Export and Analytics**
+```typescript
+// Export comprehensive usage analytics
+const usageData = tracker.exportUsageData('json')
+const costAnalysis = calculator.exportCostAnalysis()
+
+// Save usage data for external analysis
+console.log('Usage data exported:', JSON.parse(usageData).records.length, 'records')
+
+// Save cost analysis report
+const analysisData = JSON.parse(costAnalysis)
+console.log('Cost analysis exported:')
+console.log('- Provider comparison included')
+console.log('- Optimization report included')
+console.log('- Current pricing models included')
+console.log('- Export timestamp:', analysisData.exportedAt)
+```
+
+**Key Benefits:**
+- ✅ **Real-Time Cost Monitoring**: Live tracking of token usage and costs across all providers
+- ✅ **Intelligent Optimization**: AI-powered recommendations for cost reduction based on usage patterns
+- ✅ **Budget Management**: Multi-period budget limits with smart alerting at 80% and 100% thresholds
+- ✅ **Provider Cost Comparison**: Side-by-side cost analysis for Anthropic vs Bedrock providers
+- ✅ **Automatic Integration**: Seamless cost tracking in existing provider system without code changes
+- ✅ **Comprehensive Analytics**: Detailed breakdowns by provider, model, operation, and time period
+- ✅ **Trend Analysis**: Historical usage patterns with basic forecasting and efficiency metrics
+- ✅ **Data Export**: Complete usage analytics and cost reports in JSON/CSV formats
+- ✅ **Professional Dashboard**: Production-ready UI with interactive charts and optimization insights
+- ✅ **Enterprise-Grade**: Budget projection, ROI calculation, and optimization strategy analysis
+
+**Cost Optimization Strategies:**
+- **Model Recommendations**: Automatically suggests switching to Haiku for simple tasks (80% cost savings)
+- **Provider Switching**: Identifies cost advantages between Anthropic and Bedrock for specific use cases
+- **Batching Optimization**: Recommends request batching for small tasks to reduce overhead (15% savings)
+- **Caching Improvements**: Detects repeated requests and suggests caching (70% cost reduction for duplicates)
+- **Usage Pattern Analysis**: Identifies inefficient usage patterns and provides specific improvement guidance
+
+**Technical Implementation:**
+- **UsageTracker Class**: Comprehensive usage record management with localStorage persistence
+- **CostCalculator Class**: Multi-provider cost analysis with current pricing models and optimization algorithms
+- **Dashboard Component**: Professional React interface with real-time data visualization
+- **Provider Integration**: Automatic cost tracking in ProviderAwareSubAgentManager for all AI requests
+- **Budget System**: Intelligent alerting with configurable thresholds and actionable recommendations
+- **Analytics Engine**: Advanced usage analytics with trend analysis and forecasting capabilities
+
 ### Provider Configuration (Previous Feature)
 
 The Moments application now supports configurable AI model providers, allowing seamless switching between Anthropic API and Amazon Bedrock for enterprise deployments.

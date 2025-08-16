@@ -13,6 +13,8 @@ import { ModelProvider, ModelRequest, ModelResponse } from './model-providers/pr
 import { loadConfigClient } from './config-loader.client'
 import { getGlobalModelTranslator, translateModel } from './model-mapping/model-translator'
 import { LogicalModelName, ProviderType } from '@/types/model-provider'
+import { trackUsage } from './cost-tracking/usage-tracker'
+import { calculateCost } from './cost-tracking/cost-calculator'
 
 interface AgentResponse<T = any> {
   success: boolean
@@ -269,6 +271,7 @@ export class ProviderAwareSubAgentManager {
     retryCount: number = 0
   ): Promise<ModelResponse> {
     const maxRetries = 2
+    const startTime = Date.now()
     
     try {
       const activeProvider = await this.getActiveProvider()
@@ -284,6 +287,37 @@ export class ProviderAwareSubAgentManager {
       }
 
       const response = await activeProvider.sendRequest(request)
+      
+      // Track successful usage
+      const latency = Date.now() - startTime
+      if (response.usage) {
+        const cost = calculateCost(
+          activeProvider.getType() as ProviderType,
+          translatedModelId,
+          response.usage.inputTokens,
+          response.usage.outputTokens
+        )
+        
+        trackUsage(
+          activeProvider.getType() as ProviderType,
+          translatedModelId,
+          this.getOperationFromConfig(agentConfig),
+          {
+            inputTokens: response.usage.inputTokens,
+            outputTokens: response.usage.outputTokens,
+            totalTokens: response.usage.totalTokens || (response.usage.inputTokens + response.usage.outputTokens)
+          },
+          cost,
+          latency,
+          true,
+          {
+            agentType: this.getAgentTypeFromConfig(agentConfig),
+            batchSize: 1,
+            contentType: 'text'
+          }
+        )
+      }
+      
       return response
     } catch (error) {
       console.error(`Provider request failed (attempt ${retryCount + 1}/${maxRetries + 1}):`, error)
@@ -303,12 +337,81 @@ export class ProviderAwareSubAgentManager {
         }
         
         try {
+          const fallbackStartTime = Date.now()
           const response = await this.fallbackProvider.sendRequest(fallbackRequest)
+          
+          // Track successful fallback usage
+          const fallbackLatency = Date.now() - fallbackStartTime
+          if (response.usage) {
+            const cost = calculateCost(
+              this.fallbackProvider.getType() as ProviderType,
+              fallbackTranslatedModelId,
+              response.usage.inputTokens,
+              response.usage.outputTokens
+            )
+            
+            trackUsage(
+              this.fallbackProvider.getType() as ProviderType,
+              fallbackTranslatedModelId,
+              this.getOperationFromConfig(agentConfig),
+              {
+                inputTokens: response.usage.inputTokens,
+                outputTokens: response.usage.outputTokens,
+                totalTokens: response.usage.totalTokens || (response.usage.inputTokens + response.usage.outputTokens)
+              },
+              cost,
+              fallbackLatency,
+              true,
+              {
+                agentType: this.getAgentTypeFromConfig(agentConfig),
+                batchSize: 1,
+                contentType: 'text'
+              }
+            )
+          }
+          
           return response
         } catch (fallbackError) {
           console.error('Fallback provider also failed:', fallbackError)
+          
+          // Track failed fallback attempt
+          const fallbackLatency = Date.now() - startTime
+          trackUsage(
+            this.fallbackProvider.getType() as ProviderType,
+            fallbackTranslatedModelId,
+            this.getOperationFromConfig(agentConfig),
+            { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+            0,
+            fallbackLatency,
+            false,
+            {
+              agentType: this.getAgentTypeFromConfig(agentConfig),
+              batchSize: 1,
+              contentType: 'text'
+            }
+          )
         }
       }
+      
+      // Track failed primary attempt
+      const latency = Date.now() - startTime
+      const activeProvider = await this.getActiveProvider()
+      const translatedModelId = await this.translateModelId(agentConfig.model, activeProvider.getType())
+      
+      trackUsage(
+        activeProvider.getType() as ProviderType,
+        translatedModelId,
+        this.getOperationFromConfig(agentConfig),
+        { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+        0,
+        latency,
+        false,
+        {
+          agentType: this.getAgentTypeFromConfig(agentConfig),
+          batchSize: 1,
+          contentType: 'text'
+        }
+      )
       
       // Standard retry logic
       if (retryCount < maxRetries) {
@@ -676,6 +779,40 @@ export class ProviderAwareSubAgentManager {
    */
   getConfigs(): SubAgentConfigs {
     return { ...this.configs }
+  }
+
+  /**
+   * Map agent config to operation type for cost tracking
+   */
+  private getOperationFromConfig(agentConfig: AgentConfig): 'analysis' | 'classification' | 'correlation' | 'generation' | 'other' {
+    // Match agent config to known agent types
+    if (agentConfig === this.configs.content_analyzer) {
+      return 'analysis'
+    } else if (agentConfig === this.configs.classification_agent) {
+      return 'classification'
+    } else if (agentConfig === this.configs.correlation_engine) {
+      return 'correlation'
+    } else if (agentConfig === this.configs.report_generator) {
+      return 'generation'
+    }
+    return 'other'
+  }
+
+  /**
+   * Map agent config to agent type name for cost tracking
+   */
+  private getAgentTypeFromConfig(agentConfig: AgentConfig): string {
+    // Match agent config to known agent types
+    if (agentConfig === this.configs.content_analyzer) {
+      return 'content_analyzer'
+    } else if (agentConfig === this.configs.classification_agent) {
+      return 'classification_agent'
+    } else if (agentConfig === this.configs.correlation_engine) {
+      return 'correlation_engine'
+    } else if (agentConfig === this.configs.report_generator) {
+      return 'report_generator'
+    }
+    return 'unknown'
   }
 
   /**
