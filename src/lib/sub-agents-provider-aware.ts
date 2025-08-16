@@ -11,6 +11,8 @@ import { Config, ModelProviderConfig } from './config-types'
 import { ModelProviderFactory, ProviderFactoryConfig } from './model-providers/provider-factory'
 import { ModelProvider, ModelRequest, ModelResponse } from './model-providers/provider-interface'
 import { loadConfigClient } from './config-loader.client'
+import { getGlobalModelTranslator, translateModel } from './model-mapping/model-translator'
+import { LogicalModelName, ProviderType } from '@/types/model-provider'
 
 interface AgentResponse<T = any> {
   success: boolean
@@ -207,6 +209,33 @@ export class ProviderAwareSubAgentManager {
   }
 
   /**
+   * Translate logical model name to provider-specific model ID
+   */
+  private async translateModelId(modelName: string, providerType: string): Promise<string> {
+    try {
+      // Check if the model name is already a logical name
+      const isLogical = ['sonnet', 'haiku', 'opus'].includes(modelName)
+      
+      if (isLogical) {
+        const translatedId = await translateModel(
+          modelName as LogicalModelName, 
+          providerType as ProviderType
+        )
+        console.log(`[ModelTranslator] Translated '${modelName}' → '${translatedId}' for ${providerType}`)
+        return translatedId
+      } else {
+        // If it's not a logical name, assume it's already a provider-specific ID
+        console.warn(`[ModelTranslator] Model '${modelName}' appears to be provider-specific ID, using as-is`)
+        return modelName
+      }
+    } catch (error) {
+      console.error(`[ModelTranslator] Failed to translate model '${modelName}' for ${providerType}:`, error)
+      // Fallback to using the original model name
+      return modelName
+    }
+  }
+
+  /**
    * Get current provider with automatic fallback if enabled
    */
   private async getActiveProvider(): Promise<ModelProvider> {
@@ -244,9 +273,12 @@ export class ProviderAwareSubAgentManager {
     try {
       const activeProvider = await this.getActiveProvider()
       
+      // Translate logical model name to provider-specific model ID
+      const translatedModelId = await this.translateModelId(agentConfig.model, activeProvider.getType())
+      
       const request: ModelRequest = {
         messages,
-        model: agentConfig.model,
+        model: translatedModelId,
         maxTokens: 4000,
         temperature: agentConfig.temperature
       }
@@ -259,9 +291,13 @@ export class ProviderAwareSubAgentManager {
       // Try fallback provider if available and not already using it
       if (retryCount === 0 && this.fallbackProvider && this.autoFallback) {
         console.info('Retrying with fallback provider')
+        
+        // Translate model for fallback provider as well
+        const fallbackTranslatedModelId = await this.translateModelId(agentConfig.model, this.fallbackProvider.getType())
+        
         const fallbackRequest: ModelRequest = {
           messages,
-          model: agentConfig.model,
+          model: fallbackTranslatedModelId,
           maxTokens: 4000,
           temperature: agentConfig.temperature
         }

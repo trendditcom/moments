@@ -296,7 +296,300 @@ The repository includes curated content for immediate exploration:
 
 ## 🧪 Feature Evaluation Guide
 
-### Provider Configuration (New Feature)
+### Claude Code SDK Integration (Latest Feature)
+
+The Moments application now includes **comprehensive Claude Code SDK integration** that provides enterprise-grade multi-provider support, advanced session management, intelligent caching, and sophisticated workflow orchestration capabilities for AI-powered business intelligence analysis.
+
+#### Testing Claude Code SDK Integration
+
+**1. Multi-Provider SDK Client**
+```typescript
+// Create SDK client with automatic provider detection
+import { ClaudeSDKClient, createClaudeClient } from '@/lib/claude-sdk/client-wrapper'
+
+const client = new ClaudeSDKClient({
+  provider: 'anthropic', // or 'bedrock'
+  temperature: 0.7,
+  maxTokens: 4000,
+  max_turns: 10,
+  enableCaching: true
+})
+
+// Single query with automatic provider selection
+const result = await client.query("Analyze this AI industry development")
+console.log('Response:', result.content)
+console.log('Usage:', result.usage)
+console.log('Cost:', result.cost)
+console.log('Provider:', result.provider)
+```
+
+**2. Session Management & Multi-turn Conversations**
+```typescript
+// Test persistent session management
+import { SessionManager, createSessionManager } from '@/lib/claude-sdk/session-manager'
+
+const sessionManager = createSessionManager({
+  persistence: 'localStorage',
+  defaultOptions: {
+    system_prompt: "You are an AI business intelligence analyst",
+    max_turns: 15,
+    temperature: 0.6
+  }
+})
+
+// Create and manage sessions
+const { sessionId, client } = await sessionManager.createSession()
+
+// Continue conversation with context preservation
+const response1 = await sessionManager.continueConversation(
+  sessionId, 
+  "What are the key trends in AI funding?"
+)
+
+const response2 = await sessionManager.continueConversation(
+  sessionId,
+  "How do these trends compare to last quarter?" // Context preserved
+)
+
+// Session analytics
+const analytics = await sessionManager.getSessionAnalytics()
+console.log('Total sessions:', analytics.totalSessions)
+console.log('Total cost:', analytics.totalCost)
+console.log('Average session length:', analytics.avgSessionLength)
+```
+
+**3. Enhanced Sub-Agent Workflows**
+```typescript
+// Test enhanced sub-agent manager with SDK integration
+import { EnhancedSubAgentManager } from '@/lib/claude-sdk/enhanced-sub-agent-manager'
+
+const manager = new EnhancedSubAgentManager()
+
+// Create specialized agent sessions
+const contentSession = await manager.createAgentSession('content_analyzer', {
+  system_prompt: "Extract pivotal business moments from AI industry content",
+  temperature: 0.3
+})
+
+const classificationSession = await manager.createAgentSession('classification_agent', {
+  system_prompt: "Classify business events by micro and macro factors",
+  temperature: 0.2
+})
+
+// Execute multi-agent workflow
+const workflow = await manager.executeWorkflow([
+  {
+    agentType: 'content_analyzer',
+    prompt: 'Analyze this content for key developments: {{content}}',
+    expectedFormat: 'json',
+    parallel: true
+  },
+  {
+    agentType: 'classification_agent', 
+    prompt: 'Classify the extracted information by business factors',
+    expectedFormat: 'json',
+    dependencies: ['content_analyzer']
+  }
+], { content: "AI startup raises $100M Series B funding round" })
+
+console.log('Workflow success:', workflow.success)
+console.log('Total cost:', workflow.totalCost)
+console.log('Processing time:', workflow.totalTime)
+console.log('Results count:', workflow.results.size)
+```
+
+**4. Intelligent Prompt Caching**
+```typescript
+// Test automatic prompt caching system
+import { PromptCache, getGlobalPromptCache } from '@/lib/claude-sdk/prompt-cache'
+
+const cache = getGlobalPromptCache()
+
+// Cache automatically activated for repeated queries
+const query = "What are the key factors in AI startup success?"
+const response1 = await client.query(query) // Cache miss
+const response2 = await client.query(query) // Cache hit
+
+// Cache analytics
+const stats = cache.getStats()
+console.log('Cache hit rate:', stats.hitRate)
+console.log('Total savings:', stats.totalSavings)
+console.log('Cache entries:', stats.totalEntries)
+
+const efficiency = cache.getEfficiencyMetrics()
+console.log('Memory usage:', efficiency.memoryUsage)
+console.log('Average entry size:', efficiency.avgEntrySize)
+console.log('Savings percentage:', efficiency.savingsPercentage)
+```
+
+**5. Streaming Responses**
+```typescript
+// Test real-time streaming capabilities
+async function testStreaming() {
+  const session = await manager.createAgentSession('content_analyzer')
+  
+  for await (const chunk of manager.streamAgentResponse(
+    session.sessionId,
+    "Provide a detailed analysis of current AI market trends"
+  )) {
+    if (chunk.type === 'chunk') {
+      console.log('Streaming content:', chunk.content)
+    } else if (chunk.type === 'complete') {
+      console.log('Stream completed')
+      break
+    }
+  }
+}
+
+await testStreaming()
+```
+
+**6. Provider Adapter Integration**
+```typescript
+// Test provider adapter with fallback capabilities
+import { ProviderAdapter, createProviderAdapter } from '@/lib/claude-sdk/provider-adapter'
+
+const adapter = createProviderAdapter(undefined, { enableCache: true })
+
+// Test request with standardized response format
+const response = await adapter.sendRequest({
+  provider: provider,
+  messages: [{ role: 'user', content: 'Analyze AI market trends' }],
+  model: 'sonnet',
+  options: {
+    temperature: 0.7,
+    maxTokens: 4000,
+    enableCaching: true
+  }
+})
+
+console.log('Adapter response:', response.content)
+console.log('Cost estimate:', response.cost)
+console.log('Cache hit:', response.cacheHit)
+console.log('Provider used:', response.provider)
+
+// Test provider validation
+const validation = await adapter.validateProvider()
+console.log('Provider valid:', validation.isValid)
+console.log('Validation errors:', validation.errors)
+console.log('Validation warnings:', validation.warnings)
+```
+
+**7. Advanced Content Analysis**
+```typescript
+// Test integrated content analysis with SDK
+const contentItems = [
+  {
+    id: 'item-1',
+    name: 'AI Funding Report',
+    type: 'markdown' as const,
+    content: 'Major AI startup secures $150M Series C funding round led by top-tier VCs',
+    path: '/content/funding-report.md',
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+]
+
+// Comprehensive analysis workflow
+const analysisResult = await manager.analyzeContent(contentItems, 'correlation')
+
+if (analysisResult.success) {
+  console.log('Analysis completed successfully')
+  console.log('Processing time:', analysisResult.processingTime)
+  console.log('Total cost:', analysisResult.cost)
+  console.log('Total tokens:', analysisResult.usage?.totalTokens)
+  console.log('Analysis data:', analysisResult.data)
+  console.log('Workflow steps completed:', analysisResult.metadata?.workflowSteps)
+}
+```
+
+**8. Session Export & Analytics**
+```typescript
+// Test comprehensive session management
+const sessions = await sessionManager.listSessions()
+console.log('Active sessions:', sessions.length)
+
+// Export session for analysis
+const sessionExport = await sessionManager.exportSession(sessionId)
+if (sessionExport) {
+  console.log('Session analysis:', sessionExport.analysis)
+  console.log('Average response length:', sessionExport.analysis.averageResponseLength)
+  console.log('Total interactions:', sessionExport.analysis.totalInteractions)
+  console.log('Cost per message:', sessionExport.analysis.costPerMessage)
+}
+
+// Cleanup old sessions
+const deletedCount = await sessionManager.cleanupOldSessions(7) // 7 days
+console.log('Cleaned up sessions:', deletedCount)
+```
+
+**9. Error Handling & Resilience**
+```typescript
+// Test comprehensive error handling
+try {
+  // Test with invalid configuration
+  const faultyClient = new ClaudeSDKClient({
+    provider: 'anthropic',
+    providerConfig: { apiKey: 'invalid-key' }
+  })
+  
+  await faultyClient.query("Test query")
+} catch (error) {
+  console.log('Error handled gracefully:', error.message)
+}
+
+// Test automatic provider failover
+const response = await client.query("Test failover scenario")
+console.log('Failover response received:', !!response.content)
+```
+
+**10. Integration with Existing Moments Features**
+```typescript
+// Test integration with existing moments functionality
+import { useMomentsStore } from '@/store/moments-store'
+
+const momentsStore = useMomentsStore.getState()
+
+// Use enhanced manager for moment analysis
+const moments = momentsStore.moments.slice(0, 5)
+const enhancedAnalysis = await manager.executeWorkflow([
+  {
+    agentType: 'classification_agent',
+    prompt: 'Re-classify these moments with enhanced accuracy',
+    parallel: true
+  },
+  {
+    agentType: 'correlation_engine',
+    prompt: 'Find new correlations between these moments',
+    dependencies: ['classification_agent']
+  }
+], { moments })
+
+console.log('Enhanced analysis completed:', enhancedAnalysis.success)
+console.log('New correlations found:', enhancedAnalysis.results.get('correlation_engine'))
+```
+
+**Key Benefits:**
+- ✅ **Enterprise-Grade SDK Integration**: Professional Claude Code SDK wrapper with multi-provider support
+- ✅ **Advanced Session Management**: Persistent multi-turn conversations with automatic context preservation
+- ✅ **Intelligent Prompt Caching**: LRU cache with compression, persistence, and efficiency monitoring
+- ✅ **Workflow Orchestration**: Parallel and sequential agent execution with dependency management
+- ✅ **Provider Abstraction**: Seamless switching between Anthropic and Bedrock providers
+- ✅ **Streaming Capabilities**: Real-time response streaming with chunk-based processing
+- ✅ **Cost Optimization**: Automatic cost tracking, usage monitoring, and intelligent caching
+- ✅ **Error Resilience**: Comprehensive error handling with automatic fallback and retry logic
+- ✅ **Session Analytics**: Detailed usage statistics, session management, and export capabilities
+- ✅ **TypeScript Safety**: Complete type definitions with build-time validation
+
+**Technical Implementation:**
+- **ClaudeSDKClient Wrapper**: Unified client supporting both Anthropic and Bedrock providers
+- **SessionManager**: localStorage/memory persistence with multi-turn conversation context
+- **PromptCache**: Intelligent caching with LRU eviction, TTL expiration, and efficiency metrics
+- **EnhancedSubAgentManager**: Multi-agent workflow orchestration with session-based conversations
+- **ProviderAdapter**: Standardized provider interface with automatic failover and validation
+- **Integration Layer**: Seamless compatibility with existing Moments architecture and components
+
+### Provider Configuration (Previous Feature)
 
 The Moments application now supports configurable AI model providers, allowing seamless switching between Anthropic API and Amazon Bedrock for enterprise deployments.
 

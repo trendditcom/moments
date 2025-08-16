@@ -1,10 +1,7 @@
-# Moments Application Configuration
-
-# Source folders for hydrating catalogs
 catalogs:
   companies:
-    name: "Companies"
-    description: "AI startup companies and enterprises"
+    name: Companies
+    description: AI startup companies and enterprises
     source_folders:
       - ./companies
     default_folder: ./companies
@@ -16,15 +13,13 @@ catalogs:
       - "*.jpeg"
       - "*.webp"
       - "*.svg"
-    # File system persistence settings
-    persistence_mode: "file_primary" # file_primary | memory_primary | hybrid
-    auto_sync: true # automatically sync changes to filesystem
-    cache_enabled: true # use localStorage for performance caching
-    cache_ttl_seconds: 3600 # cache time-to-live
-    
+    persistence_mode: file_primary
+    auto_sync: true
+    cache_enabled: true
+    cache_ttl_seconds: 3600
   technologies:
-    name: "Technologies"
-    description: "AI technologies, frameworks, and tools"
+    name: Technologies
+    description: AI technologies, frameworks, and tools
     source_folders:
       - ./technologies
     default_folder: ./technologies
@@ -36,90 +31,70 @@ catalogs:
       - "*.jpeg"
       - "*.webp"
       - "*.svg"
-    # File system persistence settings
-    persistence_mode: "file_primary" # file_primary | memory_primary | hybrid
-    auto_sync: true # automatically sync changes to filesystem
-    cache_enabled: true # use localStorage for performance caching
-    cache_ttl_seconds: 3600 # cache time-to-live
-      
+    persistence_mode: file_primary
+    auto_sync: true
+    cache_enabled: true
+    cache_ttl_seconds: 3600
   moments:
-    name: "Moments"
-    description: "Pivotal business moments extracted and analyzed by AI"
+    name: Moments
+    description: Pivotal business moments extracted and analyzed by AI
     source_folders:
       - ./moments
     default_folder: ./moments
     file_patterns:
       - "*.md"
       - "*.mdx"
-    metadata_format: "frontmatter" # yaml frontmatter for moment metadata
-    # File system persistence settings
-    persistence_mode: "file_primary" # file_primary | memory_primary | hybrid
-    auto_save: true # automatically save analyzed moments to files
-    auto_sync: true # automatically sync changes to filesystem
-    sync_mode: "bidirectional" # file ↔ memory sync
-    cache_enabled: true # use localStorage for performance caching
-    cache_ttl_seconds: 3600 # cache time-to-live
-
-# Global persistence settings
+    metadata_format: frontmatter
+    persistence_mode: file_primary
+    auto_save: true
+    auto_sync: true
+    sync_mode: bidirectional
+    cache_enabled: true
+    cache_ttl_seconds: 3600
 persistence:
-  # Primary storage strategy: file_system_first | local_storage_first | hybrid
-  strategy: "file_system_first"
-  
-  # Cache settings for performance optimization
+  strategy: file_system_first
   cache:
     enabled: true
     default_ttl_seconds: 3600
     max_size_mb: 50
-    
-  # File system settings
   file_system:
-    auto_sync: true # automatically sync changes between memory and files
-    backup_enabled: true # create backup files before overwriting
-    compression_enabled: false # compress stored data (not implemented yet)
-    
-  # Local storage settings (used for temporary cache only when file_system_first)
+    auto_sync: true
+    backup_enabled: true
+    compression_enabled: false
   local_storage:
-    used_for: ["session_cache", "temporary_data", "performance_optimization"]
-    clear_on_startup: false # whether to clear cache on app startup
-    versioning: true # use versioned storage for migration support
-
-# Application settings
+    used_for:
+      - session_cache
+      - temporary_data
+      - performance_optimization
+    clear_on_startup: false
+    versioning: true
 app:
-  name: "Moments"
-  description: "AI Business Intelligence Dashboard"
-  version: "0.1.0"
-  
-  # Data processing settings
+  name: Moments
+  description: AI Business Intelligence Dashboard
+  version: 0.1.0
   processing:
     max_file_size_mb: 10
     cache_enabled: true
     cache_ttl_seconds: 3600
-    
-    # Parallel processing configuration
     parallel_processing:
       enabled: true
-      max_concurrent_sources: 4 # How many companies/technologies to process simultaneously
-      max_concurrent_content_per_source: 3 # How many content files per source to process simultaneously
-      enable_sub_agent_parallelization: true # Run sub-agents (classification, correlation) in parallel
-      sub_agent_batch_size: 10 # Batch size for sub-agent processing
+      max_concurrent_sources: 4
+      max_concurrent_content_per_source: 3
+      enable_sub_agent_parallelization: true
+      sub_agent_batch_size: 10
       api_rate_limiting:
-        requests_per_minute: 120 # Stay within API limits
-        concurrent_requests: 10 # Max simultaneous API calls
-    
-  # UI settings
+        requests_per_minute: 120
+        concurrent_requests: 10
   ui:
     items_per_page: 20
     enable_search: true
     enable_filters: true
-    
-# Moment classification factors
 factors:
   micro:
     - company
     - competition
     - partners
     - customers
-    
   macro:
     - economic
     - geo_political
@@ -127,59 +102,46 @@ factors:
     - technology
     - environment
     - supply_chain
-    
-# Model provider configuration for AI operations
 model_provider:
-  type: "anthropic" # anthropic | bedrock
-  
-  # Anthropic API configuration
+  type: bedrock
   anthropic:
-    api_key_env: "ANTHROPIC_API_KEY"
-    base_url: "https://api.anthropic.com"
-    
-  # Amazon Bedrock configuration
+    api_key_env: ANTHROPIC_API_KEY
+    base_url: https://api.anthropic.com
   bedrock:
-    aws_region: "us-east-1"
-    aws_profile: "default" # optional
-    use_bedrock_api_key: false # use Bedrock API keys instead of AWS credentials
-    inference_profile: null # optional cross-region inference profile
-    
-  # Model mapping between logical names and provider-specific model IDs
+    aws_region: us-east-1
+    aws_profile: default
+    use_bedrock_api_key: false
+    inference_profile: null
   model_mapping:
     sonnet:
-      anthropic: "claude-sonnet-4-20250514"
-      bedrock: "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
+      anthropic: claude-sonnet-4-20250514
+      bedrock: us.anthropic.claude-3-7-sonnet-20250219-v1:0
     haiku:
-      anthropic: "claude-3-5-haiku-latest"
-      bedrock: "us.anthropic.claude-3-5-haiku-20241022-v1:0"
+      anthropic: claude-3-5-haiku-latest
+      bedrock: us.anthropic.claude-3-5-haiku-20241022-v1:0
     opus:
-      anthropic: "claude-opus-4-1-20250805"
-      bedrock: "us.anthropic.claude-opus-4-1-20250805-v1:0"
-
-# Sub-agent configurations with parallel processing support
+      anthropic: claude-opus-4-1-20250805
+      bedrock: us.anthropic.claude-opus-4-1-20250805-v1:0
 agents:
   content_analyzer:
     enabled: true
-    model: "claude-sonnet-4-20250514"
+    model: sonnet
     temperature: 0.3
-    parallel_batch_size: 5 # Process content in batches for performance
-    
+    parallel_batch_size: 5
   classification_agent:
     enabled: true
-    model: "claude-sonnet-4-20250514"
+    model: sonnet
     temperature: 0.2
-    parallel_batch_size: 10 # Classify moments in parallel batches
+    parallel_batch_size: 10
     enable_parallel_batches: true
-    
   correlation_engine:
     enabled: true
-    model: "claude-sonnet-4-20250514"
+    model: sonnet
     temperature: 0.4
-    parallel_batch_size: 15 # Find correlations in parallel batches
+    parallel_batch_size: 15
     enable_parallel_batches: true
-    
   report_generator:
     enabled: true
-    model: "claude-sonnet-4-20250514"
+    model: haiku
     temperature: 0.5
-    parallel_batch_size: 8 # Generate reports in parallel when applicable
+    parallel_batch_size: 8
