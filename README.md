@@ -3105,6 +3105,183 @@ const confidence = Math.min(90, Math.max(10, 70 - Math.abs(momentum) * 5))
 - **Average Density**: Events per day average
 - **Key Events**: Count of significant annotations
 
+### Trend Analysis Charts with Momentum Indicators (Latest Feature)
+The Temporal Analysis Dashboard now includes **advanced momentum indicators and AI-powered anomaly detection**, transforming basic trend visualization into sophisticated predictive intelligence with velocity tracking, seasonal pattern recognition, and machine learning forecasts.
+
+#### Testing Trend Analysis Charts with Momentum Indicators
+
+**1. Accessing Enhanced Trend Analysis**
+- Navigate to **Dashboard** tab → Switch to **"Operational"** analysis depth
+- The **Temporal Analysis** component now displays enhanced momentum indicators
+- Look for the **"Momentum Indicators"** panel below the main charts
+- Activate **"Predictions"** layer using layer toggle controls
+
+**2. Momentum Indicators Panel Evaluation**
+```typescript
+// Three momentum indicators displayed with significance levels:
+// 1. Velocity (first derivative - rate of change)
+velocity = (recent[recent.length - 1] - recent[0]) / (recent.length - 1)
+
+// 2. Acceleration (second derivative - momentum change)  
+acceleration = currentVelocity - previousVelocity
+
+// 3. Overall Momentum (average rate of change)
+momentum = recentChanges.reduce((sum, change) => sum + change) / count
+```
+
+**Testing Momentum Indicators:**
+- **Velocity Display**: Green (+) for increasing, Red (-) for decreasing activity
+- **Acceleration Display**: Shows if velocity is speeding up or slowing down
+- **Significance Badges**: High/Medium/Low indicators based on statistical thresholds
+- **Real-time Updates**: Values update automatically as data changes
+
+**3. Seasonal Pattern Recognition Evaluation**
+**Autocorrelation-Based Pattern Detection:**
+```typescript
+// Weekly pattern analysis (7-day cycle)
+const weeklyPattern = analyzeSeasonalPattern(values, 7)
+if (weeklyPattern.strength > 0.3) {
+  // Pattern detected with confidence scoring
+  patterns.push({
+    pattern: 'weekly',
+    strength: weeklyPattern.strength,
+    phase: 'peak' | 'valley' | 'rising' | 'declining',
+    confidence: weeklyPattern.strength * 100
+  })
+}
+```
+
+**Testing Seasonal Patterns:**
+- **Pattern Detection Panel**: Blue panel shows detected weekly/monthly/quarterly cycles
+- **Confidence Scoring**: Percentage confidence for each detected pattern
+- **Phase Indicators**: Current cycle position (peak, valley, rising, declining)
+- **Business Cycle Recognition**: Identifies recurring patterns in AI industry activity
+
+**4. AI-Powered Anomaly Detection Evaluation**
+**Multi-Type Anomaly Detection:**
+```typescript
+// Statistical threshold calculation
+const zScore = (dataPoint.value - mean) / standardDeviation
+const anomalyScore = Math.abs(zScore)
+
+// Anomaly types detected:
+// 1. Spikes: zScore > 2.5 (unusual activity surges)
+// 2. Drops: zScore < -2.5 (significant declines)  
+// 3. Trend Breaks: pattern reversals detected
+// 4. Seasonal Deviations: cycle disruptions
+```
+
+**Testing Anomaly Detection:**
+- **Anomaly Alerts Panel**: Red panel appears when anomalies detected
+- **Severity Classification**: Critical/High/Medium/Low with color coding
+- **AI Explanations**: Contextual insights for each anomaly with contributing factors
+- **Affected Metrics**: Tags showing which metrics triggered the anomaly
+- **Investigation Guidance**: AI-generated suggestions for external event correlation
+
+**5. Machine Learning Forecasts Evaluation**
+**Enhanced Prediction Algorithm:**
+```typescript
+// Linear regression with momentum weighting
+const forecast = intercept + slope * nextPeriod + velocityAdjustment + 
+                 accelerationAdjustment * 0.5
+
+// Seasonal adjustment integration
+if (seasonalPatterns.length > 0) {
+  const seasonalAdjustment = predictSeasonalValue(index + 1, patterns[0])
+  forecast += seasonalAdjustment * patterns[0].strength
+}
+
+// Confidence calculation based on volatility and pattern strength
+const confidence = 70 + patternStrength * 20 + momentumConsistency * 10 - 
+                   recentVolatility * 30
+```
+
+**Testing ML Forecasts:**
+- **Prediction Layer**: Orange dashed line showing forecasted values
+- **Confidence Bands**: Percentage confidence displayed in tooltips
+- **Momentum Integration**: Forecasts incorporate velocity and acceleration
+- **Seasonal Awareness**: Predictions adjust for detected business cycles
+- **Volatility Assessment**: Confidence decreases with recent data volatility
+
+**6. Enhanced Interactive Features Evaluation**
+**Advanced Tooltip System:**
+```typescript
+// Comprehensive tooltip data
+{
+  basicMetrics: { moments, impact, density },
+  momentumAnalysis: { velocity, acceleration, momentum },
+  anomalyInfo: { score, explanation, severity },
+  forecastData: { prediction, confidence, seasonalContext },
+  aiInsights: "Contextual explanations for unusual patterns..."
+}
+```
+
+**Testing Enhanced Tooltips:**
+- **Hover over data points** to see comprehensive momentum analysis
+- **Anomaly Explanations**: AI-generated insights for unusual activity
+- **Forecast Details**: Prediction values with confidence percentages
+- **Seasonal Context**: Current cycle phase and pattern information
+
+**7. Advanced Analytics Framework Testing**
+**Statistical Functions Validation:**
+```bash
+# Test momentum calculations
+# 1. Hover over recent data points - velocity should show rate of change
+# 2. Check acceleration values - should reflect momentum changes
+# 3. Verify significance badges match visual trends
+
+# Test seasonal pattern detection  
+# 1. Look for blue "Seasonal Patterns Detected" panel
+# 2. Verify cycle detection (weekly/monthly/quarterly)
+# 3. Check confidence percentages match pattern strength
+
+# Test anomaly detection
+# 1. Look for red "Anomalies Detected" panel when unusual activity occurs
+# 2. Verify AI explanations provide context (micro/macro factors, etc.)
+# 3. Check severity classification matches anomaly significance
+
+# Test ML forecasting
+# 1. Enable "Predictions" layer toggle
+# 2. Verify orange dashed forecast line appears
+# 3. Check confidence values in tooltips make sense
+# 4. Verify seasonal adjustments affect predictions
+```
+
+**8. Integration with Existing Dashboard Testing**
+**Layer Control Integration:**
+- **Predictions Layer**: New toggle for ML forecast overlay
+- **Enhanced Trends Layer**: Now includes velocity trend line
+- **Anomaly Visualization**: Scatter points highlighting unusual activity
+- **Backward Compatibility**: All existing functionality preserved
+
+**Performance and Data Processing:**
+```typescript
+// Efficient memoized calculations for large datasets
+const momentumIndicators = useMemo(() => { ... }, [timeSeriesData])
+const seasonalPatterns = useMemo(() => { ... }, [timeSeriesData, timeGranularity])
+const anomalyDetection = useMemo(() => { ... }, [timeSeriesData, seasonalPatterns])
+const trendData = useMemo(() => { ... }, [timeSeriesData, momentumIndicators, seasonalPatterns])
+```
+
+**9. Feature Validation Checklist**
+- ✅ **Momentum Indicators**: Velocity, acceleration, and momentum with significance levels
+- ✅ **Statistical Analysis**: Z-score calculations, volatility assessment, autocorrelation
+- ✅ **Seasonal Recognition**: Weekly/monthly/quarterly pattern detection with confidence
+- ✅ **Anomaly Detection**: Spike/drop/trend-break/seasonal-deviation detection
+- ✅ **AI Explanations**: Contextual insights with contributing factor analysis
+- ✅ **ML Forecasting**: Linear regression with momentum weighting and seasonal adjustment
+- ✅ **Confidence Bands**: Volatility-based confidence scoring for predictions
+- ✅ **Enhanced Tooltips**: Comprehensive momentum analysis in hover details
+- ✅ **Performance Optimization**: Memoized calculations for responsive interactions
+- ✅ **Dashboard Integration**: Seamless integration with existing three-tier architecture
+
+**Expected Business Intelligence Outcomes:**
+- **Predictive Insights**: 70-95% confidence forecasts for strategic planning
+- **Anomaly Alerting**: Real-time detection of unusual market activity
+- **Pattern Recognition**: Identification of recurring business cycles
+- **Momentum Tracking**: Velocity and acceleration metrics for trend analysis
+- **AI-Powered Context**: Explanatory insights for investigation and decision-making
+
 **6. Professional UI/UX Features**
 
 **Custom Tooltips:**

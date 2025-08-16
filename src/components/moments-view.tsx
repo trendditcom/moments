@@ -62,7 +62,7 @@ export function MomentsView({
   isRefreshing = false,
   lastRefresh = null
 }: MomentsViewProps) {
-  const [sortBy, setSortBy] = useState<SortOption>('impact')
+  const [sortBy, setSortBy] = useState<SortOption>('date')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
   const [filterFactors, setFilterFactors] = useState<Set<Factor>>(new Set())
   const [filterConfidence, setFilterConfidence] = useState<Set<ConfidenceLevel>>(new Set())
@@ -114,8 +114,8 @@ export function MomentsView({
       )
     }
 
-    // Sort moments
-    filtered.sort((a, b) => {
+    // Create a copy of the array before sorting to avoid mutating the original
+    const sorted = [...filtered].sort((a, b) => {
       let comparison = 0
 
       switch (sortBy) {
@@ -123,9 +123,36 @@ export function MomentsView({
           comparison = a.impact.score - b.impact.score
           break
         case 'date':
-          const dateA = a.timeline.estimatedDate || a.extractedAt
-          const dateB = b.timeline.estimatedDate || b.extractedAt
-          comparison = dateA.getTime() - dateB.getTime()
+          // For sorting by recency, use extractedAt (when the moment was discovered/announced)
+          // This ensures recent announcements about future events appear at the top
+          // For example: an announcement today about 2035 should appear before older news
+          const dateA = a.extractedAt
+          const dateB = b.extractedAt
+          
+          // Convert to Date objects if they're strings, with error handling
+          let dateAObj: Date
+          let dateBObj: Date
+          
+          try {
+            dateAObj = dateA instanceof Date ? dateA : new Date(dateA)
+            dateBObj = dateB instanceof Date ? dateB : new Date(dateB)
+          } catch (error) {
+            console.error('Date parsing error:', { dateA, dateB, error })
+            return 0 // Keep original order if dates can't be parsed
+          }
+          
+          // Check for invalid dates
+          if (isNaN(dateAObj.getTime())) {
+            console.warn('Invalid date for moment:', a.title, dateA)
+            return 1 // Put invalid dates at the end
+          }
+          if (isNaN(dateBObj.getTime())) {
+            console.warn('Invalid date for moment:', b.title, dateB)
+            return -1 // Put invalid dates at the end
+          }
+          
+          // Compare timestamps - for date sorting, we want chronological order
+          comparison = dateAObj.getTime() - dateBObj.getTime()
           break
         case 'confidence':
           const confidenceValues = { low: 1, medium: 2, high: 3 }
@@ -136,10 +163,11 @@ export function MomentsView({
           break
       }
 
+      // Apply sort direction
       return sortDirection === 'asc' ? comparison : -comparison
     })
 
-    return filtered
+    return sorted
   }, [moments, searchQuery, filterFactors, filterConfidence, filterSource, sortBy, sortDirection])
 
   // Statistics

@@ -142,11 +142,41 @@ export function MomentCard({ moment, onSelect, onKeywordClick, onEntityClick, sh
                 
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  <span>
-                    {moment.timeline.estimatedDate 
-                      ? formatDistanceToNow(moment.timeline.estimatedDate, { addSuffix: true })
-                      : moment.timeline.timeframe || 'Timeline unknown'
-                    }
+                  <span className="text-xs">
+                    {(() => {
+                      const extractedAtObj = moment.extractedAt instanceof Date ? moment.extractedAt : new Date(moment.extractedAt)
+                      const now = new Date()
+                      
+                      // Always show when the moment was extracted/discovered
+                      const extractedStr = formatDistanceToNow(extractedAtObj, { addSuffix: true })
+                      
+                      // If there's an estimatedDate (event date) that's different from extractedAt, show both
+                      if (moment.timeline.estimatedDate) {
+                        const estimatedObj = moment.timeline.estimatedDate instanceof Date 
+                          ? moment.timeline.estimatedDate 
+                          : new Date(moment.timeline.estimatedDate)
+                        
+                        // Check if estimated date is significantly different from extracted date
+                        const daysDiff = Math.abs((estimatedObj.getTime() - extractedAtObj.getTime()) / (1000 * 60 * 60 * 24))
+                        
+                        if (daysDiff > 7) { // If more than a week different, show both
+                          const estimatedStr = estimatedObj.toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'short'
+                          })
+                          
+                          // Determine if it's a future projection or past event
+                          if (estimatedObj > now) {
+                            return `${extractedStr} • Target: ${estimatedStr}`
+                          } else {
+                            return `${extractedStr} • Event: ${estimatedStr}`
+                          }
+                        }
+                      }
+                      
+                      // Just show when it was discovered
+                      return extractedStr
+                    })()}
                   </span>
                 </div>
               </div>
