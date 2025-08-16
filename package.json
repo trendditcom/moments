@@ -7,7 +7,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:providers": "jest tests/providers",
+    "test:integration": "jest tests/integration",
+    "test:performance": "jest tests/performance --testTimeout=60000",
+    "test:cost": "jest tests/cost-tracking",
+    "test:monitoring": "jest tests/monitoring",
+    "test:mocks": "jest tests/mocks",
+    "test:all": "jest --coverage --testTimeout=60000",
+    "test:ci": "jest --ci --coverage --watchAll=false --testTimeout=60000"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.59.0",
@@ -52,8 +63,12 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.13",
+    "@types/jest": "^30.0.0",
     "@types/js-yaml": "^4.0.9",
     "eslint": "^8.57.0",
-    "eslint-config-next": "14.2.5"
+    "eslint-config-next": "14.2.5",
+    "jest": "^30.0.5",
+    "jest-environment-node": "^30.0.5",
+    "ts-jest": "^29.4.1"
   }
 }
