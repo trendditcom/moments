@@ -15,7 +15,6 @@ import { KnowledgeGrowthMetrics } from '@/components/dashboard-growth-metrics'
 import { FactorDistributionAnalytics } from '@/components/dashboard-factor-analytics'
 import { RelationshipMatrix } from '@/components/dashboard-relationship-matrix'
 import { TemporalAnalysis } from '@/components/dashboard-temporal-analysis'
-import { CorrelationDiscoveryInterface } from '@/components/correlation-discovery-interface'
 import { Company, Technology } from '@/types/catalog'
 import { PivotalMoment } from '@/types/moments'
 import { 
@@ -123,8 +122,6 @@ export function DashboardView({ companies, technologies, moments, isLoading = fa
       {analysisDepth === 'operational' && (
         <>
           <FactorDistributionAnalytics />
-          
-          <CorrelationDiscoveryInterface />
           
           <RelationshipMatrix />
           

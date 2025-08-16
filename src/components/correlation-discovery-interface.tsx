@@ -199,36 +199,38 @@ function CorrelationHeatmap({
       </div>
 
       {/* Heatmap matrix */}
-      <div className="overflow-auto max-h-96 border rounded-lg">
-        <table className="text-xs border-collapse min-w-full">
-          <thead>
-            <tr>
-              <th className="p-2 border text-left min-w-32 bg-muted sticky left-0 z-10">Entity</th>
-              {entities.map((entity, colIndex) => (
-                <th key={colIndex} className="p-1 border text-center min-w-16 bg-muted">
-                  <div className="transform -rotate-45 origin-center truncate max-w-16">
+      <div className="overflow-x-auto overflow-y-auto max-h-96 w-full border rounded-lg">
+        <div className="min-w-max">
+          <table className="text-xs border-collapse w-full">
+            <thead>
+              <tr>
+                <th className="p-2 border text-left w-32 bg-muted sticky left-0 z-10">Entity</th>
+                {entities.map((entity, colIndex) => (
+                  <th key={colIndex} className="p-1 border text-center w-16 bg-muted">
+                    <div className="transform -rotate-45 origin-center">
+                      <Badge 
+                        variant="outline" 
+                        className={`text-xs ${getEntityTypeColor(entityTypes[entity])}`}
+                      >
+                        {entity.length > 8 ? entity.substring(0, 6) + '..' : entity}
+                      </Badge>
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {entities.map((rowEntity, rowIndex) => (
+                <tr key={rowIndex}>
+                  <td className="p-2 border bg-muted sticky left-0 z-10 w-32">
                     <Badge 
-                      variant="outline" 
-                      className={`text-xs ${getEntityTypeColor(entityTypes[entity])}`}
+                      variant="outline"
+                      className={`${getEntityTypeColor(entityTypes[rowEntity])} truncate block`}
+                      title={rowEntity}
                     >
-                      {entity.length > 10 ? entity.substring(0, 8) + '...' : entity}
+                      {rowEntity.length > 12 ? rowEntity.substring(0, 10) + '..' : rowEntity}
                     </Badge>
-                  </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {entities.map((rowEntity, rowIndex) => (
-              <tr key={rowIndex}>
-                <td className="p-2 border bg-muted sticky left-0 z-10">
-                  <Badge 
-                    variant="outline"
-                    className={`${getEntityTypeColor(entityTypes[rowEntity])}`}
-                  >
-                    {rowEntity}
-                  </Badge>
-                </td>
+                  </td>
                 {entities.map((colEntity, colIndex) => {
                   const correlation = matrix[rowIndex][colIndex]
                   const correlationId = correlation ? `${correlation.entity1}-${correlation.entity2}` : ''
@@ -238,7 +240,7 @@ function CorrelationHeatmap({
                     <td 
                       key={colIndex}
                       className={`
-                        p-1 border text-center cursor-pointer relative transition-all
+                        p-1 border text-center cursor-pointer relative transition-all w-16
                         ${isSelected ? 'ring-2 ring-blue-500' : 'hover:opacity-80'}
                         ${rowIndex === colIndex ? 'bg-gray-200' : ''}
                       `}
@@ -273,11 +275,12 @@ function CorrelationHeatmap({
                       )}
                     </td>
                   )
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Significance legend */}
@@ -468,10 +471,10 @@ export function CorrelationDiscoveryInterface() {
   }, [moments.length, correlations.length, analyzeCorrelations])
 
   return (
-    <Card className="w-full">
+    <Card className="w-full max-w-full overflow-hidden">
       <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
             <CardTitle className="text-lg font-semibold flex items-center">
               <BeakerIcon className="w-5 h-5 mr-2" />
               Correlation Discovery Interface
@@ -481,7 +484,7 @@ export function CorrelationDiscoveryInterface() {
             </CardDescription>
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 shrink-0">
             <Badge variant="secondary">
               <ChartBarIcon className="w-3 h-3 mr-1" />
               {filteredCorrelations.length} Correlations
@@ -512,7 +515,7 @@ export function CorrelationDiscoveryInterface() {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 max-w-full overflow-hidden">
         {/* Filter Controls */}
         <div className="p-4 bg-muted/50 rounded-lg space-y-4">
           <div className="flex items-center space-x-4">
@@ -520,7 +523,7 @@ export function CorrelationDiscoveryInterface() {
             <span className="text-sm font-medium">Analysis Filters</span>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {/* Strength threshold */}
             <div className="space-y-2">
               <label className="text-xs font-medium">Correlation Strength ≥</label>
@@ -599,7 +602,7 @@ export function CorrelationDiscoveryInterface() {
 
         {/* Correlation heatmap */}
         {!isAnalyzing && filteredCorrelations.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-4 w-full max-w-full overflow-hidden">
             <div className="flex items-center justify-between">
               <h3 className="font-medium">Correlation Strength Heatmap</h3>
               <div className="flex items-center space-x-2 text-xs text-muted-foreground">
@@ -617,29 +620,31 @@ export function CorrelationDiscoveryInterface() {
               </div>
             </div>
 
-            <CorrelationHeatmap
-              correlations={filteredCorrelations}
-              selectedCorrelations={selectedCorrelations}
-              onCorrelationSelect={handleCorrelationSelect}
-              onCellClick={handleCellClick}
-              strengthThreshold={filters.strengthThreshold}
-              significanceFilter={filters.significanceFilter}
-              maxEntities={filters.maxEntities}
-            />
+            <div className="w-full max-w-full overflow-hidden">
+              <CorrelationHeatmap
+                correlations={filteredCorrelations}
+                selectedCorrelations={selectedCorrelations}
+                onCorrelationSelect={handleCorrelationSelect}
+                onCellClick={handleCellClick}
+                strengthThreshold={filters.strengthThreshold}
+                significanceFilter={filters.significanceFilter}
+                maxEntities={filters.maxEntities}
+              />
+            </div>
           </div>
         )}
 
         {/* Selected correlation details */}
         {selectedCorrelationDetails && (
-          <div className="p-4 bg-blue-50 rounded-lg">
+          <div className="p-4 bg-blue-50 rounded-lg w-full max-w-full overflow-hidden">
             <div className="flex items-start space-x-2">
               <InformationCircleIcon className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-blue-900 space-y-3">
-                <div className="font-medium">
+              <div className="text-sm text-blue-900 space-y-3 min-w-0 flex-1">
+                <div className="font-medium break-words">
                   Detailed Correlation Analysis: {selectedEntity1} ↔ {selectedEntity2}
                 </div>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
                     <div className="text-blue-600 font-medium">Correlation</div>
                     <div className="font-mono text-lg">
@@ -683,12 +688,12 @@ export function CorrelationDiscoveryInterface() {
                 </div>
 
                 {selectedCorrelationDetails.sharedFactors.length > 0 && (
-                  <div>
+                  <div className="w-full max-w-full overflow-hidden">
                     <div className="text-blue-600 font-medium mb-2">Shared Factors</div>
                     <div className="flex flex-wrap gap-1">
                       {selectedCorrelationDetails.sharedFactors.map(factor => (
                         <Badge key={factor} variant="secondary" className="text-xs">
-                          {factor}
+                          {factor.length > 15 ? factor.substring(0, 13) + '...' : factor}
                         </Badge>
                       ))}
                     </div>
@@ -701,7 +706,7 @@ export function CorrelationDiscoveryInterface() {
 
         {/* Analysis summary */}
         {analysisReport && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full max-w-full overflow-hidden">
             <div className="p-4 border rounded-lg">
               <div className="text-sm font-medium mb-2">Analysis Summary</div>
               <div className="space-y-1 text-xs text-muted-foreground">
@@ -716,11 +721,11 @@ export function CorrelationDiscoveryInterface() {
               <div className="text-sm font-medium mb-2">Top Correlations</div>
               <div className="space-y-1 text-xs">
                 {analysisReport.topCorrelations.slice(0, 3).map((corr: EntityCorrelation, idx: number) => (
-                  <div key={idx} className="flex justify-between">
-                    <span className="truncate max-w-32">
+                  <div key={idx} className="flex justify-between gap-2">
+                    <span className="truncate min-w-0 flex-1">
                       {corr.entity1} ↔ {corr.entity2}
                     </span>
-                    <span className="font-mono">{corr.correlationCoefficient.toFixed(2)}</span>
+                    <span className="font-mono shrink-0">{corr.correlationCoefficient.toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -730,7 +735,7 @@ export function CorrelationDiscoveryInterface() {
               <div className="text-sm font-medium mb-2">Insights</div>
               <div className="space-y-1 text-xs text-muted-foreground">
                 {analysisReport.insights.slice(0, 2).map((insight: string, idx: number) => (
-                  <div key={idx}>{insight}</div>
+                  <div key={idx} className="break-words">{insight}</div>
                 ))}
               </div>
             </div>

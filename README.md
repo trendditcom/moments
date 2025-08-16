@@ -3327,6 +3327,145 @@ const tooltipData = {
 - **Performance**: Memoized calculations and efficient time series aggregation
 - **Integration**: Seamless integration with Zustand store and existing dashboard architecture
 
+### Pattern Discovery Panel for Emerging Insights (Latest Feature)
+The **Pattern Discovery Panel** represents the most advanced AI-powered pattern recognition system in Moments, providing automated cluster detection, temporal pattern discovery, surprise connection identification, and trend correlation analysis with confidence scoring and actionable insights.
+
+#### Testing Pattern Discovery Panel
+
+**1. Accessing Pattern Discovery**
+- Navigate to **Dashboard** tab → Switch to **"Operational"** analysis depth
+- The **Pattern Discovery Panel** appears prominently positioned after Factor Distribution Analytics
+- Look for the distinctive sparkles (✨) icon indicating AI-powered pattern recognition
+- Ensure you have moments data loaded before testing pattern discovery capabilities
+
+**2. Pattern Detection Configuration**
+```typescript
+// Four primary pattern types with configurable detection:
+// 1. Entity Clustering - Technology ecosystems, competitive groups, partnership networks
+// 2. Temporal Patterns - Cyclical, cascade, trend, and anomaly detection  
+// 3. Surprise Connections - Cross-industry, unexpected partnerships, competitive shifts
+// 4. Trend Correlations - Factor correlation analysis with statistical significance
+```
+
+**Testing Pattern Detection Settings:**
+- **Entity Clustering Toggle**: Enable/disable automated cluster detection
+- **Temporal Analysis Toggle**: Enable/disable time-based pattern discovery
+- **Surprise Detection Toggle**: Enable/disable unexpected connection identification  
+- **Trend Analysis Toggle**: Enable/disable factor correlation analysis
+- **Confidence Threshold**: Adjustable from 40% (Show All) to 90% (Very High)
+- **Real-time Analysis**: Click "Refresh Analysis" to trigger pattern discovery
+
+**3. AI-Generated Insights Evaluation**
+```typescript
+// Pattern insights with comprehensive scoring:
+interface PatternInsight {
+  confidence: number        // 0-100% AI confidence
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  entities: string[]       // Related entities
+  aiInsights: string[]     // AI-generated explanations
+  actionableRecommendations: string[]  // Strategic guidance
+  metrics: {
+    strength: number       // Pattern strength 0-1
+    significance: number   // Statistical significance 0-1
+    impact_score: number   // Business impact 0-1
+  }
+}
+```
+
+**Testing AI Insights:**
+- **Insight Cards**: Click any insight card to view detailed analysis
+- **Confidence Scoring**: Each insight displays AI confidence percentage
+- **Severity Indicators**: Color-coded severity (red=critical, orange=high, yellow=medium, blue=low)
+- **Entity Badges**: Interactive entity tags linking to related content
+- **Actionable Recommendations**: Strategic guidance for each discovered pattern
+- **AI Explanations**: Natural language insights explaining pattern significance
+
+**4. Advanced Pattern Types**
+
+**Entity Cluster Detection:**
+- **Technology Ecosystems**: Groups of interconnected technologies and companies
+- **Competitive Groups**: Companies with similar market positioning
+- **Partnership Networks**: Strategic alliances and collaborations
+- **Market Segments**: Related entities within specific market niches
+
+**Testing Cluster Detection:**
+- Look for cluster insights with 3+ entities and >50% strength
+- Verify cluster coherence through entity relationship analysis
+- Check cluster descriptions for accuracy and business relevance
+- Evaluate key connections within clusters for strategic insights
+
+**Temporal Pattern Discovery:**
+- **Cyclical Patterns**: Weekly/monthly/quarterly business cycles
+- **Cascade Events**: Triggering events leading to subsequent developments
+- **Trend Patterns**: Entity momentum and growth trajectories  
+- **Anomaly Detection**: Unusual activity spikes and market disruptions
+
+**Testing Temporal Patterns:**
+- **Pattern Strength**: Values >60% indicate significant temporal patterns
+- **Predictability Scoring**: Higher scores suggest reliable future occurrences
+- **Next Expected Date**: AI prediction of next pattern occurrence
+- **Time Window Analysis**: Review pattern timeframes for business planning
+
+**Surprise Connection Identification:**
+- **Cross-Industry Connections**: Unexpected partnerships across different sectors
+- **Technological Leaps**: Breakthrough innovation connections
+- **Competitive Shifts**: Market positioning changes and new rivalries
+- **Strategic Partnerships**: Unexpected alliance formations
+
+**Testing Surprise Connections:**
+- **Unexpectedness Score**: 70%+ indicates genuinely surprising connections
+- **Connection Types**: Verify accurate classification of surprise types
+- **Risk Assessment**: Low/medium/high risk levels for business impact
+- **Supporting Evidence**: Review content supporting surprise connections
+
+**Trend Correlation Analysis:**
+- **Factor Correlations**: Statistical relationships between business factors
+- **Correlation Types**: Positive, negative, lagged, and bidirectional relationships
+- **Significance Testing**: Statistical confidence in correlation strength
+- **Lag Detection**: Time delays between correlated factor changes
+
+**Testing Trend Correlations:**
+- **Correlation Strength**: >60% indicates meaningful factor relationships
+- **Statistical Confidence**: Review p-values and significance classifications
+- **Lag Analysis**: Examine temporal delays between correlated factors
+- **Business Implications**: Evaluate strategic recommendations from correlations
+
+**5. Performance and Integration Testing**
+```typescript
+// Pattern discovery engine performance targets:
+// - Entity clustering: <3 seconds for 50+ entities
+// - Temporal analysis: <2 seconds for 100+ moments
+// - Surprise detection: <4 seconds for complex correlation analysis
+// - Trend analysis: <3 seconds for factor correlation matrix
+```
+
+**Testing Performance:**
+- **Analysis Speed**: Pattern discovery should complete within 5-10 seconds
+- **Real-time Updates**: Insights update automatically when data changes
+- **Memory Usage**: Monitor browser performance during large dataset analysis
+- **Responsive Design**: Verify panel works across desktop/tablet/mobile devices
+
+**6. Integration with Existing Features**
+- **Dashboard Integration**: Seamless integration with operational tier analytics
+- **Entity Navigation**: Click entities in patterns to navigate to detail views
+- **Data Connectivity**: Real-time integration with moments and catalog stores
+- **Export Capabilities**: Pattern insights ready for external analysis and reporting
+
+**Expected Results:**
+- ✅ **Comprehensive Pattern Detection**: 4 distinct pattern types with AI insights
+- ✅ **High Confidence Analysis**: Patterns with 60%+ confidence and business relevance
+- ✅ **Actionable Intelligence**: Strategic recommendations and risk assessments
+- ✅ **Real-time Performance**: Sub-10 second analysis with live progress tracking
+- ✅ **Professional UI**: Intuitive interface with Apple Settings-style design
+- ✅ **Enterprise-Grade Analytics**: Statistical significance testing and correlation analysis
+
+**Technical Implementation:**
+- **AI Engine**: Sophisticated PatternDiscoveryEngine singleton with advanced algorithms
+- **Clustering**: Density-based clustering (DBSCAN-like) with coherence metrics
+- **Statistical Analysis**: Pearson correlations, Fisher's exact test, temporal stability
+- **Machine Learning**: Momentum calculation, seasonal pattern recognition, anomaly detection
+- **Performance Optimization**: Memoized calculations, parallel processing, efficient algorithms
+
 ## ⚡ Performance Features
 
 ### Intelligent Processing
