@@ -28,7 +28,8 @@ import {
   Cog6ToothIcon, 
   ShieldCheckIcon, 
   DocumentTextIcon, 
-  WrenchScrewdriverIcon 
+  WrenchScrewdriverIcon,
+  CpuChipIcon
 } from '@heroicons/react/24/outline'
 import { Zap } from 'lucide-react'
 
@@ -39,7 +40,7 @@ type ViewState =
 
 export default function HomePage() {
   const [showStorageManager, setShowStorageManager] = useState(false)
-  const [settingsSection, setSettingsSection] = useState<'health' | 'data' | 'management'>('health')
+  const [settingsSection, setSettingsSection] = useState<'health' | 'data' | 'management' | 'provider'>('health')
   const { phase, status, error, progress, isInitializing, hasData, isLoading } = useAppInitialization()
   const { 
     isHydrating: isMomentsHydrating, 
@@ -346,6 +347,18 @@ export default function HomePage() {
               >
                 <WrenchScrewdriverIcon className="w-5 h-5" />
                 <span className="text-sm font-medium">Storage Management</span>
+              </button>
+              
+              <button
+                onClick={() => setSettingsSection('provider')}
+                className={`w-full flex items-center gap-3 px-3 py-2 text-left rounded-lg transition-colors ${
+                  settingsSection === 'provider'
+                    ? 'bg-primary/10 text-primary border border-primary/20'
+                    : 'hover:bg-muted/50 text-foreground'
+                }`}
+              >
+                <CpuChipIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">Model Provider</span>
               </button>
             </div>
           </nav>
