@@ -16,6 +16,7 @@ import { useCatalogStore } from '@/store/catalog-store'
 import { useMomentsStore } from '@/store/moments-store'
 import { ProviderConfig } from '@/components/settings/provider-config'
 import { ProviderTest } from '@/components/settings/provider-test'
+import { CacheManagement } from '@/components/settings/cache-management'
 import type { ModelProviderConfig } from '@/lib/config-types'
 import { 
   ArrowDownTrayIcon, 
@@ -90,7 +91,7 @@ function StorageMetric({ label, value, description, variant = 'default' }: Stora
 }
 
 interface SettingsContentProps {
-  section: 'health' | 'data' | 'management' | 'provider'
+  section: 'health' | 'data' | 'management' | 'provider' | 'cache'
 }
 
 export function SettingsContent({ section }: SettingsContentProps) {
@@ -730,6 +731,10 @@ export function SettingsContent({ section }: SettingsContentProps) {
         )}
       </div>
     )
+  }
+
+  if (section === 'cache') {
+    return <CacheManagement />
   }
 
   return null

@@ -189,6 +189,39 @@ export interface ModelMapping {
   }
 }
 
+export interface ResponseCacheConfig {
+  enabled: boolean
+  providers: {
+    anthropic: {
+      enabled: boolean
+      max_entries: number
+      default_ttl_hours: number
+      max_memory_mb: number
+      compression_enabled: boolean
+      persist_to_disk: boolean
+      cleanup_interval_minutes: number
+    }
+    bedrock: {
+      enabled: boolean
+      max_entries: number
+      default_ttl_hours: number
+      max_memory_mb: number
+      compression_enabled: boolean
+      persist_to_disk: boolean
+      cleanup_interval_minutes: number
+    }
+  }
+  global: {
+    max_total_memory_mb: number
+    analytics_enabled: boolean
+    export_schedule: 'daily' | 'weekly' | 'never'
+    warning_thresholds: {
+      memory_usage_percent: number
+      hit_rate_percent: number
+    }
+  }
+}
+
 export interface ModelProviderConfig {
   type: 'anthropic' | 'bedrock'
   anthropic: AnthropicProviderConfig
@@ -204,6 +237,7 @@ export interface Config {
   }
   persistence?: PersistenceConfig
   model_provider?: ModelProviderConfig
+  cache?: ResponseCacheConfig
   app: AppConfig
   factors: FactorsConfig
   agents: {

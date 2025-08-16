@@ -8,18 +8,21 @@ import { AnthropicProvider } from './anthropic-provider'
 import { BedrockProvider } from './bedrock-provider'
 import { AnthropicOptimizationConfig } from '../optimizations/anthropic-optimizer'
 import { BedrockOptimizationConfig } from '../optimizations/bedrock-optimizer'
+import { withCaching, CachedProviderWrapper } from '../caching/cached-provider-wrapper'
 
 export interface ProviderFactoryConfig {
   type: 'anthropic' | 'bedrock'
   fallbackProvider?: 'anthropic' | 'bedrock'
   autoFallback?: boolean
   modelMapping?: ModelMapping
+  cachingEnabled?: boolean
   anthropic?: {
     apiKeyEnv?: string
     baseUrl?: string
     timeout?: number
     maxRetries?: number
     optimizations?: AnthropicOptimizationConfig
+    cachingEnabled?: boolean
   }
   bedrock?: {
     region?: string
@@ -30,6 +33,7 @@ export interface ProviderFactoryConfig {
     timeout?: number
     maxRetries?: number
     optimizations?: BedrockOptimizationConfig
+    cachingEnabled?: boolean
   }
 }
 
@@ -46,7 +50,8 @@ export class ModelProviderFactory {
     type: 'anthropic' | 'bedrock',
     config?: Partial<ModelProviderConfig>,
     modelMapping?: ModelMapping,
-    optimizations?: AnthropicOptimizationConfig | BedrockOptimizationConfig
+    optimizations?: AnthropicOptimizationConfig | BedrockOptimizationConfig,
+    cachingEnabled?: boolean
   ): ModelProvider {
     const providerConfig: ModelProviderConfig = {
       type,
@@ -74,6 +79,11 @@ export class ModelProviderFactory {
         throw new Error(`Unknown provider type: ${type}`)
     }
 
+    // Wrap with caching if enabled
+    if (cachingEnabled !== false) { // Default to enabled
+      provider = withCaching(provider, cachingEnabled)
+    }
+
     return provider
   }
 
@@ -82,6 +92,9 @@ export class ModelProviderFactory {
    */
   static initialize(config: ProviderFactoryConfig): void {
     this.config = config
+
+    // Determine caching for primary provider
+    const primaryCaching = config[config.type]?.cachingEnabled ?? config.cachingEnabled ?? true
 
     // Create primary provider
     const primaryConfig: ModelProviderConfig = {
@@ -92,11 +105,14 @@ export class ModelProviderFactory {
       config.type,
       primaryConfig,
       config.modelMapping,
-      config[config.type]?.optimizations
+      config[config.type]?.optimizations,
+      primaryCaching
     )
 
     // Create fallback provider if configured
     if (config.fallbackProvider && config.fallbackProvider !== config.type) {
+      const fallbackCaching = config[config.fallbackProvider]?.cachingEnabled ?? config.cachingEnabled ?? true
+      
       const fallbackConfig: ModelProviderConfig = {
         type: config.fallbackProvider,
         ...(config[config.fallbackProvider] || {})
@@ -105,7 +121,8 @@ export class ModelProviderFactory {
         config.fallbackProvider,
         fallbackConfig,
         config.modelMapping,
-        config[config.fallbackProvider]?.optimizations
+        config[config.fallbackProvider]?.optimizations,
+        fallbackCaching
       )
     }
 
@@ -142,8 +159,9 @@ export class ModelProviderFactory {
     let provider = this.instances.get(type)
     
     if (!provider) {
-      // Create on demand
-      provider = this.createProvider(type)
+      // Create on demand with caching enabled by default
+      const cachingEnabled = this.config?.[type]?.cachingEnabled ?? this.config?.cachingEnabled ?? true
+      provider = this.createProvider(type, undefined, undefined, undefined, cachingEnabled)
       this.instances.set(type, provider)
     }
     
@@ -365,10 +383,15 @@ export class ModelProviderFactory {
       try {
         let providerRecommendations: any[] = []
         
+        // Unwrap cached provider if needed
+        const unwrappedProvider = provider instanceof CachedProviderWrapper 
+          ? provider.getWrappedProvider() 
+          : provider
+        
         if (type === 'anthropic') {
-          providerRecommendations = (provider as AnthropicProvider).getOptimizationRecommendations() || []
+          providerRecommendations = (unwrappedProvider as AnthropicProvider).getOptimizationRecommendations() || []
         } else if (type === 'bedrock') {
-          providerRecommendations = (provider as BedrockProvider).getOptimizationRecommendations() || []
+          providerRecommendations = (unwrappedProvider as BedrockProvider).getOptimizationRecommendations() || []
         }
         
         recommendations.set(type, providerRecommendations)
@@ -378,5 +401,82 @@ export class ModelProviderFactory {
     }
     
     return recommendations
+  }
+
+  /**
+   * Enable caching for specific provider
+   */
+  static enableCaching(type: 'anthropic' | 'bedrock'): void {
+    const provider = this.instances.get(type)
+    if (provider && provider instanceof CachedProviderWrapper) {
+      provider.setCachingEnabled(true)
+    }
+  }
+
+  /**
+   * Disable caching for specific provider
+   */
+  static disableCaching(type: 'anthropic' | 'bedrock'): void {
+    const provider = this.instances.get(type)
+    if (provider && provider instanceof CachedProviderWrapper) {
+      provider.setCachingEnabled(false)
+    }
+  }
+
+  /**
+   * Clear cache for specific provider
+   */
+  static clearProviderCache(type: 'anthropic' | 'bedrock'): number {
+    const provider = this.instances.get(type)
+    if (provider && provider instanceof CachedProviderWrapper) {
+      return provider.clearCache()
+    }
+    return 0
+  }
+
+  /**
+   * Clear cache for all providers
+   */
+  static clearAllCache(): Map<string, number> {
+    const results = new Map<string, number>()
+    
+    for (const [type, provider] of this.instances.entries()) {
+      if (provider instanceof CachedProviderWrapper) {
+        const cleared = provider.clearCache()
+        results.set(type, cleared)
+      } else {
+        results.set(type, 0)
+      }
+    }
+    
+    return results
+  }
+
+  /**
+   * Get cache statistics for all providers
+   */
+  static getCacheStats(): Map<string, any> {
+    const stats = new Map()
+    
+    for (const [type, provider] of this.instances.entries()) {
+      if (provider instanceof CachedProviderWrapper) {
+        stats.set(type, provider.getCacheStats())
+      } else {
+        stats.set(type, { cached: false })
+      }
+    }
+    
+    return stats
+  }
+
+  /**
+   * Check if provider has caching enabled
+   */
+  static isCachingEnabled(type: 'anthropic' | 'bedrock'): boolean {
+    const provider = this.instances.get(type)
+    if (provider instanceof CachedProviderWrapper) {
+      return provider.isCachingEnabled()
+    }
+    return false
   }
 }

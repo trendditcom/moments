@@ -3,6 +3,8 @@
  * Unified interface for AI model providers (Anthropic, Bedrock, etc.)
  */
 
+export type ProviderType = 'anthropic' | 'bedrock'
+
 export interface ModelResponse {
   content: string
   usage?: {
@@ -34,8 +36,10 @@ export interface ModelRequest {
   topP?: number
   topK?: number
   stopSequences?: string[]
+  systemPrompt?: string
   system?: string
   stream?: boolean
+  tools?: any[]
   metadata?: Record<string, any>
 }
 
