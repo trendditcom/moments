@@ -8,6 +8,7 @@ import { MomentsView } from '@/components/moments-view'
 import { DashboardView } from '@/components/dashboard-view'
 import { GraphView } from '@/components/graph-view'
 import { PatternsView } from '@/components/patterns-view'
+import { QueryView } from '@/components/query-view'
 import { StorageManager } from '@/components/storage-manager'
 import { SettingsContent } from '@/components/settings-content'
 import { CatalogStatus } from '@/components/catalog-status'
@@ -35,7 +36,7 @@ import {
 import { Zap } from 'lucide-react'
 
 type ViewState = 
-  | { type: 'catalog', tab: 'companies' | 'technologies' | 'moments' | 'dashboard' | 'graph' | 'patterns' }
+  | { type: 'catalog', tab: 'companies' | 'technologies' | 'moments' | 'dashboard' | 'graph' | 'patterns' | 'query' }
   | { type: 'detail', item: Company | Technology, itemType: 'company' | 'technology' }
   | { type: 'moment-detail', moment: PivotalMoment }
 
@@ -104,7 +105,7 @@ export default function HomePage() {
     }
   }
   
-  const handleTabChange = (tab: 'companies' | 'technologies' | 'moments' | 'dashboard' | 'graph' | 'patterns') => {
+  const handleTabChange = (tab: 'companies' | 'technologies' | 'moments' | 'dashboard' | 'graph' | 'patterns' | 'query') => {
     setViewState({ type: 'catalog', tab })
   }
   
@@ -484,6 +485,16 @@ export default function HomePage() {
                       >
                         Patterns
                       </button>
+                      <button
+                        onClick={() => handleTabChange('query')}
+                        className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                          activeTab === 'query'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Query
+                      </button>
                     </nav>
                   </div>
                 )}
@@ -549,6 +560,15 @@ export default function HomePage() {
                       technologies={technologies}
                       moments={moments}
                       isLoading={isAnalyzing || isLoading}
+                    />
+                  ) : viewState.tab === 'query' ? (
+                    <QueryView
+                      companies={companies}
+                      technologies={technologies}
+                      moments={moments}
+                      isLoading={isAnalyzing || isLoading}
+                      onMomentSelect={handleMomentSelect}
+                      onEntityClick={handleEntityClick}
                     />
                   ) : (
                     <CatalogView 

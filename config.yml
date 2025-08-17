@@ -103,21 +103,21 @@ factors:
     - environment
     - supply_chain
 model_provider:
-  type: bedrock
+  type: anthropic
   anthropic:
     api_key_env: ANTHROPIC_API_KEY
     base_url: https://api.anthropic.com
     optimizations:
       prompt_caching:
         enabled: true
-        cache_key_prefix: "moments_"
+        cache_key_prefix: moments_
         min_prompt_length: 100
         max_cache_size: 1000
         ttl: 3600
       beta_features:
         enabled: true
         features:
-          - "prompt-caching-2024-07-31"
+          - prompt-caching-2024-07-31
         auto_enable: true
       streaming:
         enabled: true
@@ -134,8 +134,11 @@ model_provider:
         enabled: true
         auto_select_model: true
         fallback_models:
-          claude-opus-4-1-20250805: ["claude-sonnet-4-20250514", "claude-3-5-haiku-latest"]
-          claude-sonnet-4-20250514: ["claude-3-5-haiku-latest"]
+          claude-opus-4-1-20250805:
+            - claude-sonnet-4-20250514
+            - claude-3-5-haiku-latest
+          claude-sonnet-4-20250514:
+            - claude-3-5-haiku-latest
         cost_optimized_selection: true
   bedrock:
     aws_region: us-east-1
@@ -146,19 +149,19 @@ model_provider:
       cross_region_inference:
         enabled: true
         primary_region: us-east-1
-        fallback_regions: 
+        fallback_regions:
           - us-west-2
           - eu-west-1
         inference_profiles:
-          us-east-1: "arn:aws:bedrock:us-east-1:123456789012:inference-profile/us-east-1"
-          us-west-2: "arn:aws:bedrock:us-west-2:123456789012:inference-profile/us-west-2"
+          us-east-1: arn:aws:bedrock:us-east-1:123456789012:inference-profile/us-east-1
+          us-west-2: arn:aws:bedrock:us-west-2:123456789012:inference-profile/us-west-2
         auto_fallback: true
         latency_threshold: 2000
       batch_inference:
         enabled: true
         batch_size: 20
         max_wait_time: 5000
-        cost_threshold: 0.10
+        cost_threshold: 0.1
         compatible_operations:
           - classification
           - analysis
@@ -185,8 +188,8 @@ model_provider:
         spot_instances_usage: false
         reserved_capacity: false
         cost_budget_limits:
-          daily: 100.0
-          monthly: 3000.0
+          daily: 100
+          monthly: 3000
       enterprise:
         enabled: false
         vpc_endpoints: false

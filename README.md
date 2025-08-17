@@ -3688,7 +3688,7 @@ We welcome contributions! Priority areas:
 
 ### Short Term  
 - [ ] **Advanced Visualizations**: AI landscape maps, technology evolution trees
-- [ ] **Natural Language Queries**: Conversational analytics interface
+- [x] **Natural Language Queries**: Conversational analytics interface ✅ **COMPLETED**
 - [ ] **Real-time Updates**: WebSocket integration, live dashboard updates
 - [ ] **Collaboration Features**: Shared views, annotations, team workspaces
 
@@ -3697,6 +3697,162 @@ We welcome contributions! Priority areas:
 - [ ] **BI Platform Integration**: Tableau, PowerBI, Looker connectors
 - [ ] **Mobile Application**: Touch-optimized interface, offline capabilities
 - [ ] **Advanced AI**: Custom models, domain-specific agents, automated insights
+
+## 🧪 User Evaluation Guide
+
+### Natural Language Query Interface Testing
+
+The **Query** tab provides conversational analytics capabilities for exploring your moments data through natural language. Here's how to evaluate and test the implementation:
+
+#### Getting Started
+1. **Navigate to Query Tab**: Click the "Query" tab in the main navigation
+2. **Load Sample Data**: Ensure you have moments data loaded (use "Analyze Moments" if needed)
+3. **Try Basic Queries**: Start with simple questions to test the interface
+
+#### Core Query Types to Test
+
+**🔍 Search & Filter Queries**
+```
+- "Show me all moments related to AI regulation"
+- "Find high impact moments from Q4 2024"
+- "Moments about OpenAI in the last 3 months"
+- "What happened with Tesla this year?"
+```
+
+**📊 Analysis & Trend Queries**
+```
+- "What patterns emerged after the OpenAI leadership changes?"
+- "Compare Microsoft and Google AI developments"
+- "Trending technologies in machine learning"
+- "How many companies mentioned AI regulation?"
+```
+
+**📈 Temporal Analysis Queries**
+```
+- "Show me activity trends over the last 6 months"
+- "What were the most impactful moments in Q1?"
+- "Activity timeline for artificial intelligence"
+- "When did most AI regulation discussions happen?"
+```
+
+**🔢 Aggregation & Metrics Queries**
+```
+- "How many moments involve partnerships?"
+- "Average impact score for technology moments"
+- "Count of high confidence predictions"
+- "Total unique companies mentioned"
+```
+
+#### Features to Evaluate
+
+**✅ Query Processing**
+- [ ] Natural language parsing accuracy
+- [ ] Entity recognition (companies, technologies, people)
+- [ ] Intent classification (8 types: search, analysis, comparison, etc.)
+- [ ] Timeframe extraction (relative dates, quarters, years)
+- [ ] Factor identification (micro/macro business factors)
+
+**✅ Results Generation**
+- [ ] Relevant moment filtering based on query
+- [ ] Insight generation with contextual explanations
+- [ ] Correlation detection between entities
+- [ ] Pattern identification in data
+- [ ] Appropriate visualization selection
+
+**✅ User Interface**
+- [ ] Query input with autocomplete suggestions
+- [ ] Conversation history with expandable results
+- [ ] Interactive visualizations (charts, timelines, networks)
+- [ ] Error handling and retry mechanisms
+- [ ] Performance feedback (processing time, confidence scores)
+
+**✅ Visualization Types**
+- [ ] **Timeline**: Chronological moment display with impact scores
+- [ ] **Bar Charts**: Entity comparison and metric aggregation
+- [ ] **Line Charts**: Trend analysis over time periods
+- [ ] **Network Views**: Entity relationship mapping
+- [ ] **Cards**: Detailed moment information display
+
+#### Advanced Testing Scenarios
+
+**🎯 Complex Multi-Entity Queries**
+```
+- "Compare OpenAI, Anthropic, and Google's AI regulation responses in 2024"
+- "Show me partnerships between Big Tech and AI startups after ChatGPT launch"
+- "What correlations exist between funding rounds and product launches?"
+```
+
+**🎯 Contextual Follow-up Queries**
+```
+- Start with: "Show me Microsoft AI developments"
+- Follow up with: "What about their partnerships?"
+- Then: "How do these compare to Google's strategy?"
+```
+
+**🎯 Edge Cases & Error Handling**
+```
+- Try queries with no results: "Show me moments about nonexistent company"
+- Test malformed questions: "asdf show me stuff about things"
+- Empty state testing: Query interface with no data loaded
+```
+
+#### Expected Behaviors
+
+**📋 Successful Query Processing**
+- Query intent correctly identified with high confidence (>70%)
+- Relevant entities extracted from natural language
+- Results filtered and ranked appropriately
+- Explanations provide clear context for findings
+- Visualizations match query type and data structure
+
+**📋 User Experience Quality**
+- Response time under 2-3 seconds for most queries
+- Clear confidence indicators and processing feedback
+- Helpful error messages for failed queries
+- Intuitive conversation flow with query history
+- Professional, Apple Settings-style UI consistency
+
+**📋 Analytics Accuracy**
+- Trend detection algorithms identify meaningful patterns
+- Correlation analysis finds legitimate entity relationships
+- Impact scoring reflects actual business significance
+- Factor classification aligns with domain expertise
+- Temporal analysis accurately captures time-based insights
+
+#### Performance Benchmarks
+
+**⚡ Response Times**
+- Simple search queries: < 1 second
+- Complex analysis queries: < 3 seconds
+- Visualization generation: < 2 seconds
+- Entity extraction: < 500ms
+
+**🎯 Accuracy Targets**
+- Intent classification accuracy: > 85%
+- Entity recognition precision: > 80%
+- Query result relevance: > 90%
+- User satisfaction (qualitative): "Natural and intuitive"
+
+#### Reporting Issues
+
+When testing, please note:
+- **Query Input**: Exact text entered
+- **Expected Outcome**: What you expected to happen
+- **Actual Result**: What actually occurred
+- **Context**: Data state, browser, any error messages
+- **Severity**: Critical/High/Medium/Low impact on user experience
+
+#### Success Criteria
+
+✅ **Implementation Complete** if:
+- All query types process without errors
+- Results are relevant and accurate
+- Visualizations display correctly
+- User interface is responsive and intuitive
+- Performance meets benchmark targets
+- Error handling provides helpful feedback
+
+The Natural Language Query Interface transforms complex data exploration into conversational interactions, making advanced analytics accessible to users without technical expertise.
 
 ## 📄 License
 
