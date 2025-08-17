@@ -3854,6 +3854,130 @@ When testing, please note:
 
 The Natural Language Query Interface transforms complex data exploration into conversational interactions, making advanced analytics accessible to users without technical expertise.
 
+### Interactive Infographics Testing (Latest Feature)
+
+The Interactive Infographics feature provides sophisticated data visualizations through AI Landscape Map and Technology Evolution Tree components, offering geographic and hierarchical perspectives on the AI industry.
+
+#### Getting Started
+
+1. **Access the Infographics Tab**:
+   - Click on the "Infographics" tab in the main navigation (appears after Query tab)
+   - The interface will load with a skeleton UI briefly before displaying visualizations
+
+2. **View Mode Selection**:
+   - Choose between three viewing modes using the toggle buttons in the header:
+     - **Landscape**: AI Landscape Map only (full width)
+     - **Evolution**: Technology Evolution Tree only (full width)
+     - **Both**: Side-by-side display of both visualizations
+
+#### Testing the AI Landscape Map
+
+1. **Market Territory Visualization**:
+   - Observe the 6 market segments displayed as circular territories:
+     - AI/ML Core (blue)
+     - Enterprise AI (green)
+     - Consumer AI (amber)
+     - AI Infrastructure (purple)
+     - AI Security (red)
+     - Data & Analytics (cyan)
+   - Each territory shows dashed boundaries and labeled segments
+
+2. **Entity Positioning**:
+   - Companies appear as larger nodes within territories
+   - Technologies appear as smaller, darker nodes
+   - Node size indicates influence (based on moment count)
+   - Position within territory shows market segment affiliation
+
+3. **Interactive Navigation**:
+   - **Zoom Controls**: Use + and - buttons or mouse wheel to zoom (0.5x to 5x)
+   - **Pan**: Click and drag to move the visualization
+   - **Reset**: Click the circular arrow to reset view to default
+   - **Animation Toggle**: Enable/disable strategic movement simulation
+
+4. **Entity Interaction**:
+   - **Hover**: See tooltips with entity name, type, and influence score
+   - **Click**: Select an entity to see detailed information panel
+   - **Connections**: Observe relationship lines between connected entities
+
+5. **Strategic Movement Animation**:
+   - When enabled, entities slowly move within their territories
+   - Movement simulates market dynamics and positioning changes
+   - Entities bounce off territory boundaries to stay within segments
+
+#### Testing the Technology Evolution Tree
+
+1. **Hierarchical Structure**:
+   - Root node: "AI Technology Evolution"
+   - Category branches: Foundation AI, AI Infrastructure, AI Applications, Enterprise AI, AI Research
+   - Technology nodes: Individual technologies within categories
+   - Innovation leaves: Keywords extracted from moment classifications
+
+2. **Maturity Indicators**:
+   - **Green nodes**: Emerging technologies
+   - **Blue nodes**: Growth phase technologies
+   - **Amber nodes**: Mature technologies
+   - **Red nodes**: Declining technologies
+
+3. **Timeline Animation**:
+   - **Play/Pause**: Control temporal evolution animation
+   - **Timeline Display**: Shows current year (2020-2025)
+   - **Reset**: Return to 2020 starting point
+   - **Growth Simulation**: Watch node sizes change based on maturity and time
+
+4. **Interactive Exploration**:
+   - **Click nodes**: Expand/collapse branches (for nodes with children)
+   - **Hover**: Nodes grow to indicate interactivity
+   - **Details Panel**: Shows node type, maturity, depth, moment count, and children
+
+5. **Visual Hierarchy**:
+   - Node size decreases with depth (root > category > technology > innovation)
+   - Link thickness indicates relationship strength
+   - Horizontal layout flows from categories (left) to innovations (right)
+
+#### Features to Validate
+
+1. **Data Integration**:
+   - ✅ Entities extracted from catalog (companies and technologies)
+   - ✅ Connections based on moment co-occurrence
+   - ✅ Keywords from moment classifications appear as innovations
+   - ✅ Real-time updates when moments data changes
+
+2. **Performance**:
+   - ✅ Smooth 60fps animations without lag
+   - ✅ Responsive zoom/pan operations
+   - ✅ Efficient handling of 50+ entities
+   - ✅ Clean memory management (no leaks on view changes)
+
+3. **Export Functionality**:
+   - ✅ Export button generates JSON with visualization metadata
+   - ✅ Includes segment information, entity counts, and configuration
+   - ✅ Downloads with timestamp-based filename
+
+4. **Responsive Design**:
+   - ✅ Adapts to different screen sizes
+   - ✅ Side-by-side mode adjusts visualization dimensions
+   - ✅ Controls remain accessible on mobile devices
+
+#### Expected Behaviors
+
+- **Initial Load**: Brief skeleton loading (~800ms) before visualization appears
+- **Mode Switching**: Instant transition between landscape/evolution/both views
+- **Empty State**: If no moments loaded, visualizations show minimal entities
+- **Legend Display**: Always visible showing segment colors or maturity stages
+- **Statistics**: Real-time counts of companies, technologies, and moments in header
+
+#### Success Criteria
+
+✅ Both visualizations render without errors
+✅ All interactive features (zoom, pan, click, hover) work smoothly
+✅ Animations run at consistent framerate
+✅ Data accurately reflects moment classifications and entity relationships
+✅ Export functionality generates valid JSON
+✅ Responsive layout works across screen sizes
+✅ TypeScript compilation succeeds without errors
+
+The Interactive Infographics feature transforms complex AI industry data into intuitive visual narratives, enabling strategic insights through geographic market positioning and temporal technology evolution perspectives.
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

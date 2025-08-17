@@ -9,6 +9,7 @@ import { DashboardView } from '@/components/dashboard-view'
 import { GraphView } from '@/components/graph-view'
 import { PatternsView } from '@/components/patterns-view'
 import { QueryView } from '@/components/query-view'
+import { InfographicsView } from '@/components/infographics-view'
 import { StorageManager } from '@/components/storage-manager'
 import { SettingsContent } from '@/components/settings-content'
 import { CatalogStatus } from '@/components/catalog-status'
@@ -36,7 +37,7 @@ import {
 import { Zap } from 'lucide-react'
 
 type ViewState = 
-  | { type: 'catalog', tab: 'companies' | 'technologies' | 'moments' | 'dashboard' | 'graph' | 'patterns' | 'query' }
+  | { type: 'catalog', tab: 'companies' | 'technologies' | 'moments' | 'dashboard' | 'graph' | 'patterns' | 'query' | 'infographics' }
   | { type: 'detail', item: Company | Technology, itemType: 'company' | 'technology' }
   | { type: 'moment-detail', moment: PivotalMoment }
 
@@ -105,7 +106,7 @@ export default function HomePage() {
     }
   }
   
-  const handleTabChange = (tab: 'companies' | 'technologies' | 'moments' | 'dashboard' | 'graph' | 'patterns' | 'query') => {
+  const handleTabChange = (tab: 'companies' | 'technologies' | 'moments' | 'dashboard' | 'graph' | 'patterns' | 'query' | 'infographics') => {
     setViewState({ type: 'catalog', tab })
   }
   
@@ -495,6 +496,16 @@ export default function HomePage() {
                       >
                         Query
                       </button>
+                      <button
+                        onClick={() => handleTabChange('infographics')}
+                        className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                          activeTab === 'infographics'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Infographics
+                      </button>
                     </nav>
                   </div>
                 )}
@@ -569,6 +580,13 @@ export default function HomePage() {
                       isLoading={isAnalyzing || isLoading}
                       onMomentSelect={handleMomentSelect}
                       onEntityClick={handleEntityClick}
+                    />
+                  ) : viewState.tab === 'infographics' ? (
+                    <InfographicsView
+                      companies={companies}
+                      technologies={technologies}
+                      moments={moments}
+                      isLoading={isAnalyzing || isLoading}
                     />
                   ) : (
                     <CatalogView 
