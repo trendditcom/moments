@@ -10,6 +10,7 @@ import { GraphView } from '@/components/graph-view'
 import { PatternsView } from '@/components/patterns-view'
 import { QueryView } from '@/components/query-view'
 import { InfographicsView } from '@/components/infographics-view'
+import { ComparativeAnalysisView } from '@/components/comparative-analysis-view'
 import { StorageManager } from '@/components/storage-manager'
 import { SettingsContent } from '@/components/settings-content'
 import { CatalogStatus } from '@/components/catalog-status'
@@ -37,7 +38,7 @@ import {
 import { Zap } from 'lucide-react'
 
 type ViewState = 
-  | { type: 'catalog', tab: 'companies' | 'technologies' | 'moments' | 'dashboard' | 'graph' | 'patterns' | 'query' | 'infographics' }
+  | { type: 'catalog', tab: 'companies' | 'technologies' | 'moments' | 'dashboard' | 'graph' | 'patterns' | 'query' | 'infographics' | 'comparison' }
   | { type: 'detail', item: Company | Technology, itemType: 'company' | 'technology' }
   | { type: 'moment-detail', moment: PivotalMoment }
 
@@ -106,7 +107,7 @@ export default function HomePage() {
     }
   }
   
-  const handleTabChange = (tab: 'companies' | 'technologies' | 'moments' | 'dashboard' | 'graph' | 'patterns' | 'query' | 'infographics') => {
+  const handleTabChange = (tab: 'companies' | 'technologies' | 'moments' | 'dashboard' | 'graph' | 'patterns' | 'query' | 'infographics' | 'comparison') => {
     setViewState({ type: 'catalog', tab })
   }
   
@@ -506,6 +507,16 @@ export default function HomePage() {
                       >
                         Infographics
                       </button>
+                      <button
+                        onClick={() => handleTabChange('comparison')}
+                        className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                          activeTab === 'comparison'
+                            ? 'border-primary text-primary'
+                            : 'border-transparent text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Comparison
+                      </button>
                     </nav>
                   </div>
                 )}
@@ -583,6 +594,13 @@ export default function HomePage() {
                     />
                   ) : viewState.tab === 'infographics' ? (
                     <InfographicsView
+                      companies={companies}
+                      technologies={technologies}
+                      moments={moments}
+                      isLoading={isAnalyzing || isLoading}
+                    />
+                  ) : viewState.tab === 'comparison' ? (
+                    <ComparativeAnalysisView
                       companies={companies}
                       technologies={technologies}
                       moments={moments}

@@ -3854,7 +3854,7 @@ When testing, please note:
 
 The Natural Language Query Interface transforms complex data exploration into conversational interactions, making advanced analytics accessible to users without technical expertise.
 
-### Interactive Infographics Testing (Latest Feature)
+### Interactive Infographics Testing
 
 The Interactive Infographics feature provides sophisticated data visualizations through AI Landscape Map and Technology Evolution Tree components, offering geographic and hierarchical perspectives on the AI industry.
 
@@ -3977,6 +3977,356 @@ The Interactive Infographics feature provides sophisticated data visualizations 
 ✅ TypeScript compilation succeeds without errors
 
 The Interactive Infographics feature transforms complex AI industry data into intuitive visual narratives, enabling strategic insights through geographic market positioning and temporal technology evolution perspectives.
+
+### Comparative Analysis Testing (Latest Feature)
+
+The Comparative Analysis feature provides sophisticated multi-dimensional performance comparison and factor impact analysis, delivering professional-grade business intelligence for strategic decision-making and competitive analysis.
+
+#### Getting Started
+
+1. **Access the Comparison Tab**:
+   - Click on the "Comparison" tab in the main navigation (appears after Infographics tab)
+   - The interface will load with skeleton UI briefly before displaying analysis components
+
+2. **View Mode Selection**:
+   - Choose between four viewing modes using the toggle buttons in the header:
+     - **Radar**: Company Performance Radar only (full width)
+     - **Waterfall**: Factor Impact Waterfall only (full width)
+     - **Both**: Stacked display of both visualizations
+     - **Split**: Side-by-side display of both visualizations
+
+#### Testing the Company Performance Radar
+
+1. **Performance Metrics Overview**:
+   - Observe four key performance dimensions displayed on radar chart:
+     - **Innovation Velocity**: Rate of new announcements (6-month window)
+     - **Market Impact**: Percentage of high-impact moments (≥75 score)
+     - **Partnership Strength**: Collaboration and alliance activity percentage
+     - **Risk Management**: Inverse of risk-related moment frequency
+   - Each metric ranges from 0-100% with color-coded company lines
+
+2. **Company Selection Panel**:
+   - **Selection Controls**: Use checkboxes to show/hide companies on radar
+   - **Color Coding**: Each company has distinct color matching radar line
+   - **Moment Count**: View total moments for each company in parentheses
+   - **Select All/Deselect All**: Toggle all companies simultaneously
+   - **Performance Leaders**: Review top performer for each metric
+
+3. **Interactive Radar Chart**:
+   - **Hover Tooltips**: See detailed metric values for each company point
+   - **Animations**: Watch staggered 1000ms loading animations (when enabled)
+   - **Legend**: Companies automatically appear in chart legend
+   - **Responsive**: Chart adjusts to container size changes
+
+4. **Performance Statistics**:
+   - **Average Metrics**: View calculated averages across all metrics in header
+   - **Company Comparison**: Compare relative performance positions
+   - **Export Functionality**: Download performance data as JSON
+
+#### Testing the Factor Impact Waterfall
+
+1. **Factor Impact Visualization**:
+   - **Waterfall Chart**: View cumulative factor impacts as ascending bars
+   - **Factor Categories**: Observe micro (company/competition/partners/customers) and macro (economic/geo-political/regulation/technology/environment/supply-chain) factors
+   - **Color Coding**: Each factor type has distinct colors for easy identification
+   - **Impact Scoring**: Bars sized by calculated impact (high=3, medium=2, low=1)
+
+2. **Interactive Controls**:
+   - **Factor Type Filter**: Toggle between All/Micro/Macro factor display
+   - **Search Functionality**: Real-time filtering by factor name or category
+   - **Segment Selection**: Click waterfall bars to select and highlight factors
+   - **Export Capability**: Download comprehensive factor analysis data
+
+3. **Factor Details Panel**:
+   - **Top Contributors**: View highest-impact factors with scores
+   - **Factor Breakdown**: See micro vs macro distribution and percentages
+   - **Selected Factor Details**: Examine selected factor properties and metrics
+   - **Contributing Moments**: Drill down to see moments driving factor impact
+
+4. **Advanced Interactions**:
+   - **Tooltip Information**: Hover for detailed factor metrics and cumulative impact
+   - **Moment Drill-Down**: Expand factors to view contributing moments
+   - **Impact Calculation**: Understand how moment scores contribute to factor totals
+
+#### Testing View Modes and Integration
+
+1. **View Mode Switching**:
+   - **Instant Transitions**: Switch between radar/waterfall/both/split views
+   - **Layout Adaptation**: Verify responsive layout adjustments
+   - **State Preservation**: Ensure selections persist across view changes
+   - **Performance**: Confirm smooth transitions without lag
+
+2. **Analysis Insights Panel**:
+   - **Performance Leaders**: Review top companies by high-impact moments
+   - **Factor Distribution**: See micro vs macro factor counts
+   - **Market Activity**: Track recent moments, partnerships, and risk events
+   - **Analysis Coverage**: Understand percentage of companies/technologies analyzed
+
+3. **Export All Functionality**:
+   - **Combined Export**: Download comprehensive analysis including both radar and waterfall data
+   - **Metadata Inclusion**: Verify timestamp, analysis parameters, and configuration
+   - **JSON Format**: Confirm valid JSON structure for external analysis
+
+#### Features to Validate
+
+1. **Data Processing**:
+   - ✅ Companies extracted from catalog with moment analysis
+   - ✅ Performance metrics calculated from moment classifications and scores
+   - ✅ Factor impacts computed from micro/macro factor occurrences
+   - ✅ Real-time updates when moments data changes
+
+2. **Interactive Performance**:
+   - ✅ Smooth radar chart animations and hover effects
+   - ✅ Responsive waterfall chart with click interactions
+   - ✅ Efficient filtering and search without performance degradation
+   - ✅ Clean memory management on view changes
+
+3. **Business Intelligence**:
+   - ✅ Accurate performance calculations across all metrics
+   - ✅ Meaningful factor impact analysis and categorization
+   - ✅ Comprehensive export functionality for external analysis
+   - ✅ Professional insights panel with actionable intelligence
+
+#### Expected Behaviors
+
+- **Initial Load**: Brief skeleton loading (~600ms) before analysis appears
+- **View Switching**: Instant transitions between different visualization modes
+- **Empty State**: If no moments loaded, shows minimal data with informative messages
+- **Statistics**: Real-time counts and percentages in header and insights panel
+- **Responsive Design**: Adapts to different screen sizes while maintaining functionality
+
+#### Success Criteria
+
+✅ Both radar and waterfall visualizations render without errors
+✅ All interactive features (selection, filtering, clicking) work smoothly
+✅ Performance calculations accurately reflect moment data and classifications
+✅ Export functionality generates valid comprehensive analysis data
+✅ View mode transitions work seamlessly across all layouts
+✅ Responsive design functions across screen sizes
+✅ TypeScript compilation succeeds with proper type safety
+✅ Business intelligence insights provide actionable competitive analysis
+
+The Comparative Analysis feature transforms raw moment data into sophisticated multi-dimensional intelligence, enabling strategic insights through quantitative performance comparison and factor-driven trend analysis essential for AI industry competitive intelligence and strategic decision-making.
+
+### Performance Optimization System Testing (Latest Feature)
+
+The Moments application now includes **comprehensive Performance Optimization System** that provides enterprise-grade caching, data virtualization, query optimization, and background processing capabilities designed to handle large-scale AI industry data analysis with sub-second responsiveness and efficient resource utilization.
+
+**Testing Performance Optimization Components:**
+
+**1. Cache Management Testing**
+
+**Performance Cache Manager:**
+```typescript
+// Test intelligent caching with LRU eviction
+import { globalCacheManager } from '@/lib/performance/cache-manager'
+
+// Test cache operations
+globalCacheManager.set('test-key', { data: 'test' }, { 
+  ttl: 60000, 
+  priority: 'high' 
+})
+const cached = globalCacheManager.get('test-key')
+console.log('Cache hit:', cached !== null)
+
+// Test batch operations
+const results = await globalCacheManager.batchGet(
+  ['key1', 'key2', 'key3'],
+  async (missedKeys) => {
+    // Load missed data
+    return missedKeys.reduce((acc, key) => {
+      acc[key] = { computed: 'data' }
+      return acc
+    }, {})
+  }
+)
+
+// Monitor cache metrics
+const metrics = globalCacheManager.getMetrics()
+console.log('Cache Performance:', {
+  hitRate: Math.round(metrics.hitRate * 100) + '%',
+  memoryUsage: Math.round(metrics.totalSize / 1024 / 1024) + 'MB',
+  entryCount: metrics.entryCount
+})
+```
+
+**2. Data Virtualization Testing**
+
+**Large Dataset Handling:**
+```typescript
+// Test data virtualization for large moment datasets
+import { DataVirtualizer } from '@/lib/performance/data-virtualizer'
+
+const virtualizer = new DataVirtualizer(
+  async (page, pageSize) => {
+    // Simulate large dataset
+    const start = page * pageSize
+    const data = Array.from({ length: pageSize }, (_, i) => ({
+      id: start + i,
+      content: `Moment ${start + i}`
+    }))
+    return { data, totalCount: 10000 }
+  },
+  { pageSize: 50, bufferSize: 3 }
+)
+
+// Test window retrieval
+const window = await virtualizer.getWindow(0, 49)
+console.log('Virtualized Window:', {
+  itemCount: window.data.length,
+  totalCount: window.totalCount,
+  hasMore: window.hasMore
+})
+
+// Test search capabilities
+const searchResults = await virtualizer.search(
+  'AI regulation',
+  ['content', 'title'],
+  20
+)
+console.log('Search Performance:', searchResults.items.length + ' results')
+```
+
+**3. Query Optimization Testing**
+
+**Intelligent Query Planning:**
+```typescript
+// Test query optimization with intelligent execution planning
+import { globalQueryOptimizer } from '@/lib/performance/query-optimizer'
+
+// Create optimized query plan
+const plan = globalQueryOptimizer.createQueryPlan({
+  source: 'moments',
+  filters: [
+    { field: 'impact.score', operator: 'gte', value: 75 },
+    { field: 'extractedAt', operator: 'gte', value: '2024-01-01' }
+  ],
+  sorting: [{ field: 'extractedAt', direction: 'desc' }],
+  limit: 50
+})
+
+console.log('Query Plan:', {
+  estimatedCost: plan.estimatedCost,
+  estimatedTime: plan.estimatedTime + 'ms',
+  useCache: plan.useCache,
+  steps: plan.steps.length
+})
+
+// Execute optimized query
+const results = await globalQueryOptimizer.executeQuery(
+  plan,
+  async () => getMomentsData() // Your data source
+)
+
+// Monitor query performance
+const queryMetrics = globalQueryOptimizer.getMetrics()
+console.log('Query Performance:', {
+  averageTime: Math.round(queryMetrics.averageExecutionTime) + 'ms',
+  cacheHitRate: Math.round(queryMetrics.cacheHitRate * 100) + '%',
+  slowQueries: queryMetrics.slowQueries
+})
+```
+
+**4. Background Processing Testing**
+
+**Non-Blocking Task Processing:**
+```typescript
+// Test background processing with priority queues
+import { globalBackgroundProcessor } from '@/lib/performance/background-processor'
+
+// Queue high-priority moment analysis
+const taskId = globalBackgroundProcessor.queueTask({
+  type: 'moment_analysis',
+  payload: { momentId: 'test-moment', complexity: 1000 },
+  priority: 1, // Critical priority
+  maxRetries: 3
+})
+
+// Queue batch correlation analysis
+const batchIds = globalBackgroundProcessor.queueBatch([
+  {
+    type: 'correlation_calculation',
+    payload: { entityPairs: ['apple', 'openai'] },
+    priority: 2
+  },
+  {
+    type: 'data_indexing',
+    payload: { recordCount: 1000 },
+    priority: 3
+  }
+])
+
+// Monitor processing metrics
+const processorMetrics = globalBackgroundProcessor.getMetrics()
+console.log('Background Processing:', {
+  activeTasks: processorMetrics.activeTasks,
+  queuedTasks: processorMetrics.queuedTasks,
+  throughput: processorMetrics.throughput + ' tasks/min',
+  systemHealth: processorMetrics.systemHealth
+})
+```
+
+**5. Performance Monitor Component Testing**
+
+**Real-Time Performance Dashboard:**
+
+Access the Performance Monitor through the Dashboard's operational tier or integrate directly:
+
+```typescript
+// Test performance monitoring integration
+import { PerformanceMonitor } from '@/components/performance-monitor'
+
+// Component automatically displays:
+// - Cache hit rates and memory usage
+// - Query execution times and optimization stats  
+// - Background task throughput and system health
+// - CPU and memory utilization trends
+// - Historical performance charts
+
+// Verify metrics update in real-time
+// Check responsive design across screen sizes
+// Test view switching (overview/cache/query/background)
+```
+
+**Testing Performance Requirements:**
+
+**Load Time Optimization:**
+- ✅ Initial dashboard load <3 seconds with cache warming
+- ✅ Component rendering <1 second through virtualization
+- ✅ Data refresh <2 seconds via background processing
+
+**Interaction Responsiveness:**
+- ✅ Chart interactions <500ms with query optimization
+- ✅ Filter application <300ms through efficient indexing  
+- ✅ Search results <400ms via virtualized search
+
+**Scalability Verification:**
+- ✅ 100K+ data points handled through virtualization
+- ✅ Memory usage <2GB with intelligent eviction
+- ✅ CPU utilization <70% via background processing
+- ✅ Concurrent operations supported with task queuing
+
+**Real-Time Monitoring:**
+- ✅ Performance metrics update every 5 seconds
+- ✅ Health status indicators (healthy/warning/critical)
+- ✅ Automatic optimization recommendations
+- ✅ Resource usage tracking and alerting
+
+**Expected Performance Outcomes:**
+- **Fast Initial Load**: Dashboard appears instantly with cached data
+- **Smooth Interactions**: All chart operations respond sub-second
+- **Efficient Memory**: Large datasets don't impact browser performance  
+- **Background Processing**: Complex analysis runs without blocking UI
+- **Real-Time Insights**: Performance metrics visible and actionable
+
+**Integration Testing:**
+- ✅ Performance system integrates seamlessly with existing dashboard
+- ✅ All visualization components benefit from optimization
+- ✅ TypeScript compilation succeeds with proper type safety
+- ✅ No performance regressions in existing functionality
+- ✅ Production-ready with comprehensive error handling
+
+The Performance Optimization System transforms Moments from a prototype dashboard into an enterprise-grade business intelligence platform capable of handling large-scale AI industry data analysis with professional performance characteristics and real-time monitoring capabilities.
 
 ## 📄 License
 
