@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>⚡ Moments repo has new home at https://github.com/navam-io/moments</h1>
+  <h1>⚡ Moments: New home https://github.com/navam-io/moments</h1>
   
   **AI-Powered Business Intelligence for the AI Industry**
   
